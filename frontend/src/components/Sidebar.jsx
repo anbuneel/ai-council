@@ -5,11 +5,17 @@ export default function Sidebar({
   currentConversationId,
   onSelectConversation,
   onNewConversation,
+  onDeleteConversation,
   onLogout,
 }) {
   // Determine if a case is "resolved" (has messages) or "in deliberation"
   const getCaseStatus = (conv) => {
     return conv.message_count > 0 ? 'resolved' : 'pending';
+  };
+
+  const handleDelete = (e, convId) => {
+    e.stopPropagation(); // Prevent selecting the conversation
+    onDeleteConversation(convId);
   };
 
   return (
@@ -24,18 +30,17 @@ export default function Sidebar({
       </div>
 
       <div className="case-list">
-         <div className="section-label">History</div>
-         {conversations.length === 0 ? (
-           <div className="no-cases">No conversations yet</div>
+        <div className="section-label">History</div>
+        {conversations.length === 0 ? (
+          <div className="no-cases">No conversations yet</div>
         ) : (
           conversations.map((conv) => {
             const status = getCaseStatus(conv);
             return (
               <div
                 key={conv.id}
-                className={`case-item ${
-                  conv.id === currentConversationId ? 'active' : ''
-                }`}
+                className={`case-item ${conv.id === currentConversationId ? 'active' : ''
+                  }`}
                 onClick={() => onSelectConversation(conv.id)}
               >
                 <span className={`case-status ${status}`} title={status === 'resolved' ? 'Completed' : 'In Progress'}></span>
@@ -47,6 +52,13 @@ export default function Sidebar({
                     {conv.message_count} {conv.message_count === 1 ? 'exchange' : 'exchanges'}
                   </div>
                 </div>
+                <button
+                  className="delete-btn"
+                  onClick={(e) => handleDelete(e, conv.id)}
+                  title="Delete conversation"
+                >
+                  ✕
+                </button>
               </div>
             );
           })
@@ -63,3 +75,4 @@ export default function Sidebar({
     </aside>
   );
 }
+
