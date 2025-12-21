@@ -305,12 +305,13 @@ async def delete_conversation(conversation_id: str) -> bool:
     # are deleted via foreign key cascades when messages are deleted.
     # Messages cascade when conversation is deleted.
 
-    result = await db.execute(
+    row = await db.fetchrow(
         """
         DELETE FROM conversations
         WHERE id = $1
+        RETURNING id
         """,
         conversation_id
     )
 
-    return result == "DELETE 1"
+    return row is not None
