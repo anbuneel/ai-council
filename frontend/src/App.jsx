@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import Login from './components/Login';
+import NewConversationModal from './components/NewConversationModal';
 import { api, hasCredentials, clearCredentials } from './api';
 import './App.css';
 
@@ -13,6 +14,14 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isNewConversationOpen, setIsNewConversationOpen] = useState(false);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [defaultModels, setDefaultModels] = useState([]);
+  const [defaultLeadModel, setDefaultLeadModel] = useState('');
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [modelsError, setModelsError] = useState('');
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   // Check for existing credentials on mount
   useEffect(() => {
@@ -93,22 +102,69 @@ function App() {
     setCurrentConversationId(null);
     setCurrentConversation(null);
     setIsSidebarOpen(false);
+    setIsNewConversationOpen(false);
+  };
+
+  const loadModelOptions = async () => {
+    setIsLoadingModels(true);
+    setModelsError('');
+    try {
+      const data = await api.listModels();
+      const models = data.models || [];
+      setAvailableModels(models);
+      setDefaultModels(data.default_models || models);
+      setDefaultLeadModel(data.default_lead_model || models[0] || '');
+    } catch (error) {
+      console.error('Failed to load models:', error);
+      if (error.message === 'Authentication failed') {
+        setIsAuthenticated(false);
+      } else {
+        setModelsError('Unable to load models.');
+      }
+    } finally {
+      setIsLoadingModels(false);
+    }
   };
 
   const handleNewConversation = async () => {
     try {
-      const newConv = await api.createConversation();
-      setConversations([
+      setCreateError('');
+      setIsNewConversationOpen(true);
+      if (availableModels.length === 0 && !isLoadingModels) {
+        await loadModelOptions();
+      }
+      setIsSidebarOpen(false);
+    } catch (error) {
+      console.error('Failed to open conversation modal:', error);
+    }
+  };
+
+  const handleCloseNewConversation = () => {
+    setIsNewConversationOpen(false);
+    setCreateError('');
+    setModelsError('');
+  };
+
+  const handleCreateConversation = async ({ models, lead_model }) => {
+    setIsCreatingConversation(true);
+    setCreateError('');
+    try {
+      const newConv = await api.createConversation({ models, lead_model });
+      setConversations((prev) => [
         { id: newConv.id, created_at: newConv.created_at, title: newConv.title, message_count: 0 },
-        ...conversations,
+        ...prev,
       ]);
       setCurrentConversationId(newConv.id);
-      setIsSidebarOpen(false);
+      setIsNewConversationOpen(false);
     } catch (error) {
       console.error('Failed to create conversation:', error);
       if (error.message === 'Authentication failed') {
         setIsAuthenticated(false);
+      } else {
+        setCreateError(error.message || 'Failed to create conversation.');
       }
+    } finally {
+      setIsCreatingConversation(false);
     }
   };
 
@@ -330,6 +386,18 @@ function App() {
         onClick={handleCloseSidebar}
         role="presentation"
         aria-hidden={!isSidebarOpen}
+      />
+      <NewConversationModal
+        isOpen={isNewConversationOpen}
+        onClose={handleCloseNewConversation}
+        onCreate={handleCreateConversation}
+        availableModels={availableModels}
+        defaultModels={defaultModels}
+        defaultLeadModel={defaultLeadModel}
+        isLoading={isLoadingModels}
+        loadError={modelsError}
+        submitError={createError}
+        isSubmitting={isCreatingConversation}
       />
     </div>
   );

@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import Stage1 from './Stage1';
 import Stage2 from './Stage2';
 import Stage3 from './Stage3';
-import CouncilInfoModal from './CouncilInfoModal';
 import './ChatInterface.css';
 
 export default function ChatInterface({
@@ -14,7 +13,8 @@ export default function ChatInterface({
     isSidebarOpen,
 }) {
     const [input, setInput] = useState('');
-    const [expandedStages, setExpandedStages] = useState({});
+    const [isQuestionCollapsed, setIsQuestionCollapsed] = useState(false);
+    const [activeTab, setActiveTab] = useState('final');
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -24,6 +24,14 @@ export default function ChatInterface({
     useEffect(() => {
         scrollToBottom();
     }, [conversation]);
+
+    useEffect(() => {
+        setIsQuestionCollapsed(false);
+    }, [conversation?.id]);
+
+    useEffect(() => {
+        setActiveTab('stage1');
+    }, [conversation?.id]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -41,34 +49,15 @@ export default function ChatInterface({
         }
     };
 
-    // State for modal
-    const [isCouncilInfoOpen, setIsCouncilInfoOpen] = useState(false);
-
-    const toggleStageExpansion = (key) => {
-        setExpandedStages(prev => ({
-            ...prev,
-            [key]: !prev[key]
-        }));
-    };
-
-    const getQuestionForAssistant = (messages, assistantIndex) => {
-        for (let i = assistantIndex - 1; i >= 0; i -= 1) {
-            if (messages[i]?.role === 'user') {
-                return messages[i].content;
-            }
-        }
-        return '';
-    };
-
     const getStatusDetails = (msg) => {
         if (msg.loading?.stage1) {
-            return { label: 'Gathering opinions', tone: 'pending' };
+            return { label: 'Gathering responses', tone: 'pending' };
         }
         if (msg.loading?.stage2) {
-            return { label: 'Peer review', tone: 'pending' };
+            return { label: 'Reviewing responses', tone: 'pending' };
         }
         if (msg.loading?.stage3) {
-            return { label: 'Final synthesis', tone: 'pending' };
+            return { label: 'Final answer', tone: 'pending' };
         }
         if (msg.stage3) {
             return { label: 'Finalized', tone: 'resolved' };
@@ -90,50 +79,49 @@ export default function ChatInterface({
         });
     };
 
+    const allMessages = conversation?.messages || [];
+    const userMessages = allMessages.filter((msg) => msg.role === 'user');
+    const assistantMessages = allMessages.filter((msg) => msg.role === 'assistant');
+    const questionText = userMessages[0]?.content || '';
+    const hasQuestion = userMessages.length > 0;
+    const latestAssistant = assistantMessages[assistantMessages.length - 1];
+    const status = latestAssistant ? getStatusDetails(latestAssistant) : { label: 'Pending', tone: 'pending' };
+    const lastUpdated = formatUpdatedAt(latestAssistant?.updated_at || conversation?.created_at);
+    const hasResponse = Boolean(latestAssistant);
+    const hasStage1 = Boolean(latestAssistant?.stage1?.length);
+    const hasStage2 = Boolean(latestAssistant?.stage2?.length);
+
+    useEffect(() => {
+        if (!latestAssistant) {
+            return;
+        }
+        if (latestAssistant?.loading?.stage1) {
+            setActiveTab('stage1');
+            return;
+        }
+        if (latestAssistant?.loading?.stage2) {
+            setActiveTab('stage2');
+            return;
+        }
+        if (latestAssistant?.loading?.stage3) {
+            setActiveTab('final');
+            return;
+        }
+        if (latestAssistant?.stage3) {
+            setActiveTab('final');
+        }
+    }, [latestAssistant]);
+
+    useEffect(() => {
+        if (conversation && latestAssistant?.stage3 && hasQuestion) {
+            setIsQuestionCollapsed(true);
+        }
+    }, [conversation, latestAssistant?.stage3, hasQuestion]);
+
     if (!conversation) {
         return (
             <div className="chat-interface">
-                <div className="chat-header">
-                    <div className="header-left">
-                        <button
-                            type="button"
-                            className="sidebar-toggle"
-                            onClick={onToggleSidebar}
-                            aria-label="Toggle conversations list"
-                            aria-expanded={isSidebarOpen}
-                            aria-controls="sidebar"
-                        >
-                            Menu
-                        </button>
-                        <div className="header-title">Council Docket</div>
-                    </div>
-                    <button
-                        className="council-info-btn"
-                        onClick={() => setIsCouncilInfoOpen(true)}
-                        title="View Council Members"
-                    >
-                        Council Info
-                    </button>
-                </div>
-
-                <div className="empty-state">
-                    <div className="empty-icon">DOCKET</div>
-                    <h2>Open a Docket</h2>
-                    <p>Start a new docket to request Council deliberation</p>
-                </div>
-
-                <CouncilInfoModal
-                    isOpen={isCouncilInfoOpen}
-                    onClose={() => setIsCouncilInfoOpen(false)}
-                />
-            </div>
-        );
-    }
-
-    return (
-        <div className="chat-interface">
-            <div className="chat-header">
-                <div className="header-left">
+                <div className="empty-toolbar">
                     <button
                         type="button"
                         className="sidebar-toggle"
@@ -144,158 +132,188 @@ export default function ChatInterface({
                     >
                         Menu
                     </button>
-                    <div className="header-title">Council Docket</div>
                 </div>
-                <button
-                    className="council-info-btn"
-                    onClick={() => setIsCouncilInfoOpen(true)}
-                    title="View Council Members"
-                >
-                    Council Info
-                </button>
+                <div className="empty-state">
+                    <div className="empty-icon">START</div>
+                    <h2>Ask a focused question</h2>
+                    <p>Pick your models, choose a lead, and submit a prompt to get a synthesized answer.</p>
+                </div>
+
+            </div>
+        );
+    }
+
+    return (
+        <div className="chat-interface">
+            <div className="question-panel">
+                <div className="panel-inner">
+                    <div className="question-panel-header">
+                        <button
+                            type="button"
+                            className="sidebar-toggle"
+                            onClick={onToggleSidebar}
+                            aria-label="Toggle conversations list"
+                            aria-expanded={isSidebarOpen}
+                            aria-controls="sidebar"
+                        >
+                            Menu
+                        </button>
+                        <div className="question-panel-title">Question</div>
+                        {hasQuestion && (
+                            <button
+                                type="button"
+                                className="question-toggle"
+                                onClick={() => setIsQuestionCollapsed((prev) => !prev)}
+                                aria-expanded={!isQuestionCollapsed}
+                            >
+                                {isQuestionCollapsed ? 'Expand' : 'Collapse'}
+                            </button>
+                        )}
+                    </div>
+                    {hasQuestion ? (
+                        <>
+                            {!isQuestionCollapsed && (
+                                <div className="question-panel-text markdown-content">
+                                    <ReactMarkdown>{questionText}</ReactMarkdown>
+                                </div>
+                            )}
+                            <div className="question-panel-meta">
+                                <span className={`question-status ${status.tone}`}>
+                                    {status.label}
+                                </span>
+                                {lastUpdated && (
+                                    <span className="last-updated">Updated {lastUpdated}</span>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <form className="question-form" onSubmit={handleSubmit}>
+                            <textarea
+                                className="message-input"
+                                placeholder="Ask a question... (Shift+Enter for new line)"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                disabled={isLoading}
+                                rows={4}
+                            />
+                            <button
+                                type="submit"
+                                className="send-button"
+                                disabled={!input.trim() || isLoading}
+                            >
+                                Send
+                            </button>
+                        </form>
+                    )}
+                </div>
             </div>
 
             <div className="docket-scroll">
-                {conversation.messages.length === 0 ? (
+                {!hasResponse ? (
                     <div className="empty-state">
-                        <div className="empty-icon">DOCKET</div>
-                        <h2>File a Question</h2>
-                        <p>Enter a question for the Council to evaluate</p>
+                        <div className="empty-icon">RESPONSE</div>
+                        <h2>Responses will appear here</h2>
+                        <p>Submit a question to start the run.</p>
                     </div>
                 ) : (
-                    conversation.messages.map((msg, index) => {
-                        if (msg.role !== "assistant") {
-                            return null;
-                        }
+                    <div className="response-panel">
+                        <div className="panel-inner">
+                            <div className="response-tabs" role="tablist" aria-label="Response tabs">
+                                <button
+                                    type="button"
+                                    className={`response-tab ${activeTab === 'final' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('final')}
+                                    role="tab"
+                                    aria-selected={activeTab === 'final'}
+                                >
+                                    Final Answer
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`response-tab ${activeTab === 'stage1' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('stage1')}
+                                    role="tab"
+                                    aria-selected={activeTab === 'stage1'}
+                                >
+                                    Stage 1
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`response-tab ${activeTab === 'stage2' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('stage2')}
+                                    role="tab"
+                                    aria-selected={activeTab === 'stage2'}
+                                >
+                                    Stage 2
+                                </button>
+                            </div>
 
-                        const questionText = getQuestionForAssistant(conversation.messages, index);
-                        const stageKey = `msg-${index}-deliberation`;
-                        const isExpanded = expandedStages[stageKey] || false;
-                        const totalOpinions = msg.stage1?.length || 0;
-                        const totalReviews = msg.stage2?.length || 0;
-                        const status = getStatusDetails(msg);
-                        const lastUpdated = formatUpdatedAt(msg.updated_at || conversation.created_at);
-                        const isDeliberationActive = msg.loading?.stage1 || msg.loading?.stage2;
-                        const detailsId = `docket-details-${index}`;
-
-                        return (
-                            <article key={index} className="docket-entry">
-                                <div className="docket-question">
-                                    <div className="question-label">Filed Question</div>
-                                    <div className="question-text markdown-content">
-                                        <ReactMarkdown>{questionText || "Question not available."}</ReactMarkdown>
-                                    </div>
-                                    <div className="docket-meta">
-                                        <span className={`question-status ${status.tone}`}>
-                                            {status.label}
-                                        </span>
-                                        {lastUpdated && (
-                                            <span className="last-updated">Updated {lastUpdated}</span>
+                            <div className="response-tab-panels">
+                                {activeTab === 'final' && (
+                                    <div className="response-tab-panel" role="tabpanel">
+                                        {latestAssistant?.loading?.stage3 && !latestAssistant?.stage3 && (
+                                            <div className="stage-loading">
+                                                <div className="spinner"></div>
+                                                <span>Synthesizing final answer...</span>
+                                            </div>
+                                        )}
+                                        {latestAssistant?.stage3 ? (
+                                            <Stage3 finalResponse={latestAssistant.stage3} />
+                                        ) : (
+                                            !latestAssistant?.loading?.stage3 && (
+                                                <div className="tab-empty">Final answer is pending.</div>
+                                            )
                                         )}
                                     </div>
-                                </div>
+                                )}
 
-                                <section className="docket-section docket-final">
-                                    {msg.loading?.stage3 && !msg.stage3 && (
-                                        <div className="stage-loading">
-                                            <div className="spinner"></div>
-                                            <span>Synthesizing final answer...</span>
-                                        </div>
-                                    )}
-
-                                    {msg.stage3 && <Stage3 finalResponse={msg.stage3} />}
-                                </section>
-
-                                <section className="docket-section docket-deliberation">
-                                    <button
-                                        className="docket-toggle"
-                                        onClick={() => toggleStageExpansion(stageKey)}
-                                        aria-expanded={isExpanded}
-                                        aria-controls={detailsId}
-                                        type="button"
-                                    >
-                                        <div className="toggle-left">
-                                            <span className="toggle-title">Deliberation Records</span>
-                                            {isDeliberationActive && (
-                                                <span className="toggle-status">In progress</span>
-                                            )}
-                                        </div>
-                                        <div className="toggle-right">
-                                            {totalOpinions > 0 && (
-                                                <span className="docket-pill">{totalOpinions} Opinions</span>
-                                            )}
-                                            {totalReviews > 0 && (
-                                                <span className="docket-pill">{totalReviews} Reviews</span>
-                                            )}
-                                            <span className="toggle-chevron">
-                                                {isExpanded ? "Hide" : "Show"}
-                                            </span>
-                                        </div>
-                                    </button>
-
-                                    {isExpanded && (
-                                        <div className="docket-details" id={detailsId} role="region" aria-label="Deliberation records">
-                                            <div className="docket-stage">
-                                                {msg.loading?.stage1 && !msg.stage1 && (
-                                                    <div className="stage-loading">
-                                                        <div className="spinner-small"></div>
-                                                        <span>Gathering perspectives...</span>
-                                                    </div>
-                                                )}
-                                                {msg.stage1 && <Stage1 responses={msg.stage1} />}
+                                {activeTab === 'stage1' && (
+                                    <div className="response-tab-panel" role="tabpanel">
+                                        {latestAssistant?.loading?.stage1 && !hasStage1 && (
+                                            <div className="stage-loading">
+                                                <div className="spinner-small"></div>
+                                                <span>Gathering responses...</span>
                                             </div>
+                                        )}
+                                        {hasStage1 ? (
+                                            <Stage1 responses={latestAssistant.stage1} />
+                                        ) : (
+                                            !latestAssistant?.loading?.stage1 && (
+                                                <div className="tab-empty">Stage 1 responses are pending.</div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
 
-                                            {(msg.stage2 || msg.loading?.stage2) && (
-                                                <div className="docket-stage">
-                                                    {msg.loading?.stage2 && !msg.stage2 && (
-                                                        <div className="stage-loading">
-                                                            <div className="spinner-small"></div>
-                                                            <span>Reviewing arguments...</span>
-                                                        </div>
-                                                    )}
-                                                    {msg.stage2 && (
-                                                        <Stage2
-                                                            rankings={msg.stage2}
-                                                            labelToModel={msg.metadata?.label_to_model}
-                                                            aggregateRankings={msg.metadata?.aggregate_rankings}
-                                                        />
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </section>
-                            </article>
-                        );
-                    })
+                                {activeTab === 'stage2' && (
+                                    <div className="response-tab-panel" role="tabpanel">
+                                        {latestAssistant?.loading?.stage2 && !hasStage2 && (
+                                            <div className="stage-loading">
+                                                <div className="spinner-small"></div>
+                                                <span>Reviewing responses...</span>
+                                            </div>
+                                        )}
+                                        {hasStage2 ? (
+                                            <Stage2
+                                                rankings={latestAssistant.stage2}
+                                                labelToModel={latestAssistant.metadata?.label_to_model}
+                                                aggregateRankings={latestAssistant.metadata?.aggregate_rankings}
+                                            />
+                                        ) : (
+                                            !latestAssistant?.loading?.stage2 && (
+                                                <div className="tab-empty">Stage 2 reviews are pending.</div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 <div ref={messagesEndRef} />
             </div>
-            <form className="input-form" onSubmit={handleSubmit}>
-                <textarea
-                    className="message-input"
-                    placeholder="File a question... (Shift+Enter for new line)"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    disabled={isLoading}
-                    rows={1}
-                    style={{ height: 'auto', minHeight: '44px' }}
-                />
-                <button
-                    type="submit"
-                    className="send-button"
-                    disabled={!input.trim() || isLoading}
-                >
-                    File
-                </button>
-            </form>
-
-            <CouncilInfoModal
-                isOpen={isCouncilInfoOpen}
-                onClose={() => setIsCouncilInfoOpen(false)}
-            />
         </div>
     );
 }

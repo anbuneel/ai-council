@@ -72,11 +72,11 @@ export default function Stage1({ responses }) {
   return (
     <div className="stage stage1">
       <div className="stage-heading">
-        <h3 className="stage-title">Stage I: First Opinions</h3>
-        <p className="stage-desc">Initial perspectives from each expert</p>
+        <h3 className="stage-title">Stage 1: Responses</h3>
+        <p className="stage-desc">Initial responses from each model</p>
       </div>
 
-      <div className="councilor-tabs" role="tablist" aria-label="Stage one opinions">
+      <div className="councilor-tabs" role="tablist" aria-label="Stage 1 responses">
         {responses.map((resp, index) => (
           <button
             key={index}
@@ -94,14 +94,14 @@ export default function Stage1({ responses }) {
             }}
           >
             <span className="councilor-letter">{getCouncilorLetter(index)}</span>
-            <span className="councilor-label">Expert {getCouncilorLetter(index)}</span>
+            <span className="councilor-label">Model {getCouncilorLetter(index)}</span>
           </button>
         ))}
       </div>
 
       <div className="councilor-content" role="tabpanel" id={panelId} aria-labelledby={`stage1-tab-${activeTab}`}>
         <div className="councilor-header">
-          <span className="councilor-badge">Expert {getCouncilorLetter(activeTab)}</span>
+          <span className="councilor-badge">Model {getCouncilorLetter(activeTab)}</span>
           <span className="model-identifier">{activeResponse.model}</span>
         </div>
 
