@@ -18,15 +18,22 @@ AUTH_PASSWORD = os.getenv("AUTH_PASSWORD")
 # CORS origins (comma-separated list)
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 
-# Council members - list of OpenRouter model identifiers
-COUNCIL_MODELS = [
+# Available models - list of OpenRouter model identifiers
+AVAILABLE_MODELS = [
     "openai/gpt-5.1",
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
 ]
 
-# Chairman model - synthesizes final response
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+# Default models used for new conversations
+DEFAULT_MODELS = list(AVAILABLE_MODELS)
+
+# Lead model - synthesizes final response
+DEFAULT_LEAD_MODEL = "google/gemini-3-pro-preview"
+
+# Backwards compatibility
+COUNCIL_MODELS = DEFAULT_MODELS
+CHAIRMAN_MODEL = DEFAULT_LEAD_MODEL
 
 # OpenRouter API endpoint
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"

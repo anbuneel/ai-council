@@ -59,27 +59,6 @@
 }
 
 
-.council-info-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(31, 36, 54, 0.5);
-  border: 1px solid var(--border-dim);
-  border-radius: 20px;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.council-info-btn:hover {
-  background: var(--bg-input);
-  border-color: var(--border-bright);
-  color: var(--text-primary);
-  transform: translateY(-1px);
-}
 
 .docket-scroll {
   flex: 1;
@@ -375,10 +354,6 @@
 
   .sidebar-toggle {
     display: inline-flex;
-  }
-
-  .council-info-btn {
-    padding: 8px 12px;
   }
 
   .docket-scroll {

@@ -10,7 +10,13 @@ import uuid
 import json
 import asyncio
 
-from .config import CORS_ORIGINS, DATABASE_URL
+from .config import (
+    CORS_ORIGINS,
+    DATABASE_URL,
+    AVAILABLE_MODELS,
+    DEFAULT_MODELS,
+    DEFAULT_LEAD_MODEL
+)
 from .auth import verify_credentials
 from .council import (
     run_full_council,
@@ -58,7 +64,8 @@ app.add_middleware(
 
 class CreateConversationRequest(BaseModel):
     """Request to create a new conversation."""
-    pass
+    models: List[str] | None = None
+    lead_model: str | None = None
 
 
 class SendMessageRequest(BaseModel):
@@ -82,6 +89,32 @@ class Conversation(BaseModel):
     messages: List[Dict[str, Any]]
 
 
+def validate_model_selection(
+    models: List[str] | None,
+    lead_model: str | None
+) -> tuple[List[str], str]:
+    selected_models = DEFAULT_MODELS if models is None else models
+    selected_lead = DEFAULT_LEAD_MODEL if lead_model is None else lead_model
+
+    unique_models = []
+    seen = set()
+    for model in selected_models:
+        if model not in AVAILABLE_MODELS:
+            raise HTTPException(status_code=400, detail=f"Unknown model: {model}")
+        if model not in seen:
+            unique_models.append(model)
+            seen.add(model)
+
+    if len(unique_models) < 2:
+        raise HTTPException(status_code=400, detail="Select at least two models")
+    if len(unique_models) > len(AVAILABLE_MODELS):
+        raise HTTPException(status_code=400, detail="Too many models selected")
+    if selected_lead not in AVAILABLE_MODELS:
+        raise HTTPException(status_code=400, detail=f"Unknown lead model: {selected_lead}")
+
+    return unique_models, selected_lead
+
+
 @app.get("/")
 async def root():
     """Health check endpoint."""
@@ -94,6 +127,16 @@ async def list_conversations(username: str = Depends(verify_credentials)):
     return await storage.list_conversations()
 
 
+@app.get("/api/models")
+async def list_models(username: str = Depends(verify_credentials)):
+    """List available models and defaults."""
+    return {
+        "models": AVAILABLE_MODELS,
+        "default_models": DEFAULT_MODELS,
+        "default_lead_model": DEFAULT_LEAD_MODEL
+    }
+
+
 @app.post("/api/conversations", response_model=Conversation)
 async def create_conversation(
     request: CreateConversationRequest,
@@ -101,7 +144,15 @@ async def create_conversation(
 ):
     """Create a new conversation."""
     conversation_id = str(uuid.uuid4())
-    conversation = await storage.create_conversation(conversation_id)
+    selected_models, selected_lead = validate_model_selection(
+        request.models,
+        request.lead_model
+    )
+    conversation = await storage.create_conversation(
+        conversation_id,
+        models=selected_models,
+        lead_model=selected_lead
+    )
     return conversation
 
 
@@ -147,6 +198,10 @@ async def send_message(
 
     # Check if this is the first message
     is_first_message = len(conversation["messages"]) == 0
+    selected_models, selected_lead = validate_model_selection(
+        conversation.get("models"),
+        conversation.get("lead_model")
+    )
 
     # Add user message
     await storage.add_user_message(conversation_id, request.content)
@@ -158,7 +213,9 @@ async def send_message(
 
     # Run the 3-stage council process
     stage1_results, stage2_results, stage3_result, metadata = await run_full_council(
-        request.content
+        request.content,
+        models=selected_models,
+        lead_model=selected_lead
     )
 
     # Add assistant message with all stages
@@ -195,6 +252,10 @@ async def send_message_stream(
 
     # Check if this is the first message
     is_first_message = len(conversation["messages"]) == 0
+    selected_models, selected_lead = validate_model_selection(
+        conversation.get("models"),
+        conversation.get("lead_model")
+    )
 
     async def event_generator():
         try:
@@ -208,18 +269,30 @@ async def send_message_stream(
 
             # Stage 1: Collect responses
             yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
-            stage1_results = await stage1_collect_responses(request.content)
+            stage1_results = await stage1_collect_responses(
+                request.content,
+                models=selected_models
+            )
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
 
             # Stage 2: Collect rankings
             yield f"data: {json.dumps({'type': 'stage2_start'})}\n\n"
-            stage2_results, label_to_model = await stage2_collect_rankings(request.content, stage1_results)
+            stage2_results, label_to_model = await stage2_collect_rankings(
+                request.content,
+                stage1_results,
+                models=selected_models
+            )
             aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
             yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings}})}\n\n"
 
             # Stage 3: Synthesize final answer
             yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
-            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results)
+            stage3_result = await stage3_synthesize_final(
+                request.content,
+                stage1_results,
+                stage2_results,
+                lead_model=selected_lead
+            )
             yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
 
             # Wait for title generation if it was started

@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from .config import DEFAULT_MODELS, DEFAULT_LEAD_MODEL
 from pathlib import Path
 
 # Local storage directory
@@ -20,14 +21,23 @@ def _get_conversation_path(conversation_id: str) -> Path:
     return DATA_DIR / f"{conversation_id}.json"
 
 
-async def create_conversation(conversation_id: str) -> Dict[str, Any]:
+async def create_conversation(
+    conversation_id: str,
+    models: List[str] | None = None,
+    lead_model: str | None = None
+) -> Dict[str, Any]:
     """Create a new conversation."""
     _ensure_data_dir()
+
+    selected_models = list(DEFAULT_MODELS) if models is None else models
+    selected_lead = DEFAULT_LEAD_MODEL if lead_model is None else lead_model
 
     conversation = {
         "id": conversation_id,
         "created_at": datetime.utcnow().isoformat(),
         "title": "New Conversation",
+        "models": selected_models,
+        "lead_model": selected_lead,
         "messages": []
     }
 
@@ -45,7 +55,10 @@ async def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
         return None
 
     with open(path, 'r') as f:
-        return json.load(f)
+        conversation = json.load(f)
+        conversation.setdefault("models", list(DEFAULT_MODELS))
+        conversation.setdefault("lead_model", DEFAULT_LEAD_MODEL)
+        return conversation
 
 
 async def list_conversations() -> List[Dict[str, Any]]:

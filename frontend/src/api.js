@@ -79,16 +79,45 @@ export const api = {
   /**
    * Create a new conversation.
    */
-  async createConversation() {
+  async createConversation(options = {}) {
     const response = await fetchWithAuth(`${API_BASE}/api/conversations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify(options),
     });
     if (!response.ok) {
-      throw new Error('Failed to create conversation');
+      let message = 'Failed to create conversation';
+      try {
+        const data = await response.json();
+        if (data?.detail) {
+          message = data.detail;
+        }
+      } catch (err) {
+        // ignore JSON parse errors
+      }
+      throw new Error(message);
+    }
+    return response.json();
+  },
+
+  /**
+   * List available models and defaults.
+   */
+  async listModels() {
+    const response = await fetchWithAuth(`${API_BASE}/api/models`);
+    if (!response.ok) {
+      let message = 'Failed to load models';
+      try {
+        const data = await response.json();
+        if (data?.detail) {
+          message = data.detail;
+        }
+      } catch (err) {
+        // ignore JSON parse errors
+      }
+      throw new Error(message);
     }
     return response.json();
   },

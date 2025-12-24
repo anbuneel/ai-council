@@ -4,9 +4,31 @@ import json
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from . import database as db
+from .config import DEFAULT_MODELS, DEFAULT_LEAD_MODEL
+
+_schema_ready = False
 
 
-async def create_conversation(conversation_id: str) -> Dict[str, Any]:
+async def ensure_schema():
+    """Ensure conversation settings columns exist."""
+    global _schema_ready
+    if _schema_ready:
+        return
+    await db.execute(
+        """
+        ALTER TABLE conversations
+        ADD COLUMN IF NOT EXISTS models JSONB,
+        ADD COLUMN IF NOT EXISTS lead_model TEXT
+        """
+    )
+    _schema_ready = True
+
+
+async def create_conversation(
+    conversation_id: str,
+    models: List[str] | None = None,
+    lead_model: str | None = None
+) -> Dict[str, Any]:
     """
     Create a new conversation.
 
@@ -16,22 +38,29 @@ async def create_conversation(conversation_id: str) -> Dict[str, Any]:
     Returns:
         New conversation dict
     """
+    await ensure_schema()
     created_at = datetime.utcnow()
+    selected_models = list(DEFAULT_MODELS) if models is None else models
+    selected_lead = DEFAULT_LEAD_MODEL if lead_model is None else lead_model
 
     await db.execute(
         """
-        INSERT INTO conversations (id, title, created_at, updated_at)
-        VALUES ($1, $2, $3, $3)
+        INSERT INTO conversations (id, title, created_at, updated_at, models, lead_model)
+        VALUES ($1, $2, $3, $3, $4, $5)
         """,
         conversation_id,
         "New Conversation",
-        created_at
+        created_at,
+        selected_models,
+        selected_lead
     )
 
     return {
         "id": conversation_id,
         "created_at": created_at.isoformat(),
         "title": "New Conversation",
+        "models": selected_models,
+        "lead_model": selected_lead,
         "messages": []
     }
 
@@ -47,9 +76,10 @@ async def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
         Conversation dict or None if not found
     """
     # Get conversation metadata
+    await ensure_schema()
     conv_row = await db.fetchrow(
         """
-        SELECT id, title, created_at
+        SELECT id, title, created_at, models, lead_model
         FROM conversations
         WHERE id = $1
         """,
@@ -58,6 +88,15 @@ async def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
 
     if not conv_row:
         return None
+
+    raw_models = conv_row["models"]
+    if isinstance(raw_models, str):
+        try:
+            raw_models = json.loads(raw_models)
+        except json.JSONDecodeError:
+            raw_models = None
+    models = raw_models if raw_models else list(DEFAULT_MODELS)
+    lead_model = conv_row["lead_model"] or DEFAULT_LEAD_MODEL
 
     # Get all messages for this conversation
     message_rows = await db.fetch(
@@ -130,6 +169,8 @@ async def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
         "id": str(conv_row["id"]),
         "created_at": conv_row["created_at"].isoformat(),
         "title": conv_row["title"],
+        "models": models,
+        "lead_model": lead_model,
         "messages": messages
     }
 
