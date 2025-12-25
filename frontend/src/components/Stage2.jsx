@@ -43,9 +43,9 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
   return (
     <div className="stage stage2">
       <div className="stage-heading">
-        <h3 className="stage-title">Stage II: Peer Review</h3>
+        <h3 className="stage-title">Stage 2: Review</h3>
         <p className="stage-desc">
-          Each expert evaluated all responses anonymously and provided rankings.
+          Each model evaluated all responses anonymously and ranked them.
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
           </p>
         </div>
 
-        <div className="review-list" aria-label="Peer evaluations">
+        <div className="review-list" aria-label="Model evaluations">
           {rankings.map((rank, index) => {
             const isExpanded = expandedReviews[index] || false;
             const reviewId = `stage2-review-${index}`;
@@ -123,7 +123,7 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                   <div className="reviewer-left">
                     <span className="reviewer-letter">{getCouncilorLetter(index)}</span>
                     <div className="reviewer-meta">
-                      <span className="reviewer-name">Expert {getCouncilorLetter(index)}</span>
+                      <span className="reviewer-name">Model {getCouncilorLetter(index)}</span>
                       <span className="reviewer-model">{rank.model}</span>
                     </div>
                   </div>

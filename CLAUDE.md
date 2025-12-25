@@ -77,7 +77,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 
 ### Backend (`backend/`)
 - `main.py` - FastAPI server, runs on port 8080 (Fly.io) or 8080 (local)
-- `config.py` - `COUNCIL_MODELS`, `CHAIRMAN_MODEL`, `CORS_ORIGINS`, `DATABASE_URL`
+- `config.py` - `AVAILABLE_MODELS`, `DEFAULT_MODELS`, `DEFAULT_LEAD_MODEL`, `CORS_ORIGINS`, `DATABASE_URL`
 - `council.py` - Core logic: stage1/2/3, parsing, aggregation
 - `openrouter.py` - OpenRouter API wrapper, parallel queries
 - `storage.py` - PostgreSQL storage (production)
@@ -92,7 +92,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `components/Stage2.jsx` - Peer review summary, leaderboard, expandable reviews
 - `components/Stage3.jsx` - Final opinion (chairman synthesis)
 - `components/Sidebar.jsx` - Docket list (conversation history) and mobile drawer
-- `components/CouncilInfoModal.jsx` - Council roster modal
+- `components/NewConversationModal.jsx` - Model selection modal for new conversations
 - `components/RightPanel.jsx` - Legacy council panel (currently unused)
 - `components/ProgressOrbit.jsx` - Legacy stage stepper (currently unused)
 - `api.js` - Backend communication with SSE streaming support
@@ -168,6 +168,25 @@ All ReactMarkdown must be wrapped: `<div className="markdown-content">`
 
 ## API Endpoints
 
+### GET `/api/models`
+Returns available models and defaults:
+```json
+{
+  "models": ["openai/gpt-5.1", "..."],
+  "default_models": ["openai/gpt-5.1", "..."],
+  "default_lead_model": "google/gemini-3-pro-preview"
+}
+```
+
+### POST `/api/conversations`
+Create a new conversation with optional model selection:
+```json
+{
+  "models": ["openai/gpt-5.1", "..."],
+  "lead_model": "google/gemini-3-pro-preview"
+}
+```
+
 ### POST `/api/conversations/{id}/message`
 Non-streaming request:
 ```json
@@ -226,9 +245,9 @@ User Query
   -> Stage 1: Parallel queries to all models -> individual responses
   -> Stage 2: Anonymize -> parallel ranking queries -> evaluations + parsed rankings
   -> Calculate aggregate rankings (avg position)
-  -> Stage 3: Chairman synthesizes with full context
+  -> Stage 3: Lead model synthesizes with full context
   -> Return all stages + metadata to frontend (streaming or non-streaming)
-  -> Frontend displays docket entries, leaderboard, final opinion
+  -> Frontend displays conversation entries, leaderboard, final answer
   -> Save to Supabase database (via storage.py)
 ```
 
@@ -240,14 +259,16 @@ All stages are async/parallel where possible to minimize latency.
 
 Edit `backend/config.py`:
 ```python
-COUNCIL_MODELS = [
+AVAILABLE_MODELS = [
     "openai/gpt-5.1",
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
     "x-ai/grok-4",
 ]
 
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+DEFAULT_MODELS = list(AVAILABLE_MODELS)
+
+DEFAULT_LEAD_MODEL = "google/gemini-3-pro-preview"
 ```
 
 Use OpenRouter model identifiers. Verify with `test_openrouter.py` before adding.
@@ -259,7 +280,7 @@ Use OpenRouter model identifiers. Verify with `test_openrouter.py` before adding
 ### Production (Supabase PostgreSQL)
 - Enabled when `DATABASE_URL` is set
 - Uses `storage.py` with asyncpg connection pool
-- Conversation schema: `{id, created_at, title, messages[]}`
+- Conversation schema: `{id, created_at, title, models[], lead_model, messages[]}`
 - Message schema:
   - User: `{role, content}`
   - Assistant: `{role, stage1, stage2, stage3}`

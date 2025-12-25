@@ -36,20 +36,19 @@ export default function Sidebar({
   };
 
   return (
-    <aside className={`sidebar ${isOpen ? 'open' : ''}`} id="sidebar" aria-label="Docket list">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`} id="sidebar" aria-label="Conversation list">
       <div className="sidebar-header">
         <h1 className="sidebar-title">AI Council</h1>
-        <p className="sidebar-tagline">Where AI Minds Convene</p>
         <button className="new-case-btn" onClick={handleNewConversation}>
           <span className="btn-icon">+</span>
-          <span>New Docket</span>
+          <span>New Conversation</span>
         </button>
       </div>
 
       <div className="case-list">
-        <div className="section-label">Dockets</div>
+        <div className="section-label">Conversations</div>
         {conversations.length === 0 ? (
-          <div className="no-cases">No dockets yet</div>
+          <div className="no-cases">No conversations yet</div>
         ) : (
           conversations.map((conv) => {
             const status = getCaseStatus(conv);
@@ -63,7 +62,7 @@ export default function Sidebar({
                 <span className={`case-status ${status}`} title={status === 'resolved' ? 'Completed' : 'In Progress'}></span>
                 <div className="case-content">
                   <div className="case-title">
-                    {conv.title || 'Untitled Docket'}
+                    {conv.title || 'Untitled Conversation'}
                   </div>
                   <div className="case-meta">
                     {conv.message_count} {conv.message_count === 1 ? 'entry' : 'entries'}
