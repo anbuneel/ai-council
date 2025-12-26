@@ -1,6 +1,6 @@
 /* ==========================================================================
    Stage 2: Peer Review - "The Paper of Record" Theme
-   Rankings and individual evaluations
+   Rankings and individual evaluations with tabbed navigation
    ========================================================================== */
 
 .stage2 {
@@ -171,7 +171,7 @@
 }
 
 /* ==========================================================================
-   Individual Evaluations - Accordion cards
+   Individual Evaluations - Tabbed navigation (matching Stage 1)
    ========================================================================== */
 .evaluations-section {
   margin-top: 1.5rem;
@@ -198,105 +198,115 @@
   color: var(--ink-light);
 }
 
-.review-list {
+/* Reviewer tabs - pill navigation (matching Stage 1) */
+.reviewer-tabs {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
 }
 
-/* Review card accordion */
-.review-card {
-  border: 1px solid var(--paper-border);
-  border-radius: var(--radius-md);
-  background: var(--paper-cream);
-  overflow: hidden;
-  transition: all var(--transition-fast);
-}
-
-.review-card:hover {
-  border-color: var(--ink-faint);
-}
-
-.review-card.expanded {
-  border-color: var(--accent-vermillion);
-}
-
-.review-header {
-  width: 100%;
+.reviewer-tab {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  background: none;
-  border: none;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--paper-aged);
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-sm);
   color: var(--ink-medium);
   cursor: pointer;
   font-family: var(--font-ui);
-  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: all var(--transition-normal);
 }
 
-.review-header:hover {
-  background: var(--paper-aged);
+.reviewer-tab:hover {
+  background: var(--paper-shadow);
+  border-color: var(--ink-faint);
   color: var(--ink-dark);
 }
 
-.reviewer-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.reviewer-tab.active {
+  background: var(--ink-black);
+  color: var(--paper-cream);
+  border-color: var(--ink-black);
 }
 
 .reviewer-letter {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
+  background: var(--paper-shadow);
   border-radius: 50%;
-  background: var(--paper-aged);
-  color: var(--ink-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-sm);
+}
+
+.reviewer-tab.active .reviewer-letter {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.reviewer-label {
+  display: none;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+@media (min-width: 640px) {
+  .reviewer-label {
+    display: inline;
+  }
+}
+
+/* Reviewer content panel (matching Stage 1) */
+.reviewer-content {
+  background: var(--paper-aged);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--paper-border);
 }
 
-.reviewer-meta {
+.reviewer-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  text-align: left;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--paper-border);
 }
 
-.reviewer-name {
-  font-size: var(--text-sm);
+.reviewer-badge {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--ink-dark);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
 }
 
-.reviewer-model {
+.model-identifier {
   font-size: var(--text-xs);
   font-family: var(--font-mono);
   color: var(--ink-light);
+  word-break: break-word;
 }
 
-.review-toggle {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-  color: var(--accent-vermillion);
-  font-weight: 500;
+/* Evaluation preview */
+.evaluation-preview {
+  font-family: var(--font-body);
+  color: var(--ink-medium);
+  line-height: var(--leading-normal);
+  margin-bottom: 1rem;
+  font-size: var(--text-sm);
 }
 
-/* Expanded review body */
-.review-body {
-  padding: 1rem 1.25rem 1.25rem;
-  border-top: 1px solid var(--paper-border);
-  background: var(--paper-aged);
-  animation: fadeIn 200ms ease-out;
-}
-
+/* Full evaluation text */
 .evaluation-text {
   font-family: var(--font-body);
   color: var(--ink-dark);
@@ -306,6 +316,28 @@
 
 .evaluation-text.markdown-content {
   padding: 0;
+}
+
+/* Expand/collapse toggle */
+.evaluation-toggle {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--paper-border);
+  color: var(--accent-vermillion);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.evaluation-toggle:hover {
+  border-color: var(--accent-vermillion);
+  background: var(--accent-vermillion-bg);
 }
 
 /* Extracted ranking list */
@@ -357,18 +389,24 @@
     font-size: var(--text-xs);
   }
 
-  .review-header {
+  .reviewer-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+
+  .reviewer-tab {
+    flex-shrink: 0;
+  }
+
+  .reviewer-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
   }
 
-  .reviewer-left {
-    width: 100%;
-  }
-
-  .review-toggle {
-    align-self: flex-start;
+  .reviewer-content {
+    padding: 1rem;
   }
 
   .council-standing {

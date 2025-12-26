@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Stage 1: Expert Responses - Accordion Cards (matching Stage 2)
+   Stage 1: Expert Responses - "The Paper of Record" Theme
+   Individual expert opinions in card format
    ========================================================================== */
 
 .stage1 {
@@ -35,135 +36,170 @@
   font-style: italic;
 }
 
-/* ==========================================================================
-   Response Cards - Accordion style (matching Stage 2 review cards)
-   ========================================================================== */
-.response-list {
+/* Expert tabs - pill navigation */
+.councilor-tabs {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
 }
 
-.response-card {
-  border: 1px solid var(--paper-border);
-  border-radius: var(--radius-md);
-  background: var(--paper-cream);
-  overflow: hidden;
-  transition: all var(--transition-fast);
-}
-
-.response-card:hover {
-  border-color: var(--ink-faint);
-}
-
-.response-card.expanded {
-  border-color: var(--accent-vermillion);
-}
-
-.response-header {
-  width: 100%;
+.councilor-tab {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  background: none;
-  border: none;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--paper-aged);
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-sm);
   color: var(--ink-medium);
   cursor: pointer;
   font-family: var(--font-ui);
-  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: all var(--transition-normal);
 }
 
-.response-header:hover {
-  background: var(--paper-aged);
+.councilor-tab:hover {
+  background: var(--paper-shadow);
+  border-color: var(--ink-faint);
   color: var(--ink-dark);
 }
 
-.responder-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.councilor-tab.active {
+  background: var(--ink-black);
+  color: var(--paper-cream);
+  border-color: var(--ink-black);
 }
 
-.responder-letter {
-  width: 28px;
-  height: 28px;
+.councilor-letter {
+  width: 22px;
+  height: 22px;
+  background: var(--paper-shadow);
   border-radius: 50%;
-  background: var(--paper-aged);
-  color: var(--ink-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-sm);
+}
+
+.councilor-tab.active .councilor-letter {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.councilor-label {
+  display: none;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+@media (min-width: 640px) {
+  .councilor-label {
+    display: inline;
+  }
+}
+
+/* Expert content panel */
+.councilor-content {
+  background: var(--paper-aged);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--paper-border);
 }
 
-.responder-meta {
+.councilor-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  text-align: left;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--paper-border);
 }
 
-.responder-name {
-  font-size: var(--text-sm);
+.councilor-badge {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--ink-dark);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
 }
 
-.responder-model {
+.model-identifier {
   font-size: var(--text-xs);
   font-family: var(--font-mono);
   color: var(--ink-light);
+  word-break: break-word;
 }
 
-.response-toggle {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-  color: var(--accent-vermillion);
-  font-weight: 500;
+/* Response preview */
+.response-preview {
+  font-family: var(--font-body);
+  color: var(--ink-medium);
+  line-height: var(--leading-normal);
+  margin-bottom: 1rem;
+  font-size: var(--text-sm);
 }
 
-/* Expanded response body */
-.response-body {
-  padding: 1rem 1.25rem 1.25rem;
-  border-top: 1px solid var(--paper-border);
-  background: var(--paper-aged);
-  animation: fadeIn 200ms ease-out;
-}
-
+/* Full response text */
 .response-text {
   font-family: var(--font-body);
   color: var(--ink-dark);
   line-height: var(--leading-relaxed);
-  font-size: var(--text-sm);
 }
 
 .response-text.markdown-content {
   padding: 0;
 }
 
-/* Mobile responsive */
+/* Expand/collapse toggle */
+.response-toggle {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--paper-border);
+  color: var(--accent-vermillion);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.response-toggle:hover {
+  border-color: var(--accent-vermillion);
+  background: var(--accent-vermillion-bg);
+}
+
+/* Mobile adjustments */
 @media (max-width: 767px) {
   .stage1 {
     padding: 1rem;
   }
 
-  .response-header {
+  .councilor-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+
+  .councilor-tab {
+    flex-shrink: 0;
+  }
+
+  .councilor-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
   }
 
-  .responder-left {
-    width: 100%;
-  }
-
-  .response-toggle {
-    align-self: flex-start;
+  .councilor-content {
+    padding: 1rem;
   }
 }
