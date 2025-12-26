@@ -52,20 +52,44 @@ function App() {
     }
   }, [currentConversationId]);
 
+  // Keyboard shortcuts and escape handling
   useEffect(() => {
-    if (!isSidebarOpen) {
-      return undefined;
-    }
-
     const handleKeyDown = (event) => {
+      // Escape key - close sidebar or modal
       if (event.key === 'Escape') {
-        setIsSidebarOpen(false);
+        if (isNewConversationOpen) {
+          setIsNewConversationOpen(false);
+        } else if (isSidebarOpen) {
+          setIsSidebarOpen(false);
+        }
+        return;
+      }
+
+      // Don't trigger shortcuts when typing in input/textarea
+      const target = event.target;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
+      const isMod = event.metaKey || event.ctrlKey;
+
+      // Cmd/Ctrl + K - Toggle archive drawer
+      if (isMod && event.key === 'k') {
+        event.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+        return;
+      }
+
+      // Cmd/Ctrl + N - New conversation
+      if (isMod && event.key === 'n') {
+        event.preventDefault();
+        handleNewConversation();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, isNewConversationOpen]);
 
   const loadConversations = async () => {
     try {

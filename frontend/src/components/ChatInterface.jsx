@@ -126,16 +126,17 @@ export default function ChatInterface({
                         type="button"
                         className="sidebar-toggle"
                         onClick={onToggleSidebar}
-                        aria-label="Open archive"
+                        aria-label="Open archive (Ctrl+K)"
                         aria-expanded={isSidebarOpen}
                         aria-controls="sidebar"
+                        title="Open archive (Ctrl+K)"
                     >
                         Archive
                     </button>
                     <h1 className="masthead-title">The AI Council</h1>
                     <div className="masthead-spacer" />
                 </header>
-                <div className="empty-state">
+                <div className="empty-state reveal-stagger">
                     <div className="empty-icon">NEW INQUIRY</div>
                     <h2>Submit Your Question</h2>
                     <p>Select your models and pose a question to receive synthesized insights from the Council.</p>
@@ -151,9 +152,10 @@ export default function ChatInterface({
                     type="button"
                     className="sidebar-toggle"
                     onClick={onToggleSidebar}
-                    aria-label="Open archive"
+                    aria-label="Open archive (Ctrl+K)"
                     aria-expanded={isSidebarOpen}
                     aria-controls="sidebar"
+                    title="Open archive (Ctrl+K)"
                 >
                     Archive
                 </button>
@@ -217,13 +219,13 @@ export default function ChatInterface({
 
             <div className="docket-scroll">
                 {!hasResponse ? (
-                    <div className="empty-state">
+                    <div className="empty-state reveal-stagger">
                         <div className="empty-icon">RESPONSE</div>
                         <h2>Responses will appear here</h2>
                         <p>Submit a question to start the run.</p>
                     </div>
                 ) : (
-                    <div className="response-panel">
+                    <div className="response-panel reveal-stagger">
                         <div className="panel-inner">
                             <div className="response-tabs" role="tablist" aria-label="Response tabs">
                                 <button
@@ -259,9 +261,22 @@ export default function ChatInterface({
                                 {activeTab === 'final' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage3 && !latestAssistant?.stage3 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner"></div>
-                                                <span>Synthesizing final answer...</span>
+                                            <div className="skeleton-card">
+                                                <div className="skeleton-card-header">
+                                                    <div className="skeleton skeleton-icon"></div>
+                                                    <div className="skeleton-header-text">
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="skeleton-paragraph">
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                </div>
+                                                <p className="skeleton-status">Synthesizing final answer...</p>
                                             </div>
                                         )}
                                         {latestAssistant?.stage3 ? (
@@ -277,9 +292,20 @@ export default function ChatInterface({
                                 {activeTab === 'stage1' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage1 && !hasStage1 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner-small"></div>
-                                                <span>Gathering responses...</span>
+                                            <div className="skeleton-stage">
+                                                <div className="skeleton-tabs">
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                </div>
+                                                <div className="skeleton-content-box">
+                                                    <div className="skeleton-paragraph">
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                    </div>
+                                                </div>
+                                                <p className="skeleton-status">Gathering responses...</p>
                                             </div>
                                         )}
                                         {hasStage1 ? (
@@ -295,9 +321,22 @@ export default function ChatInterface({
                                 {activeTab === 'stage2' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage2 && !hasStage2 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner-small"></div>
-                                                <span>Reviewing responses...</span>
+                                            <div className="skeleton-stage">
+                                                <div className="skeleton-ranking-list">
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                </div>
+                                                <p className="skeleton-status">Reviewing responses...</p>
                                             </div>
                                         )}
                                         {hasStage2 ? (

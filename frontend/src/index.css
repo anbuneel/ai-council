@@ -470,3 +470,167 @@ select:focus-visible {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ==========================================================================
+   Skeleton Loading States
+   ========================================================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--paper-aged) 0%,
+    var(--paper-shadow) 50%,
+    var(--paper-aged) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.75em;
+}
+
+.skeleton-text:last-child {
+  width: 60%;
+  margin-bottom: 0;
+}
+
+.skeleton-title {
+  height: 1.5em;
+  width: 40%;
+  margin-bottom: 1em;
+}
+
+.skeleton-paragraph {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-line {
+  height: 0.875rem;
+  border-radius: 3px;
+}
+
+.skeleton-line:nth-child(1) { width: 100%; }
+.skeleton-line:nth-child(2) { width: 95%; }
+.skeleton-line:nth-child(3) { width: 90%; }
+.skeleton-line:nth-child(4) { width: 85%; }
+.skeleton-line:nth-child(5) { width: 70%; }
+
+/* Skeleton card for Stage 3 */
+.skeleton-card {
+  padding: 2rem;
+  background: var(--paper-cream);
+  border-top: 3px solid var(--paper-border);
+  border-bottom: 3px solid var(--paper-border);
+}
+
+.skeleton-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--paper-border);
+}
+
+.skeleton-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-header-text {
+  flex: 1;
+}
+
+.skeleton-header-text .skeleton-line:first-child {
+  height: 1.25rem;
+  width: 50%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-header-text .skeleton-line:last-child {
+  height: 0.75rem;
+  width: 30%;
+}
+
+/* Skeleton for tabs/pills */
+.skeleton-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-tab {
+  height: 36px;
+  width: 80px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skeleton for stage content */
+.skeleton-stage {
+  padding: 1.5rem;
+  background: var(--paper-cream);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--paper-border);
+}
+
+.skeleton-content-box {
+  padding: 1.25rem;
+  background: var(--paper-aged);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--paper-border);
+}
+
+.skeleton-status {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--ink-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skeleton-status::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--paper-border);
+  border-top-color: var(--accent-vermillion);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Skeleton ranking list (Stage 2) */
+.skeleton-ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--paper-aged);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--paper-border);
+}
+
+.skeleton-ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--paper-cream);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--paper-border);
+}
+
+.skeleton-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

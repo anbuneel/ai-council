@@ -344,6 +344,16 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - Stage 1 tabs support Arrow/Home/End keys
 - Toggle buttons use `aria-expanded` and `aria-controls`
 
+### Keyboard Shortcuts
+- `Ctrl/Cmd + K` - Toggle archive drawer
+- `Ctrl/Cmd + N` - New conversation
+- `Escape` - Close drawer or modal
+
+### Loading States
+- Skeleton loaders with shimmer animation for Stage 3, Stage 1, and Stage 2
+- Status text with spinner during each stage
+- Staggered reveal animations on page load
+
 ---
 
 ## Quick Links

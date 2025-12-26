@@ -93,6 +93,12 @@ npm run dev
 
 Then open http://localhost:5173 in your browser.
 
+### Keyboard Shortcuts
+
+- `Ctrl/Cmd + K` - Toggle archive drawer
+- `Ctrl/Cmd + N` - New conversation
+- `Escape` - Close drawer or modal
+
 ## Tech Stack
 
 - Backend: FastAPI (Python 3.10+), Uvicorn, asyncpg, OpenRouter API
