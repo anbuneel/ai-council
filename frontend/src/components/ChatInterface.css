@@ -56,7 +56,7 @@
    Question/Inquiry Panel - Dynamic height with overflow detection
    ========================================================================== */
 .question-panel {
-  border-bottom: 1px solid var(--paper-border);
+  border-bottom: 2px solid var(--ink-black);
   background: var(--paper-cream);
   padding: 0.75rem var(--container-padding);
 }
