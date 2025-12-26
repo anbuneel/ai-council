@@ -5,7 +5,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate UI redesign proposal with implementation status and design decision\n\n- Mark all phases as complete with checkboxes\n- Document tab-based navigation design decision\n- Note mobile touch gestures as deferred \\(non-critical\\)\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

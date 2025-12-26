@@ -238,15 +238,21 @@
   box-shadow: none;
 }
 
+/* Response tabs bar - fixed above scroll area */
+.response-tabs-bar {
+  flex-shrink: 0;
+  background: var(--paper-cream);
+  border-bottom: 1px solid var(--paper-border);
+  padding: 0.75rem var(--container-padding) 1rem;
+}
+
 /* Response tabs - editorial section headers */
 .response-tabs {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 0;
-  background: var(--paper-cream);
-  border-bottom: 1px solid var(--paper-border);
-  padding: 0.75rem 0 1rem;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
 }
 
 .response-tab {

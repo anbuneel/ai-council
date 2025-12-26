@@ -217,6 +217,40 @@ export default function ChatInterface({
                 </div>
             </div>
 
+            {hasResponse && (
+                <div className="response-tabs-bar">
+                    <div className="response-tabs" role="tablist" aria-label="Response tabs">
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'final' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('final')}
+                            role="tab"
+                            aria-selected={activeTab === 'final'}
+                        >
+                            Final Answer
+                        </button>
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'stage1' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('stage1')}
+                            role="tab"
+                            aria-selected={activeTab === 'stage1'}
+                        >
+                            Stage 1
+                        </button>
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'stage2' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('stage2')}
+                            role="tab"
+                            aria-selected={activeTab === 'stage2'}
+                        >
+                            Stage 2
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="docket-scroll">
                 {!hasResponse ? (
                     <div className="empty-state reveal-stagger">
@@ -227,36 +261,6 @@ export default function ChatInterface({
                 ) : (
                     <div className="response-panel reveal-stagger">
                         <div className="panel-inner">
-                            <div className="response-tabs" role="tablist" aria-label="Response tabs">
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'final' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('final')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'final'}
-                                >
-                                    Final Answer
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'stage1' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('stage1')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'stage1'}
-                                >
-                                    Stage 1
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'stage2' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('stage2')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'stage2'}
-                                >
-                                    Stage 2
-                                </button>
-                            </div>
-
                             <div className="response-tab-panels">
                                 {activeTab === 'final' && (
                                     <div className="response-tab-panel" role="tabpanel">
@@ -356,7 +360,6 @@ export default function ChatInterface({
                         </div>
                     </div>
                 )}
-
                 <div ref={messagesEndRef} />
             </div>
         </div>
