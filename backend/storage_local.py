@@ -269,8 +269,13 @@ async def save_user_api_key(
         with open(path, 'r') as f:
             keys = json.load(f)
 
+    # Generate an ID if this is a new key
+    existing_id = keys.get(provider, {}).get("id")
+    key_id = existing_id if existing_id else str(uuid4())
+
     # Upsert the key
     keys[provider] = {
+        "id": key_id,
         "user_id": str(user_id),
         "provider": provider,
         "encrypted_key": encrypted_key,
