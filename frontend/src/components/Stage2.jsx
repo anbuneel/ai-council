@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './Stage2.css';
 
@@ -18,8 +18,9 @@ function deAnonymizeText(text, labelToModel) {
 }
 
 export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
+  const [activeTab, setActiveTab] = useState(0);
   const [showAllRankings, setShowAllRankings] = useState(false);
-  const [expandedReviews, setExpandedReviews] = useState({});
+  const tabsRef = useRef([]);
 
   if (!rankings || rankings.length === 0) {
     return null;
@@ -33,11 +34,36 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
   const canToggleRankings = hasAggregate && aggregateRankings.length > 3;
   const standingsId = 'stage2-standings';
 
-  const toggleReview = (index) => {
-    setExpandedReviews((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const activeRanking = rankings[activeTab];
+  const evaluationText = deAnonymizeText(activeRanking.ranking, labelToModel);
+  const panelId = `stage2-panel-${activeTab}`;
+
+  const handleTabKeyDown = (event, index) => {
+    const count = rankings.length;
+    let nextIndex = null;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (index + 1) % count;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (index - 1 + count) % count;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = count - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    setActiveTab(nextIndex);
+    tabsRef.current[nextIndex]?.focus();
   };
 
   return (
@@ -105,58 +131,53 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
           </p>
         </div>
 
-        <div className="review-list" aria-label="Model evaluations">
-          {rankings.map((rank, index) => {
-            const isExpanded = expandedReviews[index] || false;
-            const reviewId = `stage2-review-${index}`;
-            const reviewButtonId = `stage2-review-toggle-${index}`;
-            return (
-              <div key={rank.model} className={`review-card ${isExpanded ? 'expanded' : ''}`}>
-                <button
-                  type="button"
-                  className="review-header"
-                  onClick={() => toggleReview(index)}
-                  aria-expanded={isExpanded}
-                  aria-controls={reviewId}
-                  id={reviewButtonId}
-                >
-                  <div className="reviewer-left">
-                    <span className="reviewer-letter">{getCouncilorLetter(index)}</span>
-                    <div className="reviewer-meta">
-                      <span className="reviewer-name">Model {getCouncilorLetter(index)}</span>
-                      <span className="reviewer-model">{rank.model}</span>
-                    </div>
-                  </div>
-                  <span className="review-toggle">{isExpanded ? 'Hide' : 'Show'}</span>
-                </button>
+        <div className="reviewer-tabs" role="tablist" aria-label="Stage 2 evaluations">
+          {rankings.map((rank, index) => (
+            <button
+              key={index}
+              className={`reviewer-tab ${activeTab === index ? 'active' : ''}`}
+              onClick={() => setActiveTab(index)}
+              title={getModelShortName(rank.model)}
+              role="tab"
+              id={`stage2-tab-${index}`}
+              aria-selected={activeTab === index}
+              aria-controls={`stage2-panel-${index}`}
+              tabIndex={activeTab === index ? 0 : -1}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
+              ref={(el) => {
+                tabsRef.current[index] = el;
+              }}
+            >
+              <span className="reviewer-letter">{getCouncilorLetter(index)}</span>
+              <span className="reviewer-label">Model {getCouncilorLetter(index)}</span>
+            </button>
+          ))}
+        </div>
 
-                {isExpanded && (
-                  <div className="review-body" id={reviewId} role="region" aria-labelledby={reviewButtonId}>
-                    <div className="evaluation-text markdown-content">
-                      <ReactMarkdown>
-                        {deAnonymizeText(rank.ranking, labelToModel)}
-                      </ReactMarkdown>
-                    </div>
+        <div className="reviewer-content" role="tabpanel" id={panelId} aria-labelledby={`stage2-tab-${activeTab}`}>
+          <div className="reviewer-header">
+            <span className="reviewer-badge">Model {getCouncilorLetter(activeTab)}</span>
+            <span className="model-identifier">{activeRanking.model}</span>
+          </div>
 
-                    {rank.parsed_ranking && rank.parsed_ranking.length > 0 && (
-                      <div className="extracted-ranking">
-                        <span className="extracted-label">Extracted Ranking:</span>
-                        <ol className="extracted-list">
-                          {rank.parsed_ranking.map((label, i) => (
-                            <li key={i}>
-                              {labelToModel && labelToModel[label]
-                                ? getModelShortName(labelToModel[label])
-                                : label}
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          <div className="evaluation-text markdown-content">
+            <ReactMarkdown>{evaluationText}</ReactMarkdown>
+          </div>
+
+          {activeRanking.parsed_ranking && activeRanking.parsed_ranking.length > 0 && (
+            <div className="extracted-ranking">
+              <span className="extracted-label">Extracted Ranking:</span>
+              <ol className="extracted-list">
+                {activeRanking.parsed_ranking.map((label, i) => (
+                  <li key={i}>
+                    {labelToModel && labelToModel[label]
+                      ? getModelShortName(labelToModel[label])
+                      : label}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
       </div>
     </div>

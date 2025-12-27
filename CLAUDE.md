@@ -86,15 +86,14 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `auth.py` - Basic Auth credential verification
 
 ### Frontend (`frontend/src/`)
-- `App.jsx` - Main orchestration, two-pane layout (sidebar + docket main)
-- `components/ChatInterface.jsx` - Docket view, sticky question header, SSE streaming, input
-- `components/Stage1.jsx` - Expert opinions tabs with preview/expand and keyboard navigation
-- `components/Stage2.jsx` - Peer review summary, leaderboard, expandable reviews
-- `components/Stage3.jsx` - Final opinion (chairman synthesis)
-- `components/Sidebar.jsx` - Docket list (conversation history) and mobile drawer
-- `components/NewConversationModal.jsx` - Model selection modal for new conversations
-- `components/RightPanel.jsx` - Legacy council panel (currently unused)
-- `components/ProgressOrbit.jsx` - Legacy stage stepper (currently unused)
+- `App.jsx` - Main orchestration, two-pane layout (sidebar + main)
+- `components/ChatInterface.jsx` - Main view, question display, SSE streaming, stage tabs
+- `components/InquiryComposer.jsx` - Home page inquiry form with model selection
+- `components/Stage1.jsx` - Expert opinions with tabbed navigation and keyboard support
+- `components/Stage2.jsx` - Peer review with rankings leaderboard and tabbed evaluations
+- `components/Stage3.jsx` - Final answer (lead model synthesis)
+- `components/Sidebar.jsx` - Inquiry list and mobile drawer
+- `components/NewConversationModal.jsx` - Legacy modal (fallback, mostly unused)
 - `api.js` - Backend communication with SSE streaming support
 - `components/Login.jsx` - Authentication UI
 
@@ -302,15 +301,29 @@ Use OpenRouter model identifiers. Verify with `test_openrouter.py` before adding
 
 ---
 
-## Design Theme: The Modern Chamber
+## Design Theme: The Paper of Record
 
-- Dark deliberative aesthetic (Gotham/political vibe)
-- Colors: `--bg-chamber` (#050713), `--bg-card` (#141829), `--accent-gold` (#D4AF37)
-- Typography: DM Serif Display (headers), Inter (body), JetBrains Mono (code)
-- Terminology: "Docket" (conversation), "Filed Question" (user prompt),
-  "Deliberation Records" (Stage 1/2), "Final Opinion" (Stage 3),
-  "Expert A/B/C" (models), "Chairman" (final synthesizer)
-- Design docs: `docs/DESIGN_PROPOSAL.md` and `docs/ui-redesign-plan.md`
+An editorial/newspaper-inspired light theme that treats AI Council as a prestigious publication.
+
+### Color Palette
+- Paper tones: `--paper-cream` (#FAF8F5), `--paper-aged` (#F5F0E8)
+- Ink tones: `--ink-black` (#1A1614), `--ink-dark` (#2D2926)
+- Accents: `--accent-vermillion` (#C43D2E), `--accent-forest` (#2D5A3D), `--accent-ochre` (#C4943D)
+
+### Typography
+- Display: Playfair Display (headlines, Council's Position)
+- Body: Source Serif 4 (readable article text)
+- UI: IBM Plex Sans (labels, buttons)
+- Mono: IBM Plex Mono (code, model identifiers)
+
+### Design Philosophy
+- "Answer-First" hierarchy: Stage 3 (Council's Position) is the hero with editorial flourishes (drop cap, two-column layout)
+- Deliberation as footnotes: Stage 1 & 2 are secondary, accordion-style
+- Editorial conventions: Double-rule borders, pull-quote questions, masthead styling
+- Warm, authoritative feel inspired by The Economist and The New York Times
+
+### Design Docs
+- `docs/UI_REDESIGN_PROPOSAL_opus_claude.md` - Full design proposal
 
 ## UX Features (Latest Implementation)
 
@@ -329,6 +342,16 @@ Use OpenRouter model identifiers. Verify with `test_openrouter.py` before adding
 - Escape key closes the drawer
 - Stage 1 tabs support Arrow/Home/End keys
 - Toggle buttons use `aria-expanded` and `aria-controls`
+
+### Keyboard Shortcuts
+- `Ctrl/Cmd + K` - Toggle archive drawer
+- `Ctrl/Cmd + N` - New conversation
+- `Escape` - Close drawer or modal
+
+### Loading States
+- Skeleton loaders with shimmer animation for Stage 3, Stage 1, and Stage 2
+- Status text with spinner during each stage
+- Staggered reveal animations on page load
 
 ---
 

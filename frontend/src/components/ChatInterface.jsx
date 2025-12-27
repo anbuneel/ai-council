@@ -1,9 +1,57 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Stage1 from './Stage1';
 import Stage2 from './Stage2';
 import Stage3 from './Stage3';
+import InquiryComposer from './InquiryComposer';
 import './ChatInterface.css';
+
+const MAX_COLLAPSED_HEIGHT = 60; // pixels
+
+function QuestionDisplay({ questionText, status, lastUpdated }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [needsExpansion, setNeedsExpansion] = useState(false);
+    const contentRef = useRef(null);
+
+    useLayoutEffect(() => {
+        if (contentRef.current) {
+            const scrollHeight = contentRef.current.scrollHeight;
+            setNeedsExpansion(scrollHeight > MAX_COLLAPSED_HEIGHT);
+        }
+    }, [questionText]);
+
+    return (
+        <div className="question-display">
+            <div
+                ref={contentRef}
+                className={`question-text ${!isExpanded && needsExpansion ? 'collapsed' : ''}`}
+                style={!isExpanded && needsExpansion ? { maxHeight: MAX_COLLAPSED_HEIGHT } : {}}
+            >
+                <div className="markdown-content">
+                    <ReactMarkdown>{questionText}</ReactMarkdown>
+                </div>
+            </div>
+            <div className="question-meta">
+                <span className={`question-status ${status.tone}`}>
+                    {status.label}
+                </span>
+                {lastUpdated && (
+                    <span className="question-timestamp">{lastUpdated}</span>
+                )}
+                {needsExpansion && (
+                    <button
+                        type="button"
+                        className="question-toggle-btn"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        aria-expanded={isExpanded}
+                    >
+                        {isExpanded ? 'Show less' : 'Show more'}
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function ChatInterface({
     conversation,
@@ -11,23 +59,18 @@ export default function ChatInterface({
     isLoading,
     onToggleSidebar,
     isSidebarOpen,
+    // New inquiry composer props
+    availableModels,
+    defaultModels,
+    defaultLeadModel,
+    isLoadingModels,
+    modelsError,
+    onCreateAndSubmit,
+    isCreating,
+    createError,
 }) {
     const [input, setInput] = useState('');
-    const [isQuestionCollapsed, setIsQuestionCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('final');
-    const messagesEndRef = useRef(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [conversation]);
-
-    useEffect(() => {
-        setIsQuestionCollapsed(false);
-    }, [conversation?.id]);
 
     useEffect(() => {
         setActiveTab('stage1');
@@ -112,80 +155,64 @@ export default function ChatInterface({
         }
     }, [latestAssistant]);
 
-    useEffect(() => {
-        if (conversation && latestAssistant?.stage3 && hasQuestion) {
-            setIsQuestionCollapsed(true);
-        }
-    }, [conversation, latestAssistant?.stage3, hasQuestion]);
-
     if (!conversation) {
         return (
             <div className="chat-interface">
-                <div className="empty-toolbar">
+                <header className="masthead">
                     <button
                         type="button"
                         className="sidebar-toggle"
                         onClick={onToggleSidebar}
-                        aria-label="Toggle conversations list"
+                        aria-label="Open archive (Ctrl+K)"
                         aria-expanded={isSidebarOpen}
                         aria-controls="sidebar"
+                        title="Open archive (Ctrl+K)"
                     >
-                        Menu
+                        Archive
                     </button>
-                </div>
-                <div className="empty-state">
-                    <div className="empty-icon">START</div>
-                    <h2>Ask a focused question</h2>
-                    <p>Pick your models, choose a lead, and submit a prompt to get a synthesized answer.</p>
-                </div>
-
+                    <h1 className="masthead-title">The AI Council</h1>
+                    <div className="masthead-spacer" />
+                </header>
+                <InquiryComposer
+                    availableModels={availableModels || []}
+                    defaultModels={defaultModels || []}
+                    defaultLeadModel={defaultLeadModel || ''}
+                    isLoadingModels={isLoadingModels}
+                    modelsError={modelsError}
+                    onSubmit={onCreateAndSubmit}
+                    isSubmitting={isCreating}
+                    submitError={createError}
+                />
             </div>
         );
     }
 
     return (
         <div className="chat-interface">
+            <header className="masthead">
+                <button
+                    type="button"
+                    className="sidebar-toggle"
+                    onClick={onToggleSidebar}
+                    aria-label="Open archive (Ctrl+K)"
+                    aria-expanded={isSidebarOpen}
+                    aria-controls="sidebar"
+                    title="Open archive (Ctrl+K)"
+                >
+                    Archive
+                </button>
+                <h1 className="masthead-title">The AI Council</h1>
+                <div className="masthead-spacer" />
+            </header>
+
             <div className="question-panel">
                 <div className="panel-inner">
-                    <div className="question-panel-header">
-                        <button
-                            type="button"
-                            className="sidebar-toggle"
-                            onClick={onToggleSidebar}
-                            aria-label="Toggle conversations list"
-                            aria-expanded={isSidebarOpen}
-                            aria-controls="sidebar"
-                        >
-                            Menu
-                        </button>
-                        <div className="question-panel-title">Question</div>
-                        {hasQuestion && (
-                            <button
-                                type="button"
-                                className="question-toggle"
-                                onClick={() => setIsQuestionCollapsed((prev) => !prev)}
-                                aria-expanded={!isQuestionCollapsed}
-                            >
-                                {isQuestionCollapsed ? 'Expand' : 'Collapse'}
-                            </button>
-                        )}
-                    </div>
                     {hasQuestion ? (
-                        <>
-                            {!isQuestionCollapsed && (
-                                <div className="question-panel-text markdown-content">
-                                    <ReactMarkdown>{questionText}</ReactMarkdown>
-                                </div>
-                            )}
-                            <div className="question-panel-meta">
-                                <span className={`question-status ${status.tone}`}>
-                                    {status.label}
-                                </span>
-                                {lastUpdated && (
-                                    <span className="last-updated">Updated {lastUpdated}</span>
-                                )}
-                            </div>
-                        </>
+                        <QuestionDisplay
+                            questionText={questionText}
+                            status={status}
+                            lastUpdated={lastUpdated}
+                        />
                     ) : (
                         <form className="question-form" onSubmit={handleSubmit}>
                             <textarea
@@ -209,53 +236,70 @@ export default function ChatInterface({
                 </div>
             </div>
 
+            {hasResponse && (
+                <div className="response-tabs-bar">
+                    <div className="response-tabs" role="tablist" aria-label="Response tabs">
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'final' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('final')}
+                            role="tab"
+                            aria-selected={activeTab === 'final'}
+                        >
+                            Final Answer
+                        </button>
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'stage1' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('stage1')}
+                            role="tab"
+                            aria-selected={activeTab === 'stage1'}
+                        >
+                            Stage 1
+                        </button>
+                        <button
+                            type="button"
+                            className={`response-tab ${activeTab === 'stage2' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('stage2')}
+                            role="tab"
+                            aria-selected={activeTab === 'stage2'}
+                        >
+                            Stage 2
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="docket-scroll">
                 {!hasResponse ? (
-                    <div className="empty-state">
+                    <div className="empty-state reveal-stagger">
                         <div className="empty-icon">RESPONSE</div>
                         <h2>Responses will appear here</h2>
                         <p>Submit a question to start the run.</p>
                     </div>
                 ) : (
-                    <div className="response-panel">
+                    <div className="response-panel reveal-stagger">
                         <div className="panel-inner">
-                            <div className="response-tabs" role="tablist" aria-label="Response tabs">
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'final' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('final')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'final'}
-                                >
-                                    Final Answer
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'stage1' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('stage1')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'stage1'}
-                                >
-                                    Stage 1
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`response-tab ${activeTab === 'stage2' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('stage2')}
-                                    role="tab"
-                                    aria-selected={activeTab === 'stage2'}
-                                >
-                                    Stage 2
-                                </button>
-                            </div>
-
                             <div className="response-tab-panels">
                                 {activeTab === 'final' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage3 && !latestAssistant?.stage3 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner"></div>
-                                                <span>Synthesizing final answer...</span>
+                                            <div className="skeleton-card">
+                                                <div className="skeleton-card-header">
+                                                    <div className="skeleton skeleton-icon"></div>
+                                                    <div className="skeleton-header-text">
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="skeleton-paragraph">
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                    <div className="skeleton skeleton-line"></div>
+                                                </div>
+                                                <p className="skeleton-status">Synthesizing final answer...</p>
                                             </div>
                                         )}
                                         {latestAssistant?.stage3 ? (
@@ -271,9 +315,20 @@ export default function ChatInterface({
                                 {activeTab === 'stage1' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage1 && !hasStage1 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner-small"></div>
-                                                <span>Gathering responses...</span>
+                                            <div className="skeleton-stage">
+                                                <div className="skeleton-tabs">
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                    <div className="skeleton skeleton-tab"></div>
+                                                </div>
+                                                <div className="skeleton-content-box">
+                                                    <div className="skeleton-paragraph">
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                        <div className="skeleton skeleton-line"></div>
+                                                    </div>
+                                                </div>
+                                                <p className="skeleton-status">Gathering responses...</p>
                                             </div>
                                         )}
                                         {hasStage1 ? (
@@ -289,9 +344,22 @@ export default function ChatInterface({
                                 {activeTab === 'stage2' && (
                                     <div className="response-tab-panel" role="tabpanel">
                                         {latestAssistant?.loading?.stage2 && !hasStage2 && (
-                                            <div className="stage-loading">
-                                                <div className="spinner-small"></div>
-                                                <span>Reviewing responses...</span>
+                                            <div className="skeleton-stage">
+                                                <div className="skeleton-ranking-list">
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                    <div className="skeleton-ranking-item">
+                                                        <div className="skeleton skeleton-badge"></div>
+                                                        <div className="skeleton skeleton-line" style={{flex: 1}}></div>
+                                                    </div>
+                                                </div>
+                                                <p className="skeleton-status">Reviewing responses...</p>
                                             </div>
                                         )}
                                         {hasStage2 ? (
@@ -311,8 +379,6 @@ export default function ChatInterface({
                         </div>
                     </div>
                 )}
-
-                <div ref={messagesEndRef} />
             </div>
         </div>
     );
