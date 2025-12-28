@@ -73,8 +73,8 @@ The "Paper of Record" concept is well-executed with:
 - "THE AI COUNCIL" title didn't breathe
 - User controls (settings, logout) felt cramped
 
-**Implemented Changes (commit `ace7f9f`):**
-1. ✅ Added thin rule with date stamp (e.g., "Friday, December 27, 2025")
+**Implemented Changes (commit `ace7f9f`, updated `bb02e46`):**
+1. ~~Added date stamp~~ (removed - not useful)
 2. ✅ Tagline beneath title: "Synthesized knowledge from AI experts"
 3. ✅ Two-row layout with more vertical breathing room
 4. ✅ Paper texture overlay in header background
