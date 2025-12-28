@@ -172,10 +172,10 @@ export default function InquiryComposer({
             {isSubmitting ? (
               <>
                 <span className="submit-spinner"></span>
-                Convening...
+                Asking...
               </>
             ) : (
-              'Convene the Council'
+              'Ask the Council'
             )}
           </button>
         </form>
