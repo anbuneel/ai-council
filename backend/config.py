@@ -24,10 +24,6 @@ GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 OAUTH_REDIRECT_BASE = os.getenv("OAUTH_REDIRECT_BASE", "http://localhost:5173")
 
-# Legacy Basic Auth credentials (deprecated, kept for backwards compatibility)
-AUTH_USERNAME = os.getenv("AUTH_USERNAME")
-AUTH_PASSWORD = os.getenv("AUTH_PASSWORD")
-
 # CORS origins (comma-separated list)
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 
@@ -44,12 +40,5 @@ DEFAULT_MODELS = list(AVAILABLE_MODELS)
 # Lead model - synthesizes final response
 DEFAULT_LEAD_MODEL = "google/gemini-3-pro-preview"
 
-# Backwards compatibility
-COUNCIL_MODELS = DEFAULT_MODELS
-CHAIRMAN_MODEL = DEFAULT_LEAD_MODEL
-
 # OpenRouter API endpoint
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-
-# Data directory for conversation storage (legacy, kept for local dev fallback)
-DATA_DIR = os.getenv("DATA_DIR", "data/conversations")

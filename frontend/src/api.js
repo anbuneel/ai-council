@@ -37,13 +37,6 @@ export function hasTokens() {
   return !!accessToken;
 }
 
-// Legacy compatibility aliases
-export const setCredentials = (username, password) => {
-  console.warn('setCredentials is deprecated, use setTokens instead');
-};
-export const clearCredentials = clearTokens;
-export const hasCredentials = hasTokens;
-
 /**
  * Try to refresh the access token using the refresh token.
  */
