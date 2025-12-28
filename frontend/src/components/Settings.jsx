@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { settings, auth } from '../api';
+import { settings } from '../api';
 import ConfirmDialog from './ConfirmDialog';
 import './Settings.css';
 

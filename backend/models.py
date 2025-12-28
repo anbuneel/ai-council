@@ -1,6 +1,6 @@
 """Pydantic models for multi-user authentication with OAuth."""
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 from uuid import UUID
 from typing import Optional

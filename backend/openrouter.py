@@ -1,7 +1,9 @@
 """OpenRouter API client for making LLM requests."""
 
+import asyncio
 import httpx
 from typing import List, Dict, Any, Optional
+
 from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL
 
 
@@ -77,8 +79,6 @@ async def query_models_parallel(
     Returns:
         Dict mapping model identifier to response dict (or None if failed)
     """
-    import asyncio
-
     # Create tasks for all models, passing the API key to each
     tasks = [query_model(model, messages, api_key=api_key) for model in models]
 

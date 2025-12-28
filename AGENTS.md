@@ -35,12 +35,30 @@ npm run dev                      # Run on http://localhost:5173
 
 Create `.env` in project root:
 ```
-OPENROUTER_API_KEY=sk-or-v1-...
-AUTH_USERNAME=admin
-AUTH_PASSWORD=your-password
-DATABASE_URL=postgresql://user:pass@host/dbname    # Supabase PostgreSQL (required for production)
+# Database (required for production)
+DATABASE_URL=postgresql://user:pass@host/dbname
+
+# JWT Authentication (required)
+JWT_SECRET=your-secure-random-secret-here
+
+# API Key Encryption (required for production)
+API_KEY_ENCRYPTION_KEY=your-fernet-key-here
+
+# OAuth Configuration (required for production)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+OAUTH_REDIRECT_BASE=http://localhost:5173
+
+# CORS origins
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,https://your-vercel-frontend.vercel.app
+
+# Optional: Fallback OpenRouter API key for local dev
+OPENROUTER_API_KEY=sk-or-v1-...
 ```
+
+**Authentication:** Users sign in via Google or GitHub OAuth. Each user provides their own OpenRouter API key in Settings.
 
 Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in `data/conversations/`.
 
@@ -76,27 +94,33 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 ## Key File Locations
 
 ### Backend (`backend/`)
-- `main.py` - FastAPI server, runs on port 8080 (Fly.io) or 8080 (local)
-- `config.py` - `AVAILABLE_MODELS`, `DEFAULT_MODELS`, `DEFAULT_LEAD_MODEL`, `CORS_ORIGINS`, `DATABASE_URL`
+- `main.py` - FastAPI server, OAuth endpoints, runs on port 8080
+- `config.py` - Models, CORS, DB, JWT, OAuth environment variables
+- `oauth.py` - Google and GitHub OAuth handlers
 - `council.py` - Core logic: stage1/2/3, parsing, aggregation
 - `openrouter.py` - OpenRouter API wrapper, parallel queries
-- `storage.py` - PostgreSQL storage (production)
+- `storage.py` - PostgreSQL storage with user and API key management
 - `storage_local.py` - JSON file storage (fallback when `DATABASE_URL` not set)
 - `database.py` - Async PostgreSQL connection pool (asyncpg)
-- `auth.py` - Basic Auth credential verification
+- `auth_jwt.py` - JWT token creation and verification
+- `encryption.py` - API key encryption (Fernet)
+- `models.py` - Pydantic schemas for OAuth and API key endpoints
+- `migrate.py` - Database migration runner
 
 ### Frontend (`frontend/src/`)
-- `App.jsx` - Main orchestration, two-pane layout (sidebar + docket main)
-- `components/ChatInterface.jsx` - Docket view, sticky question header, SSE streaming, input
-- `components/Stage1.jsx` - Expert opinions tabs with preview/expand and keyboard navigation
-- `components/Stage2.jsx` - Peer review summary, leaderboard, expandable reviews
-- `components/Stage3.jsx` - Final opinion (chairman synthesis)
-- `components/Sidebar.jsx` - Docket list (conversation history) and mobile drawer
-- `components/NewConversationModal.jsx` - Model selection modal for new conversations
-- `components/RightPanel.jsx` - Legacy council panel (currently unused)
-- `components/ProgressOrbit.jsx` - Legacy stage stepper (currently unused)
-- `api.js` - Backend communication with SSE streaming support
-- `components/Login.jsx` - Authentication UI
+- `App.jsx` - Main orchestration with BrowserRouter, OAuth callback routing
+- `components/ChatInterface.jsx` - Main view, question display, SSE streaming, stage tabs
+- `components/InquiryComposer.jsx` - Home page inquiry form with model selection
+- `components/Stage1.jsx` - Expert opinions with tabbed navigation and keyboard support
+- `components/Stage2.jsx` - Peer review with rankings leaderboard and tabbed evaluations
+- `components/Stage3.jsx` - Final answer (lead model synthesis)
+- `components/Sidebar.jsx` - Inquiry list, mobile drawer
+- `components/OAuthCallback.jsx` - Handles OAuth provider redirects
+- `components/Login.jsx` - OAuth login UI (Google and GitHub buttons)
+- `components/Settings.jsx` - API key management modal
+- `components/AvatarMenu.jsx` - User avatar dropdown with settings/logout
+- `components/ConfirmDialog.jsx` - Custom styled confirmation/alert dialogs
+- `api.js` - Backend communication with OAuth auth, JWT tokens, SSE streaming
 
 ---
 
@@ -354,18 +378,21 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 - [ ] Test SPA routing (all paths redirect to `/index.html`)
 
 ### Fly.io (Backend)
-- [ ] Set `OPENROUTER_API_KEY` in Fly.io secrets
-- [ ] Set `AUTH_USERNAME` and `AUTH_PASSWORD` in Fly.io secrets
+- [ ] Set `JWT_SECRET` in Fly.io secrets (required)
+- [ ] Set `API_KEY_ENCRYPTION_KEY` in Fly.io secrets (required)
+- [ ] Set OAuth secrets: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+- [ ] Set `OAUTH_REDIRECT_BASE` to Vercel frontend URL
 - [ ] Set `DATABASE_URL` pointing to Supabase PostgreSQL
 - [ ] Set `CORS_ORIGINS` to include Vercel frontend URL
 - [ ] Verify `fly.toml` configuration (port 8080, region, memory)
 - [ ] Test health check endpoint: `GET /`
+- [ ] Run database migrations: `uv run python -m backend.migrate`
 
 ### Supabase
 - [ ] Create PostgreSQL database
 - [ ] Generate connection string and set as `DATABASE_URL`
-- [ ] Enable required extensions if needed
-- [ ] Verify schema creation via `storage.py` migrations
+- [ ] Enable `gen_random_uuid()` extension (usually enabled by default)
+- [ ] Run migrations (includes OAuth user columns)
 
 ---
 

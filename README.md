@@ -83,14 +83,14 @@ uv run python -m backend.migrate
 Edit `backend/config.py` to customize the council:
 
 ```python
-COUNCIL_MODELS = [
+AVAILABLE_MODELS = [
     "openai/gpt-5.1",
     "google/gemini-3-pro-preview",
     "anthropic/claude-sonnet-4.5",
-    "x-ai/grok-4",
 ]
 
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+DEFAULT_MODELS = list(AVAILABLE_MODELS)
+DEFAULT_LEAD_MODEL = "google/gemini-3-pro-preview"
 ```
 
 ## Running the Application

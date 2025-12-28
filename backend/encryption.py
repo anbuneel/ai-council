@@ -1,31 +1,8 @@
-"""Encryption utilities for password hashing and API key storage."""
+"""Encryption utilities for API key storage."""
 
-import bcrypt
 from cryptography.fernet import Fernet, InvalidToken
 
 from .config import API_KEY_ENCRYPTION_KEY
-
-
-# ============== Password Hashing ==============
-
-def hash_password(password: str) -> str:
-    """Hash a password using bcrypt."""
-    salt = bcrypt.gensalt(rounds=12)
-    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
-
-
-def verify_password(password: str, password_hash: str) -> bool:
-    """Verify a password against its hash."""
-    try:
-        return bcrypt.checkpw(
-            password.encode("utf-8"),
-            password_hash.encode("utf-8")
-        )
-    except Exception:
-        return False
-
-
-# ============== API Key Encryption ==============
 
 def _get_fernet() -> Fernet:
     """Get the Fernet instance for API key encryption."""
