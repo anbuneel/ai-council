@@ -27,7 +27,8 @@ def _get_conversation_path(conversation_id: str) -> Path:
 async def create_conversation(
     conversation_id: str,
     models: List[str] | None = None,
-    lead_model: str | None = None
+    lead_model: str | None = None,
+    user_id: Optional[UUID] = None
 ) -> Dict[str, Any]:
     """Create a new conversation."""
     _ensure_data_dir()
@@ -37,6 +38,7 @@ async def create_conversation(
 
     conversation = {
         "id": conversation_id,
+        "user_id": str(user_id) if user_id else None,
         "created_at": datetime.utcnow().isoformat(),
         "title": "New Conversation",
         "models": selected_models,
@@ -64,8 +66,8 @@ async def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
         return conversation
 
 
-async def list_conversations() -> List[Dict[str, Any]]:
-    """List all conversations (metadata only)."""
+async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, Any]]:
+    """List all conversations (metadata only), optionally filtered by user_id."""
     _ensure_data_dir()
 
     conversations = []
@@ -73,6 +75,11 @@ async def list_conversations() -> List[Dict[str, Any]]:
         try:
             with open(path, 'r') as f:
                 conv = json.load(f)
+                # Filter by user_id if provided
+                if user_id is not None:
+                    conv_user_id = conv.get("user_id")
+                    if conv_user_id != str(user_id):
+                        continue
                 conversations.append({
                     "id": conv["id"],
                     "created_at": conv["created_at"],
