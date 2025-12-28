@@ -9,13 +9,13 @@
   width: 34px;
   height: 34px;
   padding: 0;
-  background: var(--accent-forest);
-  border: 1px solid var(--accent-forest);
+  background: var(--paper-cream);
+  border: 2px solid var(--ink-dark);
   border-radius: 50%;
-  color: var(--paper-white);
+  color: var(--ink-dark);
   font-family: var(--font-ui);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -25,6 +25,7 @@
 .avatar-btn:hover {
   background: var(--ink-dark);
   border-color: var(--ink-dark);
+  color: var(--paper-cream);
 }
 
 .avatar-btn:focus {
