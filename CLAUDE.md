@@ -503,3 +503,19 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 ## Browser Support
 
 Tested on latest Chrome/Firefox. Frontend uses modern React patterns (hooks, streaming SSE via EventSource API).
+
+---
+
+## Security Review Status
+
+A comprehensive security review was conducted on 2025-12-28 (see `docs/ai-council-review-codex-20251228-154048.md`).
+
+**Verdict:** Not ready for public launch until High priority security items are resolved.
+
+**Key findings requiring attention before launch:**
+- OAuth state validation and PKCE implementation
+- Fail-fast secret validation at startup
+- Complete database migrations for all tables
+- Rate limiting and request size limits
+
+See `docs/IMPLEMENTATION_PLAN_security_fixes.md` for the detailed implementation plan.
