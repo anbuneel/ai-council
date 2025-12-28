@@ -52,10 +52,19 @@ function Login({ onLogin }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <div className="council-emblem">
-            <span className="emblem-icon">AI</span>
+          <div className="login-title-wrapper">
+            <span className="title-rule left"></span>
+            <h1 className="login-title">AI Council</h1>
+            <span className="title-rule right"></span>
           </div>
-          <h1 className="login-title">AI Council</h1>
+
+          <p className="login-subtitle">Synthesized knowledge from AI experts</p>
+
+          <div className="header-divider">
+            <span className="divider-line"></span>
+            <span className="divider-ornament">&#9830;</span>
+            <span className="divider-line"></span>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -136,10 +145,7 @@ function Login({ onLogin }) {
           )}
         </p>
 
-        <p className="login-footer">
-          A council of AI models working together
-        </p>
-      </div>
+        </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 /* ==========================================================================
    Login Page - "The Paper of Record" Theme
-   Entry point with editorial styling
+   Editorial entry point with ornate styling
    ========================================================================== */
 
 .login-container {
@@ -10,39 +10,122 @@
   min-height: 100vh;
   background: var(--paper-cream);
   padding: 1.5rem;
+  position: relative;
 }
 
+/* Subtle paper texture overlay */
+.login-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Login Box - Ornate double-border treatment
+   ========================================================================== */
 .login-box {
   background: var(--paper-cream);
   padding: 3rem 2.5rem;
-  border: 2px solid var(--ink-black);
   width: 100%;
-  max-width: 420px;
-  animation: fadeInUp 400ms ease-out;
+  max-width: 440px;
+  position: relative;
+  animation: loginReveal 600ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Outer border */
+  border: 3px solid var(--ink-black);
+  box-shadow:
+    inset 0 0 0 1px var(--paper-cream),
+    inset 0 0 0 4px var(--ink-black),
+    inset 0 0 0 5px var(--paper-cream),
+    var(--shadow-lg);
 }
 
+@keyframes loginReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Header - Editorial masthead styling
+   ========================================================================== */
 .login-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
-/* Council emblem - simplified for editorial theme */
+/* Decorative emblem - illuminated initial style */
 .council-emblem {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 1.25rem;
-  background: var(--ink-black);
-  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.5rem;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Outer decorative ring */
+.council-emblem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--ink-black);
+  border-radius: 50%;
+}
+
+/* Inner decorative ring */
+.council-emblem::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--ink-medium);
+  border-radius: 50%;
+}
+
 .emblem-icon {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: 700;
-  color: var(--paper-cream);
+  font-style: italic;
+  color: var(--ink-black);
+  z-index: 1;
+}
+
+/* Title with decorative rules */
+.login-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.title-rule {
+  flex: 1;
+  max-width: 40px;
+  height: 2px;
+  background: linear-gradient(
+    to var(--rule-direction, right),
+    var(--ink-black),
+    transparent
+  );
+}
+
+.title-rule.left {
+  --rule-direction: right;
+}
+
+.title-rule.right {
+  --rule-direction: left;
 }
 
 .login-title {
@@ -51,11 +134,44 @@
   font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--ink-black);
-  letter-spacing: var(--tracking-tight);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-/* Form styling */
+/* Subtitle / Tagline */
+.login-subtitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--ink-medium);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Decorative divider below header */
+.header-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-faint);
+}
+
+.divider-ornament {
+  font-size: 0.625rem;
+  color: var(--ink-light);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Form styling
+   ========================================================================== */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -96,6 +212,7 @@
 .form-group input:focus {
   outline: none;
   border-color: var(--accent-vermillion);
+  background: var(--paper-cream);
   box-shadow: 0 0 0 3px var(--accent-vermillion-bg);
 }
 
@@ -116,9 +233,11 @@
   text-align: center;
 }
 
-/* Login button */
+/* ==========================================================================
+   Login button - Primary CTA
+   ========================================================================== */
 .login-button {
-  padding: 0.875rem 1.5rem;
+  padding: 1rem 1.5rem;
   background: var(--ink-black);
   color: var(--paper-cream);
   border: none;
@@ -135,16 +254,37 @@
   justify-content: center;
   gap: 0.625rem;
   margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
 }
 
 .login-button:hover:not(:disabled) {
   background: var(--ink-dark);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.login-button:hover:not(:disabled)::before {
+  opacity: 1;
 }
 
 .login-button:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .login-button:disabled {
@@ -161,9 +301,11 @@
   animation: spin 0.8s linear infinite;
 }
 
-/* Switch between login/register */
+/* ==========================================================================
+   Switch between login/register
+   ========================================================================== */
 .login-switch {
-  margin: 1.5rem 0 0.5rem 0;
+  margin: 1.75rem 0 0.75rem 0;
   text-align: center;
   font-family: var(--font-ui);
   font-size: var(--text-sm);
@@ -179,30 +321,59 @@
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
+  text-underline-offset: 2px;
   padding: 0;
+  transition: color var(--transition-fast);
 }
 
 .switch-button:hover {
-  color: var(--accent-forest-dark, #244a32);
+  color: var(--accent-forest-dark, #1e4a2d);
 }
 
-/* Footer */
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 .login-footer {
-  margin: 1rem 0 0 0;
+  margin: 1.25rem 0 0 0;
   text-align: center;
-  font-family: var(--font-ui);
+  font-family: var(--font-body);
   font-size: var(--text-xs);
+  font-style: italic;
   color: var(--ink-light);
-  letter-spacing: var(--tracking-wide);
 }
 
-/* Mobile adjustments */
+/* ==========================================================================
+   Mobile adjustments
+   ========================================================================== */
 @media (max-width: 480px) {
   .login-box {
     padding: 2rem 1.5rem;
+    /* Simplified border on mobile */
+    box-shadow:
+      inset 0 0 0 1px var(--paper-cream),
+      inset 0 0 0 3px var(--ink-black),
+      var(--shadow-md);
   }
 
   .login-title {
     font-size: var(--text-xl);
+    letter-spacing: 0.08em;
+  }
+
+  .council-emblem {
+    width: 60px;
+    height: 60px;
+  }
+
+  .emblem-icon {
+    font-size: var(--text-xl);
+  }
+
+  .title-rule {
+    max-width: 24px;
+  }
+
+  .header-divider {
+    margin-top: 1rem;
   }
 }
