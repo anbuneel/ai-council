@@ -1,4 +1,4 @@
-"""Pydantic models for Phase 1 multi-user authentication."""
+"""Pydantic models for multi-user authentication with OAuth."""
 
 from pydantic import BaseModel, EmailStr, field_validator
 from datetime import datetime
@@ -8,23 +8,10 @@ from typing import Optional
 
 # ============== Request Schemas ==============
 
-class UserRegister(BaseModel):
-    """Request to register a new user."""
-    email: EmailStr
-    password: str
-
-    @field_validator("password")
-    @classmethod
-    def validate_password(cls, v: str) -> str:
-        if len(v) < 8:
-            raise ValueError("Password must be at least 8 characters")
-        return v
-
-
-class UserLogin(BaseModel):
-    """Request to login."""
-    email: EmailStr
-    password: str
+class OAuthCallbackRequest(BaseModel):
+    """Request to complete OAuth flow."""
+    code: str
+    state: Optional[str] = None
 
 
 class RefreshTokenRequest(BaseModel):
@@ -51,6 +38,9 @@ class UserResponse(BaseModel):
     """User information response."""
     id: UUID
     email: str
+    name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    oauth_provider: Optional[str] = None
     created_at: datetime
 
 

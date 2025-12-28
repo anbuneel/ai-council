@@ -251,6 +251,122 @@ async def get_user_by_id(user_id: UUID) -> Optional[Dict[str, Any]]:
         return json.load(f)
 
 
+# ============== OAuth User Management ==============
+
+def _get_oauth_index_path() -> Path:
+    """Get the OAuth provider index file path."""
+    return USERS_DIR / "_oauth_index.json"
+
+
+def _load_oauth_index() -> Dict[str, str]:
+    """Load the OAuth provider:id to user_id index."""
+    _ensure_users_dir()
+    index_path = _get_oauth_index_path()
+    if index_path.exists():
+        with open(index_path, 'r') as f:
+            return json.load(f)
+    return {}
+
+
+def _save_oauth_index(index: Dict[str, str]):
+    """Save the OAuth provider:id to user_id index."""
+    _ensure_users_dir()
+    with open(_get_oauth_index_path(), 'w') as f:
+        json.dump(index, f, indent=2)
+
+
+async def create_oauth_user(
+    email: str,
+    oauth_provider: str,
+    oauth_provider_id: str,
+    name: Optional[str] = None,
+    avatar_url: Optional[str] = None
+) -> Dict[str, Any]:
+    """Create a new OAuth user."""
+    _ensure_users_dir()
+
+    user_id = str(uuid4())
+    now = datetime.utcnow().isoformat()
+
+    user = {
+        "id": user_id,
+        "email": email,
+        "password_hash": None,
+        "oauth_provider": oauth_provider,
+        "oauth_provider_id": oauth_provider_id,
+        "name": name,
+        "avatar_url": avatar_url,
+        "created_at": now,
+        "updated_at": now
+    }
+
+    # Save user file
+    with open(_get_user_path(user_id), 'w') as f:
+        json.dump(user, f, indent=2)
+
+    # Update email index
+    email_index = _load_email_index()
+    email_index[email.lower()] = user_id
+    _save_email_index(email_index)
+
+    # Update OAuth index
+    oauth_index = _load_oauth_index()
+    oauth_key = f"{oauth_provider}:{oauth_provider_id}"
+    oauth_index[oauth_key] = user_id
+    _save_oauth_index(oauth_index)
+
+    return user
+
+
+async def get_user_by_oauth(
+    provider: str,
+    provider_id: str
+) -> Optional[Dict[str, Any]]:
+    """Get user by OAuth provider credentials."""
+    oauth_index = _load_oauth_index()
+    oauth_key = f"{provider}:{provider_id}"
+    user_id = oauth_index.get(oauth_key)
+
+    if not user_id:
+        return None
+
+    return await get_user_by_id(UUID(user_id))
+
+
+async def link_oauth_to_existing_user(
+    user_id: UUID,
+    oauth_provider: str,
+    oauth_provider_id: str,
+    name: Optional[str] = None,
+    avatar_url: Optional[str] = None
+) -> Optional[Dict[str, Any]]:
+    """Link OAuth credentials to an existing user account."""
+    user = await get_user_by_id(user_id)
+    if not user:
+        return None
+
+    # Update user data
+    user["oauth_provider"] = oauth_provider
+    user["oauth_provider_id"] = oauth_provider_id
+    if name:
+        user["name"] = name
+    if avatar_url:
+        user["avatar_url"] = avatar_url
+    user["updated_at"] = datetime.utcnow().isoformat()
+
+    # Save updated user
+    with open(_get_user_path(str(user_id)), 'w') as f:
+        json.dump(user, f, indent=2)
+
+    # Update OAuth index
+    oauth_index = _load_oauth_index()
+    oauth_key = f"{oauth_provider}:{oauth_provider_id}"
+    oauth_index[oauth_key] = str(user_id)
+    _save_oauth_index(oauth_index)
+
+    return user
+
+
 # ============== API Key Management ==============
 
 def _get_api_keys_path(user_id: str) -> Path:

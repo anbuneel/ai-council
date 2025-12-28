@@ -18,7 +18,6 @@ from .config import (
     DEFAULT_MODELS,
     DEFAULT_LEAD_MODEL
 )
-from .auth import verify_credentials
 from .auth_jwt import (
     get_current_user,
     get_optional_user,
@@ -27,16 +26,16 @@ from .auth_jwt import (
     verify_token,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
-from .encryption import hash_password, verify_password, encrypt_api_key, get_key_hint
+from .encryption import encrypt_api_key, get_key_hint
 from .models import (
-    UserRegister,
-    UserLogin,
+    OAuthCallbackRequest,
     RefreshTokenRequest,
     ApiKeyCreate,
     TokenResponse,
     UserResponse,
     ApiKeyResponse
 )
+from .oauth import GoogleOAuth, GitHubOAuth
 from .council import (
     run_full_council,
     generate_conversation_title,
@@ -140,47 +139,95 @@ async def root():
     return {"status": "ok", "service": "LLM Council API"}
 
 
-# ============== Authentication Endpoints ==============
+# ============== OAuth Authentication Endpoints ==============
 
-@app.post("/api/auth/register", response_model=TokenResponse)
-async def register(data: UserRegister):
-    """Register a new user account."""
-    # Check if email already exists
-    existing = await storage.get_user_by_email(data.email)
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    # Create user
-    password_hash = hash_password(data.password)
-    user = await storage.create_user(data.email, password_hash)
-
-    # Generate tokens
-    access_token = create_access_token(user["id"])
-    refresh_token = create_refresh_token(user["id"])
-
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+async def find_or_create_oauth_user(oauth_user) -> dict:
+    """
+    Find existing user or create new one from OAuth data.
+    Links OAuth to existing account if email matches.
+    """
+    # 1. Check if OAuth account already linked
+    existing_oauth = await storage.get_user_by_oauth(
+        oauth_user.provider,
+        oauth_user.provider_id
     )
+    if existing_oauth:
+        return existing_oauth
 
+    # 2. Check if email exists (link OAuth to existing account)
+    existing_email = await storage.get_user_by_email(oauth_user.email)
+    if existing_email:
+        from uuid import UUID
+        user = await storage.link_oauth_to_existing_user(
+            UUID(str(existing_email["id"])),
+            oauth_user.provider,
+            oauth_user.provider_id,
+            oauth_user.name,
+            oauth_user.avatar_url
+        )
+        return user
 
-@app.post("/api/auth/login", response_model=TokenResponse)
-async def login(data: UserLogin):
-    """Login with email and password."""
-    user = await storage.get_user_by_email(data.email)
-    if not user or not verify_password(data.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-
-    # Generate tokens
-    access_token = create_access_token(user["id"])
-    refresh_token = create_refresh_token(user["id"])
-
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    # 3. Create new user
+    user = await storage.create_oauth_user(
+        email=oauth_user.email,
+        oauth_provider=oauth_user.provider,
+        oauth_provider_id=oauth_user.provider_id,
+        name=oauth_user.name,
+        avatar_url=oauth_user.avatar_url
     )
+    return user
+
+
+@app.get("/api/auth/oauth/{provider}")
+async def get_oauth_url(provider: str):
+    """Get OAuth authorization URL for the specified provider."""
+    import secrets
+    state = secrets.token_urlsafe(32)
+
+    if provider == "google":
+        url = GoogleOAuth.get_authorization_url(state)
+    elif provider == "github":
+        url = GitHubOAuth.get_authorization_url(state)
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown OAuth provider: {provider}")
+
+    return {"authorization_url": url, "state": state}
+
+
+@app.post("/api/auth/oauth/{provider}/callback", response_model=TokenResponse)
+async def oauth_callback(provider: str, data: OAuthCallbackRequest):
+    """Complete OAuth flow and return JWT tokens."""
+    try:
+        if provider == "google":
+            # Exchange code for tokens
+            tokens = await GoogleOAuth.exchange_code(data.code)
+            access_token = tokens["access_token"]
+            # Get user info
+            oauth_user = await GoogleOAuth.get_user_info(access_token)
+        elif provider == "github":
+            # Exchange code for tokens
+            tokens = await GitHubOAuth.exchange_code(data.code)
+            access_token = tokens["access_token"]
+            # Get user info
+            oauth_user = await GitHubOAuth.get_user_info(access_token)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown OAuth provider: {provider}")
+
+        # Find or create user
+        user = await find_or_create_oauth_user(oauth_user)
+
+        # Generate JWT tokens
+        jwt_access = create_access_token(user["id"])
+        jwt_refresh = create_refresh_token(user["id"])
+
+        return TokenResponse(
+            access_token=jwt_access,
+            refresh_token=jwt_refresh,
+            expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"OAuth authentication failed: {str(e)}")
 
 
 @app.post("/api/auth/refresh", response_model=TokenResponse)
@@ -208,6 +255,9 @@ async def get_current_user_info(user_id: UUID = Depends(get_current_user)):
     return UserResponse(
         id=user["id"],
         email=user["email"],
+        name=user.get("name"),
+        avatar_url=user.get("avatar_url"),
+        oauth_provider=user.get("oauth_provider"),
         created_at=user["created_at"]
     )
 

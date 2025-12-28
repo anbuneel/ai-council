@@ -45,6 +45,13 @@ JWT_SECRET=your-secure-random-secret-here
 # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 API_KEY_ENCRYPTION_KEY=your-fernet-key-here
 
+# OAuth Configuration (required for production)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+OAUTH_REDIRECT_BASE=http://localhost:5173  # or https://your-frontend.vercel.app
+
 # CORS origins
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,https://your-vercel-frontend.vercel.app
 
@@ -52,7 +59,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000,https://your-vercel-fro
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-**Phase 1 Multi-User Support:** Users register with email/password and provide their own OpenRouter API key in Settings. Each user's conversations are isolated.
+**Authentication:** Users sign in via Google or GitHub OAuth. Existing users are linked by email address to preserve their archives. Each user provides their own OpenRouter API key in Settings.
 
 **Database Migrations:** Run before first use:
 ```bash
@@ -93,32 +100,32 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 ## Key File Locations
 
 ### Backend (`backend/`)
-- `main.py` - FastAPI server, runs on port 8080 (Fly.io) or 8080 (local)
-- `config.py` - `AVAILABLE_MODELS`, `DEFAULT_MODELS`, `DEFAULT_LEAD_MODEL`, `CORS_ORIGINS`, `DATABASE_URL`, `JWT_SECRET`, `API_KEY_ENCRYPTION_KEY`
+- `main.py` - FastAPI server, OAuth endpoints, runs on port 8080
+- `config.py` - Models, CORS, DB, JWT, OAuth environment variables
+- `oauth.py` - Google and GitHub OAuth handlers (code exchange, user info)
 - `council.py` - Core logic: stage1/2/3, parsing, aggregation
 - `openrouter.py` - OpenRouter API wrapper, parallel queries, accepts per-user API keys
-- `storage.py` - PostgreSQL storage (production) with user and API key management
+- `storage.py` - PostgreSQL storage with user, OAuth, and API key management
 - `storage_local.py` - JSON file storage (fallback when `DATABASE_URL` not set)
 - `database.py` - Async PostgreSQL connection pool (asyncpg)
-- `auth.py` - Legacy Basic Auth credential verification (deprecated)
 - `auth_jwt.py` - JWT token creation and verification
-- `encryption.py` - Password hashing (bcrypt) and API key encryption (Fernet)
-- `models.py` - Pydantic schemas for auth and API key endpoints
+- `encryption.py` - API key encryption (Fernet)
+- `models.py` - Pydantic schemas for OAuth and API key endpoints
 - `migrate.py` - Database migration runner
-- `migrations/` - SQL migration files for schema updates
+- `migrations/` - SQL migration files (includes 004_oauth_users.sql)
 
 ### Frontend (`frontend/src/`)
-- `App.jsx` - Main orchestration, two-pane layout (sidebar + main)
+- `App.jsx` - Main orchestration with BrowserRouter, OAuth callback routing
 - `components/ChatInterface.jsx` - Main view, question display, SSE streaming, stage tabs
 - `components/InquiryComposer.jsx` - Home page inquiry form with model selection
 - `components/Stage1.jsx` - Expert opinions with tabbed navigation and keyboard support
 - `components/Stage2.jsx` - Peer review with rankings leaderboard and tabbed evaluations
 - `components/Stage3.jsx` - Final answer (lead model synthesis)
-- `components/Sidebar.jsx` - Inquiry list, mobile drawer, user email display
-- `components/NewConversationModal.jsx` - Legacy modal (fallback, mostly unused)
-- `api.js` - Backend communication with JWT auth, token refresh, SSE streaming
-- `components/Login.jsx` - Authentication UI with login/register toggle
+- `components/Sidebar.jsx` - Inquiry list, mobile drawer
+- `components/OAuthCallback.jsx` - Handles OAuth provider redirects
+- `components/Login.jsx` - OAuth login UI (Google and GitHub buttons)
 - `components/Settings.jsx` - API key management modal
+- `api.js` - Backend communication with OAuth auth, JWT tokens, SSE streaming
 
 ---
 
@@ -189,6 +196,51 @@ All ReactMarkdown must be wrapped: `<div className="markdown-content">`
 ---
 
 ## API Endpoints
+
+### OAuth Authentication
+
+#### GET `/api/auth/oauth/{provider}`
+Get OAuth authorization URL (provider: `google` or `github`):
+```json
+{
+  "authorization_url": "https://accounts.google.com/...",
+  "state": "random-csrf-token"
+}
+```
+
+#### POST `/api/auth/oauth/{provider}/callback`
+Complete OAuth flow with authorization code:
+```json
+{
+  "code": "authorization-code-from-provider",
+  "state": "csrf-token"
+}
+```
+Returns JWT tokens:
+```json
+{
+  "access_token": "...",
+  "refresh_token": "...",
+  "token_type": "bearer",
+  "expires_in": 1800
+}
+```
+
+#### POST `/api/auth/refresh`
+Refresh access token using refresh token.
+
+#### GET `/api/auth/me`
+Get current user info (requires auth):
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "name": "User Name",
+  "avatar_url": "https://...",
+  "oauth_provider": "google",
+  "created_at": "2024-01-01T00:00:00Z"
+}
+```
 
 ### GET `/api/models`
 Returns available models and defaults:
@@ -402,6 +454,14 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 
 ## Deployment Checklist
 
+### OAuth App Setup
+- [ ] **Google Cloud Console** (https://console.cloud.google.com/apis/credentials)
+  - Create OAuth 2.0 Client ID (Web application)
+  - Add redirect URIs: `http://localhost:5173/auth/callback/google` (dev), `https://your-frontend.vercel.app/auth/callback/google` (prod)
+- [ ] **GitHub Developer Settings** (https://github.com/settings/developers)
+  - Create OAuth App
+  - Set callback URLs: `http://localhost:5173/auth/callback/github` (dev), `https://your-frontend.vercel.app/auth/callback/github` (prod)
+
 ### Vercel (Frontend)
 - [ ] Set `VITE_API_BASE` environment variable to Fly.io backend URL
 - [ ] Verify `vercel.json` has correct build command and output directory
@@ -410,9 +470,10 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 ### Fly.io (Backend)
 - [ ] Set `JWT_SECRET` in Fly.io secrets (required)
 - [ ] Set `API_KEY_ENCRYPTION_KEY` in Fly.io secrets (required)
+- [ ] Set OAuth secrets: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+- [ ] Set `OAUTH_REDIRECT_BASE` to Vercel frontend URL
 - [ ] Set `DATABASE_URL` pointing to Supabase PostgreSQL
 - [ ] Set `CORS_ORIGINS` to include Vercel frontend URL
-- [ ] Optionally set `OPENROUTER_API_KEY` as fallback for dev
 - [ ] Verify `fly.toml` configuration (port 8080, region, memory)
 - [ ] Test health check endpoint: `GET /`
 - [ ] Run database migrations: `uv run python -m backend.migrate`
@@ -421,7 +482,7 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 - [ ] Create PostgreSQL database
 - [ ] Generate connection string and set as `DATABASE_URL`
 - [ ] Enable `gen_random_uuid()` extension (usually enabled by default)
-- [ ] Run migrations to create users, user_api_keys tables, and add user_id to conversations
+- [ ] Run migrations (includes OAuth user columns in 004_oauth_users.sql)
 
 ---
 

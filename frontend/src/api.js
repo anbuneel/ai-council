@@ -109,17 +109,13 @@ async function fetchWithAuth(url, options = {}) {
 
 export const auth = {
   /**
-   * Register a new user.
+   * Start OAuth flow - redirects to provider.
    */
-  async register(email, password) {
-    const response = await fetch(`${API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+  async startOAuth(provider) {
+    const response = await fetch(`${API_BASE}/api/auth/oauth/${provider}`);
 
     if (!response.ok) {
-      let message = 'Registration failed';
+      let message = 'Failed to start OAuth';
       try {
         const error = await response.json();
         message = error.detail || message;
@@ -130,22 +126,31 @@ export const auth = {
     }
 
     const data = await response.json();
-    setTokens(data.access_token, data.refresh_token);
-    return data;
+    // Store state for CSRF validation
+    sessionStorage.setItem('oauth_state', data.state);
+    // Redirect to provider
+    window.location.href = data.authorization_url;
   },
 
   /**
-   * Login with email and password.
+   * Complete OAuth flow - exchange code for tokens.
    */
-  async login(email, password) {
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
+  async completeOAuth(provider, code, state) {
+    // Validate state (CSRF protection)
+    const storedState = sessionStorage.getItem('oauth_state');
+    if (storedState && state && storedState !== state) {
+      throw new Error('Invalid OAuth state - possible CSRF attack');
+    }
+    sessionStorage.removeItem('oauth_state');
+
+    const response = await fetch(`${API_BASE}/api/auth/oauth/${provider}/callback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ code, state }),
     });
 
     if (!response.ok) {
-      let message = 'Login failed';
+      let message = 'OAuth authentication failed';
       try {
         const error = await response.json();
         message = error.detail || message;

@@ -445,8 +445,102 @@ async def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
 async def get_user_by_id(user_id: UUID) -> Optional[Dict[str, Any]]:
     """Get user by ID."""
     row = await db.fetchrow(
-        "SELECT id, email, created_at, updated_at FROM users WHERE id = $1",
+        "SELECT id, email, name, avatar_url, oauth_provider, created_at, updated_at FROM users WHERE id = $1",
         user_id
+    )
+    return dict(row) if row else None
+
+
+# ============== OAuth User Management ==============
+
+async def create_oauth_user(
+    email: str,
+    oauth_provider: str,
+    oauth_provider_id: str,
+    name: Optional[str] = None,
+    avatar_url: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Create a new OAuth user.
+
+    Args:
+        email: User's email address
+        oauth_provider: OAuth provider ('google' or 'github')
+        oauth_provider_id: Provider's unique user ID
+        name: User's display name
+        avatar_url: User's avatar URL
+
+    Returns:
+        User dict with id, email, name, avatar_url, oauth_provider, created_at
+    """
+    row = await db.fetchrow(
+        """
+        INSERT INTO users (email, oauth_provider, oauth_provider_id, name, avatar_url)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, email, name, avatar_url, oauth_provider, created_at
+        """,
+        email,
+        oauth_provider,
+        oauth_provider_id,
+        name,
+        avatar_url
+    )
+    return dict(row)
+
+
+async def get_user_by_oauth(
+    provider: str,
+    provider_id: str
+) -> Optional[Dict[str, Any]]:
+    """Get user by OAuth provider credentials."""
+    row = await db.fetchrow(
+        """
+        SELECT id, email, name, avatar_url, oauth_provider, oauth_provider_id, created_at
+        FROM users
+        WHERE oauth_provider = $1 AND oauth_provider_id = $2
+        """,
+        provider,
+        provider_id
+    )
+    return dict(row) if row else None
+
+
+async def link_oauth_to_existing_user(
+    user_id: UUID,
+    oauth_provider: str,
+    oauth_provider_id: str,
+    name: Optional[str] = None,
+    avatar_url: Optional[str] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Link OAuth credentials to an existing user account.
+
+    Args:
+        user_id: Existing user's ID
+        oauth_provider: OAuth provider ('google' or 'github')
+        oauth_provider_id: Provider's unique user ID
+        name: User's display name (updates if provided)
+        avatar_url: User's avatar URL (updates if provided)
+
+    Returns:
+        Updated user dict or None if user not found
+    """
+    row = await db.fetchrow(
+        """
+        UPDATE users
+        SET oauth_provider = $2,
+            oauth_provider_id = $3,
+            name = COALESCE($4, name),
+            avatar_url = COALESCE($5, avatar_url),
+            updated_at = NOW()
+        WHERE id = $1
+        RETURNING id, email, name, avatar_url, oauth_provider, created_at
+        """,
+        user_id,
+        oauth_provider,
+        oauth_provider_id,
+        name,
+        avatar_url
     )
     return dict(row) if row else None
 

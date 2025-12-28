@@ -55,6 +55,13 @@ JWT_SECRET=your-secure-random-secret-here
 # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 API_KEY_ENCRYPTION_KEY=your-fernet-key-here
 
+# OAuth Configuration (required for production)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+OAUTH_REDIRECT_BASE=http://localhost:5173
+
 # CORS origins
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 
@@ -62,7 +69,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-**Multi-User Support (Phase 1):** Users register with email/password and provide their own OpenRouter API key in Settings. Each user's data is isolated. Get your OpenRouter API key at [openrouter.ai](https://openrouter.ai/).
+**Authentication:** Users sign in via Google or GitHub OAuth. Existing users are linked by email to preserve their data. Each user provides their own OpenRouter API key in Settings. Get your API key at [openrouter.ai](https://openrouter.ai/).
 
 **Database Migrations:** Run migrations before first use:
 ```bash

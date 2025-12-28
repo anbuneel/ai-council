@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import NewConversationModal from './components/NewConversationModal';
+import OAuthCallback from './components/OAuthCallback';
 import { api, auth, settings, hasTokens, clearTokens } from './api';
 import './App.css';
 
@@ -558,21 +560,8 @@ function App() {
     }
   };
 
-  // Show loading while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <div className="app-loading">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-
-  // Show login if not authenticated
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
-  return (
+  // Main app content (when authenticated)
+  const renderMainApp = () => (
     <div className="app-layout">
       <Sidebar
         conversations={conversations}
@@ -629,6 +618,30 @@ function App() {
         userEmail={userEmail}
       />
     </div>
+  );
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/auth/callback/:provider"
+          element={<OAuthCallback onLogin={handleLogin} />}
+        />
+        <Route
+          path="/*"
+          element={isAuthenticated ? renderMainApp() : <Login onLogin={handleLogin} />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
