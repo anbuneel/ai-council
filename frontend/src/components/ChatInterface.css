@@ -40,6 +40,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem var(--container-padding);
+  border-bottom: 2px solid var(--ink-black);
   position: relative;
   z-index: 1;
 }
@@ -71,27 +72,6 @@
   color: var(--ink-medium);
   margin: 0;
   letter-spacing: var(--tracking-wide);
-}
-
-/* Date stamp row */
-.masthead-dateline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem var(--container-padding);
-  border-top: 1px solid var(--ink-faint);
-  border-bottom: 2px solid var(--ink-black);
-  position: relative;
-  z-index: 1;
-}
-
-.masthead-date {
-  font-family: var(--font-ui);
-  font-size: 0.625rem;
-  font-weight: 500;
-  color: var(--ink-light);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
 }
 
 .masthead-spacer {
@@ -161,10 +141,6 @@
     font-size: var(--text-base);
     letter-spacing: 0.08em;
   }
-
-  .masthead-dateline {
-    padding: 0.375rem var(--container-padding);
-  }
 }
 
 @media (min-width: 768px) {
@@ -174,10 +150,6 @@
 
   .masthead-title {
     font-size: var(--text-xl);
-  }
-
-  .masthead-dateline {
-    padding: 0.5rem 2rem;
   }
 }
 

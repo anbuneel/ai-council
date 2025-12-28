@@ -8,13 +8,6 @@ import './ChatInterface.css';
 
 const MAX_COLLAPSED_HEIGHT = 60; // pixels
 
-// Format current date for masthead dateline
-function formatMastheadDate() {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return now.toLocaleDateString('en-US', options);
-}
-
 function QuestionDisplay({ questionText, status, lastUpdated }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
@@ -221,9 +214,6 @@ export default function ChatInterface({
                             )}
                         </div>
                     </div>
-                    <div className="masthead-dateline">
-                        <span className="masthead-date">{formatMastheadDate()}</span>
-                    </div>
                 </header>
                 <InquiryComposer
                     availableModels={availableModels || []}
@@ -292,9 +282,6 @@ export default function ChatInterface({
                             </button>
                         )}
                     </div>
-                </div>
-                <div className="masthead-dateline">
-                    <span className="masthead-date">{formatMastheadDate()}</span>
                 </div>
             </header>
 
