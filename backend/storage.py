@@ -15,13 +15,19 @@ async def ensure_schema():
     global _schema_ready
     if _schema_ready:
         return
-    await db.execute(
-        """
-        ALTER TABLE conversations
-        ADD COLUMN IF NOT EXISTS models JSONB,
-        ADD COLUMN IF NOT EXISTS lead_model TEXT
-        """
-    )
+    # Add columns one at a time (PostgreSQL requires separate statements for IF NOT EXISTS)
+    try:
+        await db.execute("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS models JSONB")
+    except Exception:
+        pass
+    try:
+        await db.execute("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_model TEXT")
+    except Exception:
+        pass
+    try:
+        await db.execute("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS user_id UUID")
+    except Exception:
+        pass
     _schema_ready = True
 
 
@@ -56,7 +62,7 @@ async def create_conversation(
         conversation_id,
         "New Conversation",
         created_at,
-        selected_models,
+        json.dumps(selected_models),
         selected_lead,
         user_id
     )
