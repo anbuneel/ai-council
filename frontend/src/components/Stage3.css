@@ -153,25 +153,6 @@
   content: ']';
 }
 
-/* Two column layout for desktop */
-@media (min-width: 1024px) {
-  .verdict-text.markdown-content {
-    column-count: 2;
-    column-gap: 2.5rem;
-    column-rule: 1px solid var(--paper-border);
-  }
-
-  .verdict-text.markdown-content p:first-of-type {
-    column-span: all;
-  }
-
-  .verdict-text.markdown-content h1,
-  .verdict-text.markdown-content h2,
-  .verdict-text.markdown-content h3 {
-    column-span: all;
-  }
-}
-
 /* Mobile responsive */
 @media (max-width: 767px) {
   .verdict-header {
