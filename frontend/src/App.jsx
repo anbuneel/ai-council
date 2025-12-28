@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Settings from './components/Settings';
 import NewConversationModal from './components/NewConversationModal';
 import OAuthCallback from './components/OAuthCallback';
+import ConfirmDialog from './components/ConfirmDialog';
 import { api, auth, settings, hasTokens, clearTokens } from './api';
 import './App.css';
 
@@ -27,6 +28,16 @@ function App() {
   const [modelsError, setModelsError] = useState('');
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [createError, setCreateError] = useState('');
+
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'default',
+    icon: null,
+    onConfirm: null,
+  });
 
   // Check if user has an API key, auto-open Settings if not
   const checkApiKeyAndPrompt = async () => {
@@ -387,32 +398,53 @@ function App() {
     setIsSidebarOpen(false);
   };
 
-  const handleDeleteConversation = async (id) => {
-    // Confirm before deleting
-    if (!window.confirm('Delete this inquiry? This cannot be undone.')) {
-      return;
-    }
+  const handleDeleteConversation = (id) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Inquiry',
+      message: 'Are you sure you want to delete this inquiry? This action cannot be undone.',
+      variant: 'danger',
+      icon: 'warning',
+      onConfirm: async () => {
+        setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        try {
+          await api.deleteConversation(id);
 
-    try {
-      await api.deleteConversation(id);
+          // Refresh conversation list
+          await loadConversations();
 
-      // Refresh conversation list
-      await loadConversations();
+          // If the deleted conversation was selected, clear selection
+          if (id === currentConversationId) {
+            setCurrentConversationId(null);
+            setCurrentConversation(null);
+          }
+          setIsSidebarOpen(false);
+        } catch (err) {
+          console.error('Failed to delete conversation:', err);
+          if (err.message === 'Authentication failed') {
+            setIsAuthenticated(false);
+          } else {
+            showAlert('Delete Failed', 'Unable to delete this inquiry. Please try again.');
+          }
+        }
+      },
+    });
+  };
 
-      // If the deleted conversation was selected, clear selection
-      if (id === currentConversationId) {
-        setCurrentConversationId(null);
-        setCurrentConversation(null);
-      }
-      setIsSidebarOpen(false);
-    } catch (err) {
-      console.error('Failed to delete conversation:', err);
-      if (err.message === 'Authentication failed') {
-        setIsAuthenticated(false);
-      } else {
-        alert('Failed to delete inquiry');
-      }
-    }
+  // Helper to show alert dialogs
+  const showAlert = (title, message) => {
+    setConfirmDialog({
+      isOpen: true,
+      title,
+      message,
+      variant: 'alert',
+      icon: 'warning',
+      onConfirm: () => setConfirmDialog((prev) => ({ ...prev, isOpen: false })),
+    });
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
   };
 
   const handleToggleSidebar = () => {
@@ -616,6 +648,17 @@ function App() {
         isOpen={isSettingsOpen}
         onClose={handleCloseSettings}
         userEmail={userEmail}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        icon={confirmDialog.icon}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirmDialog}
+        confirmLabel={confirmDialog.variant === 'danger' ? 'Delete' : 'OK'}
+        cancelLabel="Cancel"
       />
     </div>
   );

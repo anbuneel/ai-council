@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { settings, auth } from '../api';
+import ConfirmDialog from './ConfirmDialog';
 import './Settings.css';
 
 function Settings({ isOpen, onClose, userEmail }) {
@@ -9,6 +10,8 @@ function Settings({ isOpen, onClose, userEmail }) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteProvider, setPendingDeleteProvider] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -49,16 +52,29 @@ function Settings({ isOpen, onClose, userEmail }) {
     }
   };
 
-  const handleDeleteKey = async (provider) => {
-    if (!window.confirm('Remove this API key?')) return;
+  const handleDeleteKey = (provider) => {
+    setPendingDeleteProvider(provider);
+    setConfirmOpen(true);
+  };
+
+  const confirmDeleteKey = async () => {
+    setConfirmOpen(false);
+    if (!pendingDeleteProvider) return;
 
     try {
-      await settings.deleteApiKey(provider);
+      await settings.deleteApiKey(pendingDeleteProvider);
       setSuccess('API key removed');
       loadApiKeys();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setPendingDeleteProvider(null);
     }
+  };
+
+  const cancelDeleteKey = () => {
+    setConfirmOpen(false);
+    setPendingDeleteProvider(null);
   };
 
   if (!isOpen) return null;
@@ -157,6 +173,17 @@ function Settings({ isOpen, onClose, userEmail }) {
           </section>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Remove API Key"
+        message="Are you sure you want to remove this API key? You will need to add a new key to continue using the Council."
+        variant="danger"
+        icon="warning"
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        onConfirm={confirmDeleteKey}
+        onCancel={cancelDeleteKey}
+      />
     </div>
   );
 }
