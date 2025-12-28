@@ -125,6 +125,8 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `components/OAuthCallback.jsx` - Handles OAuth provider redirects
 - `components/Login.jsx` - OAuth login UI (Google and GitHub buttons)
 - `components/Settings.jsx` - API key management modal
+- `components/AvatarMenu.jsx` - User avatar dropdown with settings/logout
+- `components/ConfirmDialog.jsx` - Custom styled confirmation/alert dialogs
 - `api.js` - Backend communication with OAuth auth, JWT tokens, SSE streaming
 
 ---
@@ -415,10 +417,12 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - Input stays sticky at the bottom of the main pane
 
 ### Header User Controls
-- User email, settings, and logout buttons in masthead (top-right)
+- Avatar menu dropdown in masthead (top-right) with user initial/photo
+  - Shows email, Settings button, and Logout option
+  - Closes on Escape key or clicking outside
+- "New" button in masthead when viewing existing conversation
 - Sidebar is dedicated to archived conversations only
 - Settings modal auto-opens for new users without API key
-- Email hidden on mobile (480px and below)
 
 ### Mobile Drawer + Accessibility
 - Sidebar becomes a drawer on mobile with overlay
