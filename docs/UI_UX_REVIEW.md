@@ -2,6 +2,23 @@
 
 **Date:** 2025-12-27
 **Reviewer:** Claude (Frontend Design Skill)
+**Last Updated:** 2025-12-27
+
+---
+
+## Implementation Progress
+
+| Item | Status | Commit |
+|------|--------|--------|
+| Login screen editorial styling | ✅ Complete | `fec7e2e` |
+| Terminology changes (Archive, removed "deliberation") | ✅ Complete | `f0e58ac` |
+| Masthead header redesign | ✅ Complete | `ace7f9f` |
+| Settings modal editorial styling | ✅ Complete | `4055906` |
+| Branding direction (general-purpose) | ✅ Decided | — |
+| Sidebar status indicator size | ✅ Complete | (pending) |
+| InquiryComposer polish | ✅ Complete | (pending) |
+| Micro-interactions ("Convening" state) | ✅ Complete | (pending) |
+| Name & Logo finalization | 🔲 Deferred | — |
 
 ---
 
@@ -34,72 +51,77 @@ The "Paper of Record" concept is well-executed with:
 
 ## 2. UX Weaknesses & Improvements
 
-### Login Screen Issues
+### Login Screen Issues ✅ IMPLEMENTED
 
-**Current Problems:**
-- The `AI` emblem in a circle is generic and forgettable
-- Login box has sharp rectangle with 2px black border - feels too stark
+**Original Problems:**
+- The `AI` emblem in a circle was generic and forgettable
+- Login box had sharp rectangle with 2px black border - felt too stark
 - No visual connection to the "paper" theme
-- Footer tagline "A council of AI models working together" is weak
+- Footer tagline "A council of AI models working together" was weak
 
-**Recommendations:**
-1. Add a subtle paper texture or watermark background
-2. Use a more ornate border treatment (double-line or decorative rule)
-3. Introduce a subtle masthead graphic or seal-style logo
-4. Add an illuminated first letter or decorative initial capital
-5. Consider a brief animated quill/pen entrance effect
+**Implemented Changes (commit `fec7e2e`):**
+1. ✅ Added paper texture overlay (SVG noise filter)
+2. ✅ Ornate double-line border using box-shadow technique
+3. ✅ Decorative rules around title with diamond ornament divider
+4. ✅ Removed emblem, single tagline: "Synthesized knowledge from AI experts"
+5. ⏸️ Animated entrance effect - deferred (not critical)
 
-### Masthead Header Issues
+### Masthead Header Issues ✅ IMPLEMENTED
 
-**Current:**
+**Original Problems:**
 - Too compact and utilitarian
-- "THE AI COUNCIL" title doesn't breathe
-- User controls (settings, logout) feel cramped
+- "THE AI COUNCIL" title didn't breathe
+- User controls (settings, logout) felt cramped
 
-**Recommendations:**
-1. Add a thin rule below with date stamp (editorial convention)
-2. Consider a subtle tagline beneath the title
-3. Give the masthead more vertical breathing room
-4. Add a subtle paper texture in the header background
+**Implemented Changes (commit `ace7f9f`):**
+1. ✅ Added thin rule with date stamp (e.g., "Friday, December 27, 2025")
+2. ✅ Tagline beneath title: "Synthesized knowledge from AI experts"
+3. ✅ Two-row layout with more vertical breathing room
+4. ✅ Paper texture overlay in header background
 
-### Sidebar (Archive Drawer)
+### Sidebar (Archive Drawer) ✅ IMPLEMENTED
 
-**Issues:**
-- Status dot indicators are too subtle (8px)
-- "Inquiries" label is generic
-- Delete button only shows on hover (discoverable issue on mobile)
+**Original Issues:**
+- Status dot indicators were too subtle (8px)
+- ~~"Inquiries" label is generic~~ ✅ Changed to "Archive"
+- Delete button only showed on hover (discoverable issue on mobile)
 
-**Recommendations:**
-1. Use terminology like "The Docket" or "Archives" for more character
-2. Increase status indicators to 10-12px
-3. Add hover effect showing inquiry preview on desktop
-4. Show subtle delete affordance always on mobile
+**Implemented Changes:**
+1. ✅ Renamed "Inquiries" to "Archive" (commit `f0e58ac`)
+2. ✅ Increased status indicators to 10px with subtle ring effect
+3. ✅ Delete button now always visible on mobile (opacity 0.6)
+4. ⏸️ Hover preview - deferred (nice-to-have)
 
-### Settings Modal
+### Settings Modal ✅ IMPLEMENTED
 
-**Issues:**
-- Generic modal styling doesn't match editorial theme
-- "X" close button is plain text
+**Original Problems:**
+- Generic modal styling didn't match editorial theme
+- "X" close button was plain text
 - No visual hierarchy between sections
 
-**Recommendations:**
-1. Add editorial header treatment with rules
-2. Use proper close icon (SVG) matching the rest of the app
-3. Add section dividers with decorative rules
-4. Consider a "wax seal" or stamp metaphor for saved API key confirmation
+**Implemented Changes (commit `4055906`):**
+1. ✅ Ornate double-line border and paper texture overlay
+2. ✅ SVG close icon replacing plain "X"
+3. ✅ Editorial header with decorative rules and diamond ornament
+4. ✅ Section divider with § symbol between Account and API Key sections
+5. ✅ Refined form styling with bold borders and uppercase buttons
+6. ⏸️ "Wax seal" confirmation metaphor - deferred (nice-to-have)
 
-### InquiryComposer
+### InquiryComposer ✅ IMPLEMENTED
 
-**Issues:**
-- "What would you like to ask the Council?" feels bland
-- Configure panel collapse toggle is purely functional
-- Model chips are utilitarian
+**Original Issues:**
+- "What would you like to ask the Council?" felt bland
+- ~~"Select models for deliberation"~~ ✅ Simplified to "Select models"
+- Configure panel collapse toggle was purely functional
+- Model chips were utilitarian
 
-**Recommendations:**
-1. Use more ceremonial language: "Present Your Inquiry to the Council"
-2. Add subtle quill/scroll decoration to the input area
-3. Style model selection as "councilor seats" with more character
-4. Add micro-animation when "Convening..."
+**Implemented Changes:**
+1. ✅ Changed "Select models for deliberation" to "Select models" (commit `f0e58ac`)
+2. ✅ Added decorative heading with rules and diamond ornament
+3. ✅ Ornate double-line border on textarea (matches login screen)
+4. ✅ Enhanced submit button with uppercase styling and hover invert
+5. ✅ "Convening..." state with pulsing animation effect
+6. ⏸️ Quill/scroll decoration - deferred (visual complexity)
 
 ### Stage Components
 
@@ -304,31 +326,37 @@ You could test both framings:
 
 ## 7. Summary of Priority Improvements
 
-| Priority | Item | Impact |
+| Priority | Item | Status |
 |----------|------|--------|
-| 1 | **Login screen** - Add editorial character (ornate borders, paper texture) | First impression |
-| 2 | **Branding direction** - Decide general-purpose vs legal terminology | Positioning |
-| 3 | **Name & Logo** - Finalize after branding direction is set | Brand identity |
-| 4 | **Masthead** - Give it more breathing room and a date stamp | Polish |
-| 5 | **Sidebar** - Rename to "Archive" or "History" (less legal) | UX clarity |
-| 6 | **Micro-interactions** - Add subtle animations during "Convening" state | Delight |
+| 1 | **Login screen** - Add editorial character (ornate borders, paper texture) | ✅ Done |
+| 2 | **Branding direction** - Decide general-purpose vs legal terminology | ✅ Decided |
+| 3 | **Name & Logo** - Finalize after branding direction is set | 🔲 Deferred |
+| 4 | **Masthead** - Give it more breathing room and a date stamp | ✅ Done |
+| 5 | **Sidebar** - Rename to "Archive" or "History" (less legal) | ✅ Done |
+| 6 | **Settings modal** - Match editorial theme | ✅ Done |
+| 7 | **Sidebar status indicators** - Increase size (8px → 10-12px) | ✅ Done |
+| 8 | **InquiryComposer** - Polish and micro-interactions | ✅ Done |
+| 9 | **Micro-interactions** - Add subtle animations during "Convening" state | ✅ Done |
 
 ---
 
 ## 8. Conclusion
 
-The foundation is strong. The editorial "Paper of Record" theme is distinctive and well-implemented. These refinements would elevate it from "nice theme" to "memorable product."
+**All major UI/UX improvements have been implemented.** The editorial "Paper of Record" theme is now applied consistently across the entire app.
 
-**Key insights:**
+**Key accomplishments:**
 
-1. **Aesthetic direction is right** but applied inconsistently - login screen and settings modal feel disconnected from the main editorial experience.
+1. ✅ **Aesthetic consistency achieved** - Login screen, masthead, settings modal, sidebar, and InquiryComposer all share the same editorial design language with ornate borders, paper textures, and decorative rules.
 
-2. **Branding needs resolution** - the app oscillates between legal terminology (deliberation, docket) and general-purpose expert synthesis. Settling on "collective expertise" over "courtroom" would broaden appeal without losing authority.
+2. ✅ **Branding direction settled** - General-purpose "collective expertise" positioning, moving away from legal terminology. "Deliberation" removed, "Docket" changed to "Archive."
 
-3. **Name and logo can wait** - "AI Council" works fine while the UI does the heavy lifting. The visual language matters more than the name for establishing identity.
+3. ✅ **Typography and color** - Consistent use of Playfair Display, Source Serif 4, and IBM Plex across all components.
 
-**Next steps:**
-1. Decide branding direction (general-purpose recommended)
-2. Adjust terminology if needed (drop "docket," soften "deliberation")
-3. Polish login screen to match editorial theme
-4. Finalize name and logo once positioning is clear
+4. ✅ **Micro-interactions** - Added pulsing animation on "Convening..." state, improved button hover effects, and increased visibility of status indicators.
+
+5. ✅ **Mobile improvements** - Delete buttons now visible on mobile, responsive adjustments across all updated components.
+
+**Remaining (deferred):**
+1. 🔲 Name and logo finalization - Under consideration
+2. 🔲 Hover preview for archive items - Nice-to-have
+3. 🔲 Entrance animations - Non-critical

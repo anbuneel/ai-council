@@ -130,11 +130,12 @@
 
 /* Status indicator */
 .case-status {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  margin-top: 6px;
+  margin-top: 5px;
   flex-shrink: 0;
+  box-shadow: 0 0 0 2px var(--paper-cream);
 }
 
 .case-status.pending {
@@ -202,5 +203,14 @@
   .sidebar {
     width: 100%;
     max-width: 100%;
+  }
+
+  /* Show delete button always on mobile (no hover) */
+  .case-item .delete-btn {
+    opacity: 0.6;
+  }
+
+  .case-item .delete-btn:active {
+    opacity: 1;
   }
 }
