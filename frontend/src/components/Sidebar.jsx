@@ -97,6 +97,9 @@ export default function Sidebar({
 
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`} id="sidebar" aria-label="Inquiry list">
+      <div className="sidebar-header">
+        <div className="sidebar-title">Archive</div>
+      </div>
       <div className="sidebar-search">
         <input
           type="text"
