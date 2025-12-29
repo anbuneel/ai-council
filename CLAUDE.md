@@ -88,6 +88,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - Health Check: `GET /` every 30s
 - Auto-scaling: Min 0 machines (stops when idle)
 - HTTPS: Force HTTPS enabled
+- **Important:** OAuth state storage is in-memory; must run single instance (max 1 machine) until Redis is implemented
 
 ### Database (Supabase)
 - Type: PostgreSQL
@@ -510,12 +511,14 @@ Tested on latest Chrome/Firefox. Frontend uses modern React patterns (hooks, str
 
 A comprehensive security review was conducted on 2025-12-28 (see `docs/ai-council-review-codex-20251228-154048.md`).
 
-**Verdict:** Not ready for public launch until High priority security items are resolved.
+**Completed security fixes:**
+- [x] OAuth state validation (server-side) - `backend/oauth_state.py`
+- [x] PKCE implementation for Google OAuth (S256 code challenge)
+- [x] Frontend strict state validation (fail hard on mismatch)
 
-**Key findings requiring attention before launch:**
-- OAuth state validation and PKCE implementation
-- Fail-fast secret validation at startup
-- Complete database migrations for all tables
-- Rate limiting and request size limits
+**Remaining items before launch:**
+- [ ] Fail-fast secret validation at startup
+- [ ] Complete database migrations for all tables
+- [ ] Rate limiting and request size limits
 
 See `docs/IMPLEMENTATION_PLAN_security_fixes.md` for the detailed implementation plan.

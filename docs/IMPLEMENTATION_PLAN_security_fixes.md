@@ -1,62 +1,46 @@
 # Implementation Plan: Security & Quality Fixes
 
 **Created:** 2025-12-28
+**Updated:** 2025-12-28
 **Based on:** ai-council-review-codex-20251228-154048.md (Codex review + Claude Opus 4.5 response)
 **Priority:** Must complete High items before public launch
 
 ---
 
+## Progress Summary
+
+| Phase | Item | Status | PR |
+|-------|------|--------|-----|
+| 1.1 | OAuth State Validation & PKCE | ✅ Complete | [#16](https://github.com/anbuneel/ai-council/pull/16) |
+| 1.2 | Fail-Fast Secret Validation | ⏳ Pending | - |
+| 1.3 | Complete Database Migrations | ⏳ Pending | - |
+| 1.4 | Rate Limiting & Request Size Limits | ⏳ Pending | - |
+| 2.x | Medium Priority Fixes | ⏳ Pending | - |
+| 3.x | Low Priority Fixes | ⏳ Pending | - |
+
+---
+
 ## Phase 1: Critical Security Fixes (Launch Blockers)
 
-### 1.1 OAuth State Validation & PKCE
+### 1.1 OAuth State Validation & PKCE ✅ COMPLETED
 
-**Files to modify:**
-- `backend/main.py` (OAuth endpoints)
-- `backend/oauth.py` (OAuth handlers)
-- `frontend/src/api.js` (OAuth state handling)
+**Status:** Implemented in PR #16 (`security/oauth-state-validation`)
+**Completed:** 2025-12-28
 
-**Implementation steps:**
+**Files created/modified:**
+- `backend/oauth_state.py` (NEW) - Server-side state storage with PKCE
+- `backend/oauth.py` - Added PKCE parameters to OAuth handlers
+- `backend/main.py` - Uses state validation before token exchange
+- `backend/models.py` - Made state field required
+- `frontend/src/api.js` - Strict state validation with explicit errors
 
-1. **Add server-side state storage (Redis or in-memory with TTL)**
-   ```python
-   # backend/oauth_state.py (new file)
-   from datetime import datetime, timedelta
-   import secrets
-
-   # Simple in-memory store with TTL (use Redis for multi-instance)
-   _oauth_states: dict[str, datetime] = {}
-   STATE_TTL_SECONDS = 600  # 10 minutes
-
-   def create_state() -> str:
-       state = secrets.token_urlsafe(32)
-       _oauth_states[state] = datetime.utcnow()
-       # Cleanup expired states
-       cleanup_expired_states()
-       return state
-
-   def validate_and_consume_state(state: str) -> bool:
-       if state not in _oauth_states:
-           return False
-       created_at = _oauth_states.pop(state)
-       return (datetime.utcnow() - created_at).total_seconds() < STATE_TTL_SECONDS
-   ```
-
-2. **Update `/api/auth/oauth/{provider}` to store state**
-   - Call `create_state()` instead of just generating
-   - Return state to client as before
-
-3. **Update `/api/auth/oauth/{provider}/callback` to validate state**
-   - Call `validate_and_consume_state(data.state)`
-   - Return 400 if state is invalid or expired
-
-4. **Implement PKCE (code_verifier/code_challenge)**
-   - Generate `code_verifier` server-side
-   - Send `code_challenge` (SHA256 hash) with authorization URL
-   - Store verifier with state
-   - Send `code_verifier` in token exchange
-
-5. **Update frontend OAuth callback to fail hard on state mismatch**
-   - `frontend/src/api.js:131` - throw error if state doesn't match
+**Implementation details:**
+- Server-side state storage with 10-minute TTL
+- PKCE implementation using S256 code challenge method
+- One-time state consumption (prevents replay attacks)
+- Frontend fails hard on missing/mismatched state
+- Google OAuth uses full PKCE flow
+- GitHub OAuth uses state validation (PKCE not supported by GitHub)
 
 ---
 
