@@ -12,7 +12,7 @@
 | Phase | Item | Status | PR |
 |-------|------|--------|-----|
 | 1.1 | OAuth State Validation & PKCE | ✅ Complete | [#16](https://github.com/anbuneel/ai-council/pull/16) |
-| 1.2 | Fail-Fast Secret Validation | ⏳ Pending | - |
+| 1.2 | Fail-Fast Secret Validation | ✅ Complete | [#17](https://github.com/anbuneel/ai-council/pull/17) |
 | 1.3 | Complete Database Migrations | ⏳ Pending | - |
 | 1.4 | Rate Limiting & Request Size Limits | ⏳ Pending | - |
 | 2.x | Medium Priority Fixes | ⏳ Pending | - |
@@ -44,50 +44,21 @@
 
 ---
 
-### 1.2 Fail-Fast Secret Validation
+### 1.2 Fail-Fast Secret Validation ✅ COMPLETED
 
-**Files to modify:**
-- `backend/config.py`
-- `backend/main.py` (app startup)
+**Status:** Implemented in PR #17 (`security/fail-fast-secrets`)
+**Completed:** 2025-12-28
 
-**Implementation steps:**
+**Files modified:**
+- `backend/config.py` - Added `IS_PRODUCTION` detection and `validate_secrets()` function
+- `backend/main.py` - Calls `validate_secrets()` in lifespan startup
 
-1. **Add production detection**
-   ```python
-   # backend/config.py
-   import os
-
-   IS_PRODUCTION = os.getenv("FLY_APP_NAME") is not None or os.getenv("VERCEL") is not None
-   ```
-
-2. **Add startup validation function**
-   ```python
-   # backend/config.py
-   def validate_secrets():
-       errors = []
-
-       if IS_PRODUCTION:
-           if JWT_SECRET == "change-me-in-production":
-               errors.append("JWT_SECRET must be set in production")
-           if not API_KEY_ENCRYPTION_KEY:
-               errors.append("API_KEY_ENCRYPTION_KEY must be set in production")
-           if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
-               errors.append("Google OAuth credentials must be set in production")
-           if not GITHUB_CLIENT_ID or not GITHUB_CLIENT_SECRET:
-               errors.append("GitHub OAuth credentials must be set in production")
-
-       if errors:
-           raise RuntimeError("Configuration errors:\n" + "\n".join(errors))
-   ```
-
-3. **Call validation in app lifespan**
-   ```python
-   # backend/main.py
-   @asynccontextmanager
-   async def lifespan(app: FastAPI):
-       validate_secrets()  # Fail fast
-       # ... existing startup code
-   ```
+**Implementation details:**
+- Production detection via `FLY_APP_NAME` or `PRODUCTION=true` env vars
+- Validates at startup: JWT_SECRET, API_KEY_ENCRYPTION_KEY, OAuth credentials, DATABASE_URL
+- In production: raises `RuntimeError` with all errors listed (fails fast)
+- In development: logs warnings only, allows app to start
+- Provides helpful error messages with generation commands for keys
 
 ---
 
