@@ -88,6 +88,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - Health Check: `GET /` every 30s
 - Auto-scaling: Min 0 machines (stops when idle)
 - HTTPS: Force HTTPS enabled
+- **Important:** OAuth state storage is in-memory; must run single instance (max 1 machine) until Redis is implemented
 
 ### Database (Supabase)
 - Type: PostgreSQL

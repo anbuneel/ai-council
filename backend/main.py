@@ -187,7 +187,7 @@ async def get_oauth_url(provider: str):
     CSRF protection and authorization code interception prevention.
     """
     # Create state with PKCE - state and code_verifier are stored server-side
-    state, code_challenge = create_oauth_state()
+    state, code_challenge = await create_oauth_state()
 
     if provider == "google":
         url = GoogleOAuth.get_authorization_url(state, code_challenge)
@@ -207,7 +207,7 @@ async def oauth_callback(provider: str, data: OAuthCallbackRequest):
     code_verifier for token exchange.
     """
     # Validate state and get PKCE code_verifier
-    code_verifier = validate_and_consume_state(data.state)
+    code_verifier = await validate_and_consume_state(data.state)
     if code_verifier is None:
         raise HTTPException(
             status_code=400,

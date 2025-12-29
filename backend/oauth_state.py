@@ -2,12 +2,17 @@
 
 This module provides server-side storage for OAuth state tokens and PKCE
 code verifiers to prevent login CSRF and authorization code interception attacks.
+
+IMPORTANT: This implementation uses in-memory storage which only works with
+single-instance deployments. For multi-instance deployments (auto-scaling),
+replace with Redis or another shared state store.
 """
 
 import secrets
 import hashlib
 import base64
-from datetime import datetime, timedelta
+import asyncio
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass
 from typing import Optional
 
@@ -24,8 +29,12 @@ class OAuthStateData:
 
 
 # In-memory store for OAuth states
-# Note: For multi-instance deployments, replace with Redis
+# WARNING: Only works with single-instance deployments
+# For multi-instance deployments, replace with Redis
 _oauth_states: dict[str, OAuthStateData] = {}
+
+# Lock for thread-safe access to _oauth_states
+_state_lock = asyncio.Lock()
 
 
 def _generate_code_verifier() -> str:
@@ -51,9 +60,11 @@ def _generate_code_challenge(verifier: str) -> str:
     return base64.urlsafe_b64encode(digest).rstrip(b'=').decode('ascii')
 
 
-def _cleanup_expired_states() -> None:
-    """Remove expired state tokens from storage."""
-    cutoff = datetime.utcnow() - timedelta(seconds=STATE_TTL_SECONDS)
+def _cleanup_expired_states_sync() -> None:
+    """Remove expired state tokens from storage (must be called with lock held)."""
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(seconds=STATE_TTL_SECONDS)
+    # Build list of expired keys first to avoid modifying dict during iteration
     expired = [
         state for state, data in _oauth_states.items()
         if data.created_at < cutoff
@@ -62,7 +73,7 @@ def _cleanup_expired_states() -> None:
         del _oauth_states[state]
 
 
-def create_oauth_state() -> tuple[str, str]:
+async def create_oauth_state() -> tuple[str, str]:
     """Create a new OAuth state token with PKCE parameters.
 
     Returns:
@@ -70,26 +81,26 @@ def create_oauth_state() -> tuple[str, str]:
         - state: Random token to be included in authorization URL
         - code_challenge: PKCE challenge to be included in authorization URL
     """
-    # Cleanup old states periodically
-    _cleanup_expired_states()
-
-    # Generate state token
+    # Generate state token and PKCE values outside the lock
     state = secrets.token_urlsafe(32)
-
-    # Generate PKCE verifier and challenge
     code_verifier = _generate_code_verifier()
     code_challenge = _generate_code_challenge(code_verifier)
+    now = datetime.now(timezone.utc)
 
-    # Store state with verifier
-    _oauth_states[state] = OAuthStateData(
-        created_at=datetime.utcnow(),
-        code_verifier=code_verifier
-    )
+    async with _state_lock:
+        # Cleanup old states periodically
+        _cleanup_expired_states_sync()
+
+        # Store state with verifier
+        _oauth_states[state] = OAuthStateData(
+            created_at=now,
+            code_verifier=code_verifier
+        )
 
     return state, code_challenge
 
 
-def validate_and_consume_state(state: str) -> Optional[str]:
+async def validate_and_consume_state(state: str) -> Optional[str]:
     """Validate and consume an OAuth state token.
 
     Args:
@@ -99,13 +110,18 @@ def validate_and_consume_state(state: str) -> Optional[str]:
         The PKCE code verifier if state is valid, None otherwise.
         The state is removed after validation (one-time use).
     """
-    if not state or state not in _oauth_states:
+    if not state:
         return None
 
-    state_data = _oauth_states.pop(state)
+    async with _state_lock:
+        if state not in _oauth_states:
+            return None
 
-    # Check if expired
-    age = (datetime.utcnow() - state_data.created_at).total_seconds()
+        state_data = _oauth_states.pop(state)
+
+    # Check if expired (can be done outside lock)
+    now = datetime.now(timezone.utc)
+    age = (now - state_data.created_at).total_seconds()
     if age > STATE_TTL_SECONDS:
         return None
 
