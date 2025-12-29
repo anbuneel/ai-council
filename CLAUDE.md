@@ -515,9 +515,9 @@ A comprehensive security review was conducted on 2025-12-28 (see `docs/ai-counci
 - [x] OAuth state validation (server-side) - `backend/oauth_state.py`
 - [x] PKCE implementation for Google OAuth (S256 code challenge)
 - [x] Frontend strict state validation (fail hard on mismatch)
+- [x] Fail-fast secret validation at startup - `backend/config.py:validate_secrets()`
 
 **Remaining items before launch:**
-- [ ] Fail-fast secret validation at startup
 - [ ] Complete database migrations for all tables
 - [ ] Rate limiting and request size limits
 

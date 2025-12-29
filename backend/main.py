@@ -16,7 +16,8 @@ from .config import (
     DATABASE_URL,
     AVAILABLE_MODELS,
     DEFAULT_MODELS,
-    DEFAULT_LEAD_MODEL
+    DEFAULT_LEAD_MODEL,
+    validate_secrets
 )
 from .auth_jwt import (
     get_current_user,
@@ -60,6 +61,9 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle - startup and shutdown events."""
+    # Fail fast if required secrets are not configured
+    validate_secrets()
+
     if not USE_LOCAL_STORAGE:
         # Startup: initialize database pool
         await get_pool()
