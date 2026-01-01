@@ -558,7 +558,7 @@ async def send_message_stream(
 
     async def event_generator():
         title_task = None
-        keepalive_event = ": keepalive\n\n"
+        keepalive_event = ":\n\n"  # Standard SSE comment for keepalive
 
         async def run_with_keepalive(coro, interval=15):
             """Run a coroutine while yielding keepalive pings every interval seconds."""

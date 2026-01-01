@@ -1,8 +1,11 @@
 -- Base schema for AI Council conversations
 -- This migration creates the core tables that were previously created manually in Supabase
+--
+-- ORDERING NOTE: The "000" prefix ensures this runs FIRST (alphabetically) for new deployments.
+-- For existing deployments where tables already exist, IF NOT EXISTS makes this idempotent.
+-- Columns like user_id, models, lead_model are added by later migrations (003, ensure_schema).
 
 -- Conversations table
--- Note: user_id, models, lead_model columns are added by later migrations (003, ensure_schema)
 CREATE TABLE IF NOT EXISTS conversations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL DEFAULT 'New Conversation',
