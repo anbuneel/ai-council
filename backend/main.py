@@ -60,6 +60,15 @@ else:
     print("[WARNING] DATABASE_URL not set - using local JSON storage")
 
 
+def get_client_ip(request: Request) -> str:
+    """Get client IP address, handling proxies via X-Forwarded-For header."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        # Take the first IP in the chain (original client)
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle - startup and shutdown events."""
@@ -225,12 +234,17 @@ async def get_oauth_url(provider: str):
 
 
 @app.post("/api/auth/oauth/{provider}/callback", response_model=TokenResponse)
-async def oauth_callback(provider: str, data: OAuthCallbackRequest):
+async def oauth_callback(provider: str, data: OAuthCallbackRequest, request: Request):
     """Complete OAuth flow and return JWT tokens.
 
     Validates the state token server-side and uses the stored PKCE
     code_verifier for token exchange.
+
+    Rate limited to 30 requests/minute per IP to prevent brute-force attacks.
     """
+    # Rate limit by client IP (user not authenticated yet)
+    await api_rate_limiter.check(get_client_ip(request))
+
     # Validate state and get PKCE code_verifier
     code_verifier = await validate_and_consume_state(data.state)
     if code_verifier is None:
@@ -275,8 +289,14 @@ async def oauth_callback(provider: str, data: OAuthCallbackRequest):
 
 
 @app.post("/api/auth/refresh", response_model=TokenResponse)
-async def refresh_tokens(data: RefreshTokenRequest):
-    """Refresh access token using refresh token."""
+async def refresh_tokens(data: RefreshTokenRequest, request: Request):
+    """Refresh access token using refresh token.
+
+    Rate limited to 30 requests/minute per IP.
+    """
+    # Rate limit by client IP
+    await api_rate_limiter.check(get_client_ip(request))
+
     user_id = verify_token(data.refresh_token, "refresh")
 
     # Generate new tokens
@@ -310,7 +330,12 @@ async def get_current_user_info(user_id: UUID = Depends(get_current_user)):
 
 @app.post("/api/settings/api-key", response_model=ApiKeyResponse)
 async def save_api_key(data: ApiKeyCreate, user_id: UUID = Depends(get_current_user)):
-    """Save or update user's API key."""
+    """Save or update user's API key.
+
+    Rate limited to 30 requests/minute per user.
+    """
+    await api_rate_limiter.check(str(user_id))
+
     encrypted = encrypt_api_key(data.api_key)
     hint = get_key_hint(data.api_key)
 
@@ -325,13 +350,22 @@ async def save_api_key(data: ApiKeyCreate, user_id: UUID = Depends(get_current_u
 
 @app.get("/api/settings/api-keys")
 async def list_api_keys(user_id: UUID = Depends(get_current_user)):
-    """List user's API keys (metadata only)."""
+    """List user's API keys (metadata only).
+
+    Rate limited to 30 requests/minute per user.
+    """
+    await api_rate_limiter.check(str(user_id))
     return await storage.get_user_api_keys(user_id)
 
 
 @app.delete("/api/settings/api-key/{provider}")
 async def delete_api_key(provider: str, user_id: UUID = Depends(get_current_user)):
-    """Delete user's API key."""
+    """Delete user's API key.
+
+    Rate limited to 30 requests/minute per user.
+    """
+    await api_rate_limiter.check(str(user_id))
+
     deleted = await storage.delete_user_api_key(user_id, provider)
     if not deleted:
         raise HTTPException(status_code=404, detail="API key not found")
