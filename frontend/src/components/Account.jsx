@@ -30,10 +30,19 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
 
   // Export state
   const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   useEffect(() => {
     loadAllData();
   }, []);
+
+  // Auto-dismiss export error after 5 seconds
+  useEffect(() => {
+    if (exportError) {
+      const timer = setTimeout(() => setExportError(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [exportError]);
 
   const loadAllData = async () => {
     setIsLoading(true);
@@ -126,11 +135,11 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
 
   const handleExportData = async () => {
     setIsExporting(true);
-    setError('');
+    setExportError('');
     try {
       await auth.exportData();
     } catch (err) {
-      setError(err.message || 'Failed to export data');
+      setExportError(err.message || 'Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -445,6 +454,16 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
                     </>
                   )}
                 </button>
+                {exportError && (
+                  <div className="export-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    {exportError}
+                  </div>
+                )}
               </div>
 
               {/* Delete Account */}

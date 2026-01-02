@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { LEGAL_CONFIG } from '../legalConfig';
 import './LegalPage.css';
 
 function TermsOfService() {
@@ -15,7 +16,7 @@ function TermsOfService() {
             Back
           </button>
           <h1 className="legal-title">Terms of Service</h1>
-          <p className="legal-date">Last updated: January 2, 2026</p>
+          <p className="legal-date">Last updated: {LEGAL_CONFIG.termsOfServiceLastUpdated}</p>
         </header>
 
         <article className="legal-body">

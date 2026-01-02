@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { LEGAL_CONFIG } from '../legalConfig';
 import './LegalPage.css';
 
 function PrivacyPolicy() {
@@ -15,7 +16,7 @@ function PrivacyPolicy() {
             Back
           </button>
           <h1 className="legal-title">Privacy Policy</h1>
-          <p className="legal-date">Last updated: January 2, 2026</p>
+          <p className="legal-date">Last updated: {LEGAL_CONFIG.privacyPolicyLastUpdated}</p>
         </header>
 
         <article className="legal-body">

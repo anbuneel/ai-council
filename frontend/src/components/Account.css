@@ -723,6 +723,26 @@
   animation: spin 0.8s linear infinite;
 }
 
+/* Export Error Toast */
+.export-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: rgba(196, 61, 46, 0.08);
+  border: 1px solid rgba(196, 61, 46, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--accent-vermillion);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  animation: fadeIn 200ms ease-out;
+}
+
+.export-error svg {
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    Danger Zone (Account Management)
    ========================================================================== */
