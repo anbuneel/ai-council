@@ -153,57 +153,59 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
             </div>
           )}
 
-          {/* Balance Section */}
-          <section className="account-card">
-            <div className="card-header">
-              <h2 className="card-title">Account Balance</h2>
-              {userInfo && (
-                <span className="card-subtitle">{userInfo.email}</span>
-              )}
-            </div>
-            <div className="card-content">
-              <div className="balance-display">
-                <span className="balance-currency">$</span>
-                <span className="balance-amount">{balance?.balance?.toFixed(2) || '0.00'}</span>
+          {/* Balance + Add Funds Row */}
+          <div className="account-row">
+            {/* Balance Section */}
+            <section className="account-card">
+              <div className="card-header">
+                <h2 className="card-title">Account Balance</h2>
+              </div>
+              <div className="card-content card-content-center">
+                <div className="balance-display">
+                  <span className="balance-currency">$</span>
+                  <span className="balance-amount">{balance?.balance?.toFixed(2) || '0.00'}</span>
+                </div>
                 <span className="balance-label">available</span>
-              </div>
-              <div className="balance-stats">
-                <div className="stat">
-                  <span className="stat-value">{formatBalance(balance?.total_deposited)}</span>
-                  <span className="stat-label">deposited</span>
+                <div className="balance-stats">
+                  <div className="stat">
+                    <span className="stat-value">{formatBalance(balance?.total_deposited)}</span>
+                    <span className="stat-label">deposited</span>
+                  </div>
+                  <div className="stat-divider"></div>
+                  <div className="stat">
+                    <span className="stat-value">{formatBalance(balance?.total_spent)}</span>
+                    <span className="stat-label">spent</span>
+                  </div>
                 </div>
-                <div className="stat-divider"></div>
-                <div className="stat">
-                  <span className="stat-value">{formatBalance(balance?.total_spent)}</span>
-                  <span className="stat-label">spent</span>
-                </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Add Funds Section */}
-          <section className="account-card">
-            <div className="card-header">
-              <h2 className="card-title">Add Funds</h2>
-              <span className="card-subtitle">~$0.02–$0.10 per inquiry</span>
-            </div>
-            <div className="card-content">
-              <div className="deposit-grid">
-                {depositOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    className="deposit-card"
-                    onClick={() => handleDeposit(option.id)}
-                    disabled={isPurchasing}
-                  >
-                    <span className="deposit-amount">{formatPrice(option.amount_cents)}</span>
-                    <span className="deposit-estimate">~{Math.round(option.amount_cents / 5)} inquiries</span>
-                    {isPurchasing && <span className="deposit-loading">Processing...</span>}
-                  </button>
-                ))}
+            {/* Add Funds Section */}
+            <section className="account-card">
+              <div className="card-header">
+                <h2 className="card-title">Add Funds</h2>
               </div>
-            </div>
-          </section>
+              <div className="card-content card-content-center">
+                <div className="deposit-stack">
+                  {depositOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      className="deposit-card"
+                      onClick={() => handleDeposit(option.id)}
+                      disabled={isPurchasing}
+                    >
+                      <span className="deposit-amount">{formatPrice(option.amount_cents)}</span>
+                      <span className="deposit-meta">
+                        <span className="deposit-estimate">~{Math.round(option.amount_cents / 5)} inquiries</span>
+                        {isPurchasing && <span className="deposit-loading">Processing...</span>}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="deposit-note">~$0.02–$0.10 per inquiry</p>
+              </div>
+            </section>
+          </div>
 
           {/* Usage History Section */}
           <section className="account-card">
