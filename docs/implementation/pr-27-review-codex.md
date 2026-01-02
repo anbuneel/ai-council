@@ -1,7 +1,7 @@
 # PR 27 Review (Codex)
 Author: Codex
 Date: 2026-01-02 11:30:01 -05:00
-Re-review: 2026-01-02 11:57:55 -05:00
+Re-review: 2026-01-02 12:27:11 -05:00
 PR: https://github.com/anbuneel/ai-council/pull/27
 
 ## Findings
@@ -31,7 +31,7 @@ PR: https://github.com/anbuneel/ai-council/pull/27
 - But `Stage1.jsx:86` reads `activeResponse.response`
 - And `Stage3.jsx:25` reads `finalResponse.response`
 
-This means **demos are currently broken** - Stage 1 and Stage 3 tabs show blank content.
+This meant demos were broken before the fix - Stage 1 and Stage 3 tabs showed blank content.
 
 **Fix options:**
 1. Change DemoView adapter to use `response` key instead of `content`
@@ -54,6 +54,8 @@ Soft-delete keeps old rows but webhook lookups still require `is_active = true`,
 - Added `include_inactive` parameter to `storage.get_deposit_option()`
 - Updated `main.py:946` to call with `include_inactive=True`
 - Updated `storage_local.py` to match signature
+
+**Re-review:** Verified `include_inactive` in `backend/storage.py` and the webhook callsite in `backend/main.py` (commit 21e85f2).
 
 ---
 
