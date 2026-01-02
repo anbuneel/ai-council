@@ -204,6 +204,43 @@ export const auth = {
     clearTokens();
     return response.json();
   },
+
+  /**
+   * Export all user data as a ZIP file.
+   * Downloads a ZIP containing JSON and Markdown files.
+   */
+  async exportData() {
+    const response = await fetchWithAuth(`${API_BASE}/api/auth/export`);
+    if (!response.ok) {
+      let message = 'Failed to export data';
+      try {
+        const error = await response.json();
+        message = error.detail || message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+    // Get the blob and trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    // Get filename from Content-Disposition header or use default
+    const disposition = response.headers.get('Content-Disposition');
+    let filename = 'ai-council-export.zip';
+    if (disposition) {
+      const match = disposition.match(/filename=(.+)/);
+      if (match) {
+        filename = match[1];
+      }
+    }
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
 };
 
 // ============== Settings API ==============

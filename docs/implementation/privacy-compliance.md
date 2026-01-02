@@ -57,8 +57,8 @@ Notice in InquiryComposer informing users:
 ### Backend
 | File | Changes |
 |------|---------|
-| `backend/main.py` | Added `DELETE /api/auth/account` endpoint |
-| `backend/storage.py` | Added `delete_user_account()` function |
+| `backend/main.py` | Added `DELETE /api/auth/account` and `GET /api/auth/export` endpoints |
+| `backend/storage.py` | Added `delete_user_account()` and `export_user_data()` functions |
 
 ### Frontend
 | File | Changes |
@@ -93,13 +93,26 @@ Legal links are accessible from:
 
 ---
 
+### 5. Data Export
+
+**Backend Endpoint:** `GET /api/auth/export`
+
+Returns a ZIP archive containing:
+- `data.json` - Complete data export (account info, conversations, transactions)
+- `conversations/*.md` - Each conversation as a Markdown file (human-readable)
+- `account_summary.md` - Account overview in Markdown
+
+**Frontend:** "Download" button in Account page (Data & Privacy section).
+
+---
+
 ## User Rights Status
 
 | Right | Status |
 |-------|--------|
 | View data | Available (Account page, conversation history) |
-| Export data | Not yet implemented |
-| Delete account | Available (Account page > Account Management) |
+| Export data | Available (Account page > Data & Privacy) |
+| Delete account | Available (Account page > Data & Privacy) |
 | Delete conversations | Available (Archive sidebar) |
 
 ---

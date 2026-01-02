@@ -140,8 +140,8 @@ If a user provides their own OpenRouter API key:
 | Right | Status |
 |-------|--------|
 | View data | Available (Account page, conversation history) |
-| Export data | Not yet implemented |
-| Delete account | Available (Account page > Account Management) |
+| Export data | Available (Account page > Data & Privacy) |
+| Delete account | Available (Account page > Data & Privacy) |
 | Delete conversations | Available (Archive sidebar) |
 
 ---

@@ -28,6 +28,9 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
+
   useEffect(() => {
     loadAllData();
   }, []);
@@ -118,6 +121,18 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
       setShowDeleteConfirm(false);
     } finally {
       setIsDeletingAccount(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    setIsExporting(true);
+    setError('');
+    try {
+      await auth.exportData();
+    } catch (err) {
+      setError(err.message || 'Failed to export data');
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -395,18 +410,49 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
             </div>
           </section>
 
-          {/* Account Management Section */}
-          <section className="account-card account-card-danger">
+          {/* Data & Privacy Section */}
+          <section className="account-card">
             <div className="card-header">
-              <h2 className="card-title">Account Management</h2>
+              <h2 className="card-title">Data &amp; Privacy</h2>
             </div>
             <div className="card-content">
+              {/* Export Data */}
+              <div className="data-action">
+                <div className="data-action-info">
+                  <h3 className="data-action-title">Export Your Data</h3>
+                  <p className="data-action-description">
+                    Download a ZIP file containing all your conversations (as Markdown) and account
+                    data (as JSON).
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="data-action-btn"
+                  onClick={handleExportData}
+                  disabled={isExporting}
+                >
+                  {isExporting ? (
+                    <>
+                      <span className="btn-spinner"></span>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                      </svg>
+                      Download
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Delete Account */}
               <div className="danger-zone">
                 <div className="danger-info">
                   <h3 className="danger-title">Delete Account</h3>
                   <p className="danger-description">
-                    Permanently delete your account and all associated data including conversations,
-                    transactions, and API keys. This action cannot be undone.
+                    Permanently delete your account and all associated data. This cannot be undone.
                   </p>
                 </div>
                 <button
@@ -417,6 +463,7 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
                   Delete Account
                 </button>
               </div>
+
               <div className="legal-links-footer">
                 <a href="/privacy" className="legal-link">Privacy Policy</a>
                 <span className="legal-divider">|</span>

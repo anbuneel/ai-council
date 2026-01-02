@@ -140,11 +140,11 @@ function PrivacyPolicy() {
                 </tr>
                 <tr>
                   <td>Export your data</td>
-                  <td>Coming soon</td>
+                  <td>Available (Account page &gt; Data &amp; Privacy)</td>
                 </tr>
                 <tr>
                   <td>Delete your account</td>
-                  <td>Available (Account page &gt; Account Management)</td>
+                  <td>Available (Account page &gt; Data &amp; Privacy)</td>
                 </tr>
                 <tr>
                   <td>Delete conversations</td>

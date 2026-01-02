@@ -277,6 +277,13 @@ Returns:
 }
 ```
 
+#### GET `/api/auth/export`
+Export all user data as a ZIP file (requires auth).
+Returns a ZIP archive containing:
+- `data.json` - Complete data export (account, conversations, transactions)
+- `conversations/*.md` - Each conversation as a Markdown file
+- `account_summary.md` - Account overview in Markdown
+
 ### GET `/api/models`
 Returns available models and defaults:
 ```json
