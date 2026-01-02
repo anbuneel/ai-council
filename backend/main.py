@@ -356,7 +356,10 @@ async def get_current_user_info(user_id: UUID = Depends(get_current_user)):
 
 
 @app.delete("/api/auth/account")
-async def delete_account(user_id: UUID = Depends(get_current_user)):
+async def delete_account(
+    request: Request,
+    user_id: UUID = Depends(get_current_user)
+):
     """Delete user account and all associated data.
 
     This action is irreversible. Deletes:
@@ -365,6 +368,10 @@ async def delete_account(user_id: UUID = Depends(get_current_user)):
     - API keys
     - User account
     """
+    # Rate limit by both user and IP to prevent abuse
+    await checkout_rate_limiter.check(str(user_id))
+    await checkout_rate_limiter.check(f"ip:{get_client_ip(request)}")
+
     deleted = await storage.delete_user_account(user_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
@@ -372,13 +379,20 @@ async def delete_account(user_id: UUID = Depends(get_current_user)):
 
 
 @app.get("/api/auth/export")
-async def export_data(user_id: UUID = Depends(get_current_user)):
+async def export_data(
+    request: Request,
+    user_id: UUID = Depends(get_current_user)
+):
     """Export all user data as a ZIP file containing JSON and Markdown.
 
     Returns a ZIP archive with:
     - data.json: Complete data export in JSON format
     - conversations/: Markdown files for each conversation (human-readable)
     """
+    # Rate limit by both user and IP to prevent abuse
+    await checkout_rate_limiter.check(str(user_id))
+    await checkout_rate_limiter.check(f"ip:{get_client_ip(request)}")
+
     data = await storage.export_user_data(user_id)
     if not data:
         raise HTTPException(status_code=404, detail="User not found")
