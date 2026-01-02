@@ -1,97 +1,80 @@
 # Documentation Index
 
-Chronological reference to all project documentation.
+Project documentation organized by category.
 
 ---
 
-## 2025-12-26
+## Security
 
-| Document | Description |
-|----------|-------------|
-| [UI_REDESIGN_PROPOSAL_opus_claude.md](UI_REDESIGN_PROPOSAL_opus_claude.md) | Full UI redesign proposal - "Paper of Record" editorial theme |
-| [MULTI_USER_ROADMAP.md](MULTI_USER_ROADMAP.md) | Roadmap for multi-user support and authentication |
-| [PHASE1_IMPLEMENTATION_PLAN.md](PHASE1_IMPLEMENTATION_PLAN.md) | Phase 1 implementation plan for UI redesign |
+Security reviews and implementation plans.
 
-### Archive (superseded)
-| Document | Description |
-|----------|-------------|
-| [archive/UI_REDESIGN_PROPOSAL_claude.md](archive/UI_REDESIGN_PROPOSAL_claude.md) | Earlier UI redesign proposal |
-| [archive/ui-redesign-plan.md](archive/ui-redesign-plan.md) | Initial UI redesign planning |
-| [archive/NEW_INQUIRY_UX_REDESIGN.md](archive/NEW_INQUIRY_UX_REDESIGN.md) | New inquiry UX redesign notes |
-| [archive/DESIGN_PROPOSAL.md](archive/DESIGN_PROPOSAL.md) | Original design proposal |
+| Document | Description | Date |
+|----------|-------------|------|
+| [codex-review-2025-12-28.md](security/codex-review-2025-12-28.md) | Comprehensive security review by Codex | 2025-12-28 |
+| [security-fixes-plan.md](security/security-fixes-plan.md) | Security fixes implementation (Phase 1-3) | 2025-12-28 |
+| [production-readiness-2025-12-31.md](security/production-readiness-2025-12-31.md) | Production readiness review by Codex | 2025-12-31 |
 
 ---
 
-## 2025-12-27
+## Design
 
-| Document | Description |
-|----------|-------------|
-| [UI_UX_REVIEW.md](UI_UX_REVIEW.md) | UI/UX review and recommendations |
+UI/UX design proposals and reviews.
 
----
-
-## 2025-12-28
-
-| Document | Description |
-|----------|-------------|
-| [ai-council-review-codex-20251228-154048.md](ai-council-review-codex-20251228-154048.md) | Comprehensive security review by Codex |
-| [IMPLEMENTATION_PLAN_security_fixes.md](IMPLEMENTATION_PLAN_security_fixes.md) | Security fixes implementation plan (Phase 1-3) |
-| [OAUTH_IMPLEMENTATION_PLAN.md](OAUTH_IMPLEMENTATION_PLAN.md) | OAuth authentication implementation plan |
-| [CLEANUP_PLAN.md](CLEANUP_PLAN.md) | Code cleanup plan |
+| Document | Description | Date |
+|----------|-------------|------|
+| [ui-redesign-proposal.md](design/ui-redesign-proposal.md) | "Paper of Record" editorial theme design | 2025-12-26 |
+| [ui-ux-review.md](design/ui-ux-review.md) | UI/UX review and recommendations | 2025-12-27 |
+| [account-page.md](design/account-page.md) | Account page design (implemented) | 2026-01-01 |
 
 ---
 
-## 2025-12-31
+## Implementation
 
-| Document | Description |
-|----------|-------------|
-| [production_readiness_review_codex.md](production_readiness_review_codex.md) | Production readiness review by Codex |
+Feature implementation plans and roadmaps.
 
----
-
-## 2026-01-01
-
-| Document | Description |
-|----------|-------------|
-| [IMPLEMENTATION_PLAN_stripe_credits.md](IMPLEMENTATION_PLAN_stripe_credits.md) | Credit-based monetization with Stripe (superseded by usage-based billing) |
-| [byok_friction_recommendations_codex.md](byok_friction_recommendations_codex.md) | BYOK friction reduction recommendations |
-| [IMPLEMENTATION_PLAN_usage_based_billing.md](IMPLEMENTATION_PLAN_usage_based_billing.md) | Usage-based billing plan (implemented) |
-| [DESIGN_account_page.md](DESIGN_account_page.md) | **[IMPLEMENTED]** Account page design - replaces Settings modal |
-
-## 2026-01-02
-
-| Document | Description |
-|----------|-------------|
-| Account Page implementation | Dedicated `/account` page with "Financial Gazette" editorial styling |
-
-### Claude Sessions
-| Document | Description |
-|----------|-------------|
-| [claude-sessions/2026-01-01-how-can-i-enhance-this-to-make-it-open-for-public.txt](claude-sessions/2026-01-01-how-can-i-enhance-this-to-make-it-open-for-public.txt) | Conversation transcript: public launch planning |
+| Document | Description | Date |
+|----------|-------------|------|
+| [multi-user-roadmap.md](implementation/multi-user-roadmap.md) | Multi-user support and authentication roadmap | 2025-12-26 |
+| [phase1-ui-redesign.md](implementation/phase1-ui-redesign.md) | Phase 1 UI redesign implementation | 2025-12-26 |
+| [oauth.md](implementation/oauth.md) | OAuth authentication implementation | 2025-12-28 |
+| [cleanup.md](implementation/cleanup.md) | Code cleanup plan | 2025-12-28 |
+| [usage-based-billing.md](implementation/usage-based-billing.md) | Usage-based billing (implemented) | 2026-01-01 |
+| [byok-recommendations.md](implementation/byok-recommendations.md) | BYOK friction reduction recommendations | 2026-01-01 |
 
 ---
 
-## Status Legend
+## Sessions
 
-- **Implemented**: Feature is live in production
-- **Pending**: Plan approved, implementation not started
-- **Superseded**: Replaced by newer documentation (moved to archive)
+Claude conversation transcripts.
 
-## Current Focus
+| Document | Description | Date |
+|----------|-------------|------|
+| [2026-01-01-how-can-i-enhance-this-to-make-it-open-for-public.txt](sessions/2026-01-01-how-can-i-enhance-this-to-make-it-open-for-public.txt) | Public launch planning conversation | 2026-01-01 |
 
-**Account Page** - Implemented! A dedicated Account page at `/account` with editorial styling:
-- Balance card with deposit/spent stats
-- Deposit options ($5/$10/$20)
-- API Settings section with BYOK support
-- Transaction ledger with expandable cost breakdowns
-- Member info section
+---
 
-**Usage-Based Billing** - Implemented! Two options:
-1. **Credits Mode:** Pay actual OpenRouter cost + 10% margin per query
-2. **BYOK Mode:** Use your own OpenRouter API key, pay OpenRouter directly
+## Archive
 
-**Completed:**
-1. [x] Database migrations: `006_usage_based_billing.sql`, `007_byok_support.sql`, `008_update_deposit_options.sql`
-2. [x] Account page replaces Settings modal
-3. [x] BYOK (Bring Your Own Key) support
-4. [x] Deposit options updated to $5/$10/$20
+Superseded documentation (kept for reference).
+
+| Document | Description |
+|----------|-------------|
+| [UI_REDESIGN_PROPOSAL_claude.md](archive/UI_REDESIGN_PROPOSAL_claude.md) | Earlier UI redesign proposal |
+| [ui-redesign-plan.md](archive/ui-redesign-plan.md) | Initial UI redesign planning |
+| [NEW_INQUIRY_UX_REDESIGN.md](archive/NEW_INQUIRY_UX_REDESIGN.md) | New inquiry UX redesign notes |
+| [DESIGN_PROPOSAL.md](archive/DESIGN_PROPOSAL.md) | Original design proposal |
+| [stripe-credits-plan.md](archive/stripe-credits-plan.md) | Credit-based billing (superseded by usage-based) |
+
+---
+
+## Quick Reference
+
+**Current Status:**
+- Production app deployed (Vercel + Fly.io + Supabase)
+- Usage-based billing implemented ($5/$10/$20 deposits + BYOK)
+- All security fixes complete (Phase 1-3)
+
+**Key Docs:**
+- Security: [production-readiness-2025-12-31.md](security/production-readiness-2025-12-31.md)
+- Design: [ui-redesign-proposal.md](design/ui-redesign-proposal.md)
+- Billing: [usage-based-billing.md](implementation/usage-based-billing.md)

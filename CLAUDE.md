@@ -529,8 +529,8 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - Warm, authoritative feel inspired by The Economist and The New York Times
 
 ### Design Docs
-- `docs/UI_REDESIGN_PROPOSAL_opus_claude.md` - Full design proposal
-- `docs/UI_UX_REVIEW.md` - Latest UI/UX review and recommendations
+- `docs/design/ui-redesign-proposal.md` - Full design proposal
+- `docs/design/ui-ux-review.md` - Latest UI/UX review and recommendations
 
 ## UX Features (Latest Implementation)
 
@@ -653,7 +653,7 @@ Tested on latest Chrome/Firefox. Frontend uses modern React patterns (hooks, str
 
 ## Security Review Status
 
-A comprehensive security review was conducted on 2025-12-28 (see `docs/ai-council-review-codex-20251228-154048.md`).
+A comprehensive security review was conducted on 2025-12-28 (see `docs/security/codex-review-2025-12-28.md`).
 
 **Completed security fixes (Phase 1 - Critical):**
 - [x] OAuth state validation (server-side) - `backend/oauth_state.py`
@@ -676,11 +676,11 @@ A comprehensive security review was conducted on 2025-12-28 (see `docs/ai-counci
 
 **Launch readiness:** All Phase 1, Phase 2, and Phase 3 items are complete.
 
-See `docs/IMPLEMENTATION_PLAN_security_fixes.md` for the detailed implementation plan.
+See `docs/security/security-fixes-plan.md` for the detailed implementation plan.
 
 **Production Readiness Review (2025-12-31):**
 
-A follow-up production readiness review was conducted by Codex (see `docs/production_readiness_review_codex.md`).
+A follow-up production readiness review was conducted by Codex (see `docs/security/production-readiness-2025-12-31.md`).
 
 Completed fixes:
 - [x] Base schema migration (`000_create_base_schema.sql`) for new deployments
