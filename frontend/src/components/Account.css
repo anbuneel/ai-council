@@ -308,6 +308,204 @@
 }
 
 /* ==========================================================================
+   API Settings Section
+   ========================================================================== */
+
+.mode-badge {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.mode-badge-byok {
+  background: rgba(45, 90, 61, 0.1);
+  color: var(--accent-forest);
+}
+
+.mode-badge-credits {
+  background: var(--paper-aged);
+  color: var(--ink-medium);
+}
+
+.api-settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.key-error {
+  padding: 0.625rem 0.875rem;
+  background: rgba(196, 61, 46, 0.08);
+  border: 1px solid rgba(196, 61, 46, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--accent-vermillion);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+/* BYOK Active State */
+.byok-active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem;
+  background: rgba(45, 90, 61, 0.05);
+  border: 1px solid rgba(45, 90, 61, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+.byok-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.byok-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(45, 90, 61, 0.1);
+  border-radius: 50%;
+  color: var(--accent-forest);
+}
+
+.byok-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.byok-label {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-light);
+}
+
+.byok-preview {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink-dark);
+}
+
+.byok-remove-btn {
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--ink-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.byok-remove-btn:hover:not(:disabled) {
+  border-color: var(--accent-vermillion);
+  color: var(--accent-vermillion);
+}
+
+.byok-remove-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* BYOK Setup State */
+.byok-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.byok-description {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--ink-medium);
+  line-height: 1.5;
+}
+
+.byok-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.byok-input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  background: var(--paper-cream);
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink-dark);
+  transition: border-color var(--transition-fast);
+}
+
+.byok-input::placeholder {
+  color: var(--ink-light);
+}
+
+.byok-input:focus {
+  outline: none;
+  border-color: var(--accent-forest);
+}
+
+.byok-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.byok-save-btn {
+  padding: 0.625rem 1rem;
+  background: var(--accent-forest);
+  border: 1px solid var(--accent-forest);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.byok-save-btn:hover:not(:disabled) {
+  background: var(--accent-forest-dark, #234a31);
+}
+
+.byok-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.byok-hint {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--ink-light);
+}
+
+.byok-hint a {
+  color: var(--accent-forest);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.byok-hint a:hover {
+  color: var(--ink-dark);
+}
+
+/* ==========================================================================
    Usage History - Ledger Style
    ========================================================================== */
 
@@ -500,5 +698,22 @@
   .member-info {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .byok-active {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .byok-remove-btn {
+    align-self: flex-start;
+  }
+
+  .byok-input-group {
+    flex-direction: column;
+  }
+
+  .byok-save-btn {
+    align-self: flex-start;
   }
 }

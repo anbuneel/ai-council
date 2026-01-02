@@ -16,6 +16,13 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
   const [error, setError] = useState('');
   const [expandedTx, setExpandedTx] = useState(null);
 
+  // BYOK state
+  const [apiMode, setApiMode] = useState(null);
+  const [byokKeyInput, setByokKeyInput] = useState('');
+  const [isSavingKey, setIsSavingKey] = useState(false);
+  const [isDeletingKey, setIsDeletingKey] = useState(false);
+  const [keyError, setKeyError] = useState('');
+
   useEffect(() => {
     loadAllData();
   }, []);
@@ -23,16 +30,18 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
   const loadAllData = async () => {
     setIsLoading(true);
     try {
-      const [user, balanceData, options, history] = await Promise.all([
+      const [user, balanceData, options, history, modeData] = await Promise.all([
         auth.getMe(),
         billing.getBalance(),
         billing.getDepositOptions(),
         billing.getUsageHistory(),
+        billing.getApiMode(),
       ]);
       setUserInfo(user);
       setBalance(balanceData);
       setDepositOptions(options);
       setUsageHistory(history);
+      setApiMode(modeData);
       if (onRefreshBalance) onRefreshBalance();
     } catch (err) {
       setError('Failed to load account data');
@@ -49,6 +58,46 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
     } catch (err) {
       setError(err.message || 'Failed to process deposit');
       setIsPurchasing(false);
+    }
+  };
+
+  const handleSaveByokKey = async () => {
+    if (!byokKeyInput.trim()) {
+      setKeyError('Please enter an API key');
+      return;
+    }
+    setIsSavingKey(true);
+    setKeyError('');
+    try {
+      const result = await billing.setBYOKKey(byokKeyInput.trim());
+      setApiMode({
+        mode: result.mode,
+        has_byok_key: result.has_byok_key,
+        byok_key_preview: result.byok_key_preview,
+        byok_validated_at: result.byok_validated_at,
+        has_provisioned_key: result.has_provisioned_key,
+        balance: result.balance,
+      });
+      setByokKeyInput('');
+    } catch (err) {
+      setKeyError(err.message || 'Failed to save API key');
+    } finally {
+      setIsSavingKey(false);
+    }
+  };
+
+  const handleDeleteByokKey = async () => {
+    setIsDeletingKey(true);
+    setKeyError('');
+    try {
+      await billing.deleteBYOKKey();
+      // Reload API mode after deletion
+      const modeData = await billing.getApiMode();
+      setApiMode(modeData);
+    } catch (err) {
+      setKeyError(err.message || 'Failed to remove API key');
+    } finally {
+      setIsDeletingKey(false);
     }
   };
 
@@ -206,6 +255,80 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
               </div>
             </section>
           </div>
+
+          {/* API Settings Section */}
+          <section className="account-card">
+            <div className="card-header">
+              <h2 className="card-title">API Settings</h2>
+              <span className={`mode-badge mode-badge-${apiMode?.mode || 'credits'}`}>
+                {apiMode?.mode === 'byok' ? 'Using Your Key' : 'Using Credits'}
+              </span>
+            </div>
+            <div className="card-content">
+              <div className="api-settings-content">
+                {keyError && (
+                  <div className="key-error">{keyError}</div>
+                )}
+
+                {apiMode?.has_byok_key ? (
+                  // BYOK mode - show current key and option to remove
+                  <div className="byok-active">
+                    <div className="byok-status">
+                      <span className="byok-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                        </svg>
+                      </span>
+                      <div className="byok-details">
+                        <span className="byok-label">Your OpenRouter API Key</span>
+                        <span className="byok-preview">{apiMode.byok_key_preview}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="byok-remove-btn"
+                      onClick={handleDeleteByokKey}
+                      disabled={isDeletingKey}
+                    >
+                      {isDeletingKey ? 'Removing...' : 'Remove Key'}
+                    </button>
+                  </div>
+                ) : (
+                  // Credits mode - show option to add BYOK key
+                  <div className="byok-setup">
+                    <p className="byok-description">
+                      Use your own OpenRouter API key to bypass the credit system.
+                      You'll pay OpenRouter directly for API usage.
+                    </p>
+                    <div className="byok-input-group">
+                      <input
+                        type="password"
+                        className="byok-input"
+                        placeholder="sk-or-v1-..."
+                        value={byokKeyInput}
+                        onChange={(e) => setByokKeyInput(e.target.value)}
+                        disabled={isSavingKey}
+                      />
+                      <button
+                        type="button"
+                        className="byok-save-btn"
+                        onClick={handleSaveByokKey}
+                        disabled={isSavingKey || !byokKeyInput.trim()}
+                      >
+                        {isSavingKey ? 'Validating...' : 'Save Key'}
+                      </button>
+                    </div>
+                    <p className="byok-hint">
+                      Get your API key from{' '}
+                      <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">
+                        openrouter.ai/keys
+                      </a>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
 
           {/* Usage History Section */}
           <section className="account-card">

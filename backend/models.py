@@ -124,6 +124,7 @@ class UserBalanceResponse(BaseModel):
     total_deposited: float
     total_spent: float
     has_openrouter_key: bool
+    has_byok_key: bool = False
 
 
 class UsageHistoryResponse(BaseModel):
@@ -150,3 +151,31 @@ class QueryCostResponse(BaseModel):
     margin_cost: float
     total_cost: float
     new_balance: float
+
+
+# ============== BYOK (Bring Your Own Key) Schemas ==============
+
+class BYOKKeyCreate(BaseModel):
+    """Request to set a BYOK API key."""
+    api_key: str
+
+    @field_validator("api_key")
+    @classmethod
+    def validate_api_key(cls, v: str) -> str:
+        v = v.strip()
+        if not v or len(v) < 20:
+            raise ValueError("Invalid API key format")
+        # OpenRouter keys typically start with sk-or-
+        if not v.startswith("sk-or-"):
+            raise ValueError("Invalid OpenRouter API key format (should start with sk-or-)")
+        return v
+
+
+class ApiModeResponse(BaseModel):
+    """Current API mode and key info."""
+    mode: str  # 'byok' or 'credits'
+    has_byok_key: bool
+    byok_key_preview: Optional[str] = None
+    byok_validated_at: Optional[datetime] = None
+    has_provisioned_key: bool = False
+    balance: float = 0.0

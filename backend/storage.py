@@ -1164,7 +1164,9 @@ async def get_user_billing_info(user_id: UUID) -> Dict[str, Any]:
     """
     row = await db.fetchrow(
         """
-        SELECT balance, total_deposited, total_spent, openrouter_api_key IS NOT NULL as has_openrouter_key
+        SELECT balance, total_deposited, total_spent,
+               openrouter_api_key IS NOT NULL as has_openrouter_key,
+               byok_api_key IS NOT NULL as has_byok_key
         FROM users WHERE id = $1
         """,
         user_id
@@ -1174,11 +1176,131 @@ async def get_user_billing_info(user_id: UUID) -> Dict[str, Any]:
             "balance": float(row["balance"]),
             "total_deposited": float(row["total_deposited"]),
             "total_spent": float(row["total_spent"]),
-            "has_openrouter_key": row["has_openrouter_key"]
+            "has_openrouter_key": row["has_openrouter_key"],
+            "has_byok_key": row["has_byok_key"]
         }
     return {
         "balance": 0.0,
         "total_deposited": 0.0,
         "total_spent": 0.0,
-        "has_openrouter_key": False
+        "has_openrouter_key": False,
+        "has_byok_key": False
     }
+
+
+# ============== BYOK (Bring Your Own Key) Management ==============
+
+async def get_user_byok_key(user_id: UUID) -> Optional[str]:
+    """Get user's BYOK OpenRouter API key (decrypted).
+
+    Returns:
+        Decrypted API key or None if not set
+    """
+    row = await db.fetchrow(
+        "SELECT byok_api_key FROM users WHERE id = $1",
+        user_id
+    )
+    if row and row["byok_api_key"]:
+        from .encryption import decrypt_api_key
+        return decrypt_api_key(row["byok_api_key"])
+    return None
+
+
+async def save_user_byok_key(user_id: UUID, encrypted_key: str) -> None:
+    """Save user's BYOK OpenRouter API key.
+
+    Args:
+        user_id: User's ID
+        encrypted_key: Fernet-encrypted API key
+    """
+    await db.execute(
+        """
+        UPDATE users
+        SET byok_api_key = $2, byok_validated_at = NOW(), updated_at = NOW()
+        WHERE id = $1
+        """,
+        user_id,
+        encrypted_key
+    )
+
+
+async def delete_user_byok_key(user_id: UUID) -> bool:
+    """Delete user's BYOK API key (switch back to credits mode).
+
+    Returns:
+        True if deleted, False if no key was set
+    """
+    result = await db.execute(
+        """
+        UPDATE users
+        SET byok_api_key = NULL, byok_validated_at = NULL, updated_at = NOW()
+        WHERE id = $1 AND byok_api_key IS NOT NULL
+        """,
+        user_id
+    )
+    return result == "UPDATE 1"
+
+
+async def get_user_api_mode(user_id: UUID) -> Dict[str, Any]:
+    """Get user's current API mode and key preview.
+
+    Returns:
+        Dict with mode ('byok' or 'credits') and key_preview if BYOK
+    """
+    row = await db.fetchrow(
+        """
+        SELECT byok_api_key, byok_validated_at,
+               balance, openrouter_api_key IS NOT NULL as has_provisioned_key
+        FROM users WHERE id = $1
+        """,
+        user_id
+    )
+
+    if not row:
+        return {"mode": "credits", "has_byok_key": False, "balance": 0.0}
+
+    if row["byok_api_key"]:
+        from .encryption import decrypt_api_key
+        decrypted = decrypt_api_key(row["byok_api_key"])
+        # Show first 10 and last 4 chars: sk-or-v1-...xxxx
+        if len(decrypted) > 14:
+            preview = decrypted[:10] + "..." + decrypted[-4:]
+        else:
+            preview = decrypted[:4] + "..."
+
+        return {
+            "mode": "byok",
+            "has_byok_key": True,
+            "byok_key_preview": preview,
+            "byok_validated_at": row["byok_validated_at"].isoformat() if row["byok_validated_at"] else None,
+            "balance": float(row["balance"])
+        }
+
+    return {
+        "mode": "credits",
+        "has_byok_key": False,
+        "has_provisioned_key": row["has_provisioned_key"],
+        "balance": float(row["balance"])
+    }
+
+
+async def get_effective_api_key(user_id: UUID) -> tuple[Optional[str], str]:
+    """Get the effective API key to use for a user.
+
+    Checks BYOK first, falls back to provisioned key.
+
+    Returns:
+        Tuple of (api_key, mode) where mode is 'byok' or 'credits'
+        api_key is None if no key is available
+    """
+    # Check BYOK first
+    byok_key = await get_user_byok_key(user_id)
+    if byok_key:
+        return byok_key, "byok"
+
+    # Fall back to provisioned key
+    provisioned_key = await get_user_openrouter_key(user_id)
+    if provisioned_key:
+        return provisioned_key, "credits"
+
+    return None, "none"

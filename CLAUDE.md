@@ -72,7 +72,9 @@ OPENROUTER_PROVISIONING_KEY=sk-or-prov-...
 
 **Authentication:** Users sign in via Google or GitHub OAuth. Existing users are linked by email address to preserve their archives.
 
-**Monetization (Usage-Based Billing):** Users deposit funds via Stripe ($5/$20/$50 options). Each query is charged at actual OpenRouter cost + 10% margin. Costs are calculated after query completion using OpenRouter's generation API. The system provisions per-user OpenRouter API keys with spending limits equal to their deposit amount.
+**Monetization (Usage-Based Billing):** Users have two options:
+1. **Credits Mode:** Users deposit funds via Stripe ($5/$20/$50 options). Each query is charged at actual OpenRouter cost + 10% margin. Costs are calculated after query completion using OpenRouter's generation API.
+2. **BYOK Mode (Bring Your Own Key):** Users can provide their own OpenRouter API key to bypass the credit system entirely. They pay OpenRouter directly for API usage with no margin added.
 
 **Database Migrations:** Run before first use:
 ```bash
@@ -388,6 +390,33 @@ Returns:
   "session_id": "cs_..."
 }
 ```
+
+### BYOK API (Bring Your Own Key)
+
+#### GET `/api/settings/api-mode`
+Get user's current API mode (requires auth):
+```json
+{
+  "mode": "byok",  // or "credits"
+  "has_byok_key": true,
+  "byok_key_preview": "...abc123",
+  "byok_validated_at": "2026-01-01T12:00:00Z",
+  "has_provisioned_key": true,
+  "balance": 4.97
+}
+```
+
+#### POST `/api/settings/byok`
+Set BYOK OpenRouter API key (validates key first, requires auth):
+```json
+{
+  "api_key": "sk-or-v1-..."
+}
+```
+Returns mode info on success.
+
+#### DELETE `/api/settings/byok`
+Remove BYOK key and switch back to credits mode (requires auth).
 
 ### Credits API (Legacy)
 

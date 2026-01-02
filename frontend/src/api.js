@@ -402,6 +402,65 @@ export const billing = {
     // Redirect to Stripe Checkout
     window.location.href = data.checkout_url;
   },
+
+  /**
+   * Get current API mode (BYOK or credits).
+   * Returns { mode, has_byok_key, byok_key_preview?, balance }
+   */
+  async getApiMode() {
+    const response = await fetchWithAuth(`${API_BASE}/api/settings/api-mode`);
+    if (!response.ok) {
+      throw new Error('Failed to get API mode');
+    }
+    return response.json();
+  },
+
+  /**
+   * Set BYOK (Bring Your Own Key) OpenRouter API key.
+   * @param {string} apiKey - The OpenRouter API key
+   */
+  async setBYOKKey(apiKey) {
+    const response = await fetchWithAuth(`${API_BASE}/api/settings/byok`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_key: apiKey }),
+    });
+
+    if (!response.ok) {
+      let message = 'Failed to save API key';
+      try {
+        const error = await response.json();
+        message = error.detail || message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Delete BYOK key and switch back to credits mode.
+   */
+  async deleteBYOKKey() {
+    const response = await fetchWithAuth(`${API_BASE}/api/settings/byok`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      let message = 'Failed to delete API key';
+      try {
+        const error = await response.json();
+        message = error.detail || message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+
+    return response.json();
+  },
 };
 
 // ============== Main API ==============

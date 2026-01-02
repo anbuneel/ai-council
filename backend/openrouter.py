@@ -45,6 +45,54 @@ async def close_client():
         _client = None
 
 
+async def validate_api_key(api_key: str) -> tuple[bool, str]:
+    """Validate an OpenRouter API key by making a test request.
+
+    Makes a lightweight request to the OpenRouter models endpoint to verify
+    the key is valid and has appropriate permissions.
+
+    Args:
+        api_key: The OpenRouter API key to validate
+
+    Returns:
+        Tuple of (is_valid, error_message)
+        If valid, error_message is empty string
+    """
+    if not api_key:
+        return False, "API key is required"
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    client = await get_client()
+    try:
+        # Use the models endpoint for a lightweight validation
+        response = await client.get(
+            "https://openrouter.ai/api/v1/models",
+            headers=headers,
+            timeout=10.0
+        )
+
+        if response.status_code == 200:
+            return True, ""
+        elif response.status_code == 401:
+            return False, "Invalid API key"
+        elif response.status_code == 403:
+            return False, "API key does not have required permissions"
+        else:
+            return False, f"Validation failed (HTTP {response.status_code})"
+
+    except httpx.TimeoutException:
+        return False, "Validation timed out - try again"
+    except httpx.RequestError as e:
+        return False, f"Network error: {str(e)}"
+    except Exception as e:
+        logger.error(f"Unexpected error validating API key: {e}")
+        return False, "Validation failed - try again"
+
+
 async def query_model(
     model: str,
     messages: List[Dict[str, str]],

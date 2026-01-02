@@ -53,6 +53,9 @@ from .models import (
     UsageHistoryResponse,
     CreateDepositRequest,
     QueryCostResponse,
+    # BYOK models
+    BYOKKeyCreate,
+    ApiModeResponse,
 )
 from .oauth import GoogleOAuth, GitHubOAuth
 from .oauth_state import create_oauth_state, validate_and_consume_state
@@ -393,6 +396,70 @@ async def delete_api_key(provider: str, user_id: UUID = Depends(get_current_user
     if not deleted:
         raise HTTPException(status_code=404, detail="API key not found")
     return {"status": "deleted"}
+
+
+# ============== BYOK (Bring Your Own Key) Endpoints ==============
+
+@app.get("/api/settings/api-mode", response_model=ApiModeResponse)
+async def get_api_mode(user_id: UUID = Depends(get_current_user)):
+    """Get user's current API mode (BYOK or credits).
+
+    Returns mode, key preview if BYOK is set, and current balance.
+    """
+    await api_rate_limiter.check(str(user_id))
+    mode_info = await storage.get_user_api_mode(user_id)
+    return ApiModeResponse(**mode_info)
+
+
+@app.post("/api/settings/byok")
+async def set_byok_key(data: BYOKKeyCreate, user_id: UUID = Depends(get_current_user)):
+    """Set user's BYOK (Bring Your Own Key) OpenRouter API key.
+
+    Validates the key with OpenRouter before saving.
+    When set, queries will use this key instead of the provisioned key,
+    and no balance checks will be performed.
+    """
+    await api_rate_limiter.check(str(user_id))
+
+    # Validate the key by making a test request to OpenRouter
+    from .openrouter import validate_api_key
+    is_valid, error_msg = await validate_api_key(data.api_key)
+    if not is_valid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid OpenRouter API key: {error_msg}"
+        )
+
+    # Encrypt and save the key
+    encrypted = encrypt_api_key(data.api_key)
+    await storage.save_user_byok_key(user_id, encrypted)
+
+    # Return the new mode info
+    mode_info = await storage.get_user_api_mode(user_id)
+    return {
+        "status": "ok",
+        "message": "BYOK key saved successfully",
+        **mode_info
+    }
+
+
+@app.delete("/api/settings/byok")
+async def delete_byok_key(user_id: UUID = Depends(get_current_user)):
+    """Delete user's BYOK key and switch back to credits mode.
+
+    After deletion, queries will use the provisioned key and
+    balance checks will be enforced.
+    """
+    await api_rate_limiter.check(str(user_id))
+
+    deleted = await storage.delete_user_byok_key(user_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="No BYOK key set")
+
+    return {
+        "status": "ok",
+        "message": "BYOK key deleted, switched to credits mode"
+    }
 
 
 # ============== Credits Endpoints ==============
@@ -987,20 +1054,22 @@ async def send_message_stream(
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    # Get user's provisioned OpenRouter API key
-    api_key = await storage.get_user_openrouter_key(user_id)
+    # Get effective API key (BYOK first, then provisioned)
+    api_key, api_mode = await storage.get_effective_api_key(user_id)
     if not api_key:
         raise HTTPException(
             status_code=402,
-            detail="No API access configured. Please add funds to get started."
+            detail="No API access configured. Please add funds or set your own API key."
         )
 
-    # Check minimum balance before query (usage-based billing)
-    if not await storage.check_minimum_balance(user_id, MINIMUM_BALANCE):
-        raise HTTPException(
-            status_code=402,
-            detail=f"Insufficient balance. Minimum ${MINIMUM_BALANCE:.2f} required to make a query."
-        )
+    # For credits mode, check minimum balance before query
+    # BYOK mode skips balance check - user pays OpenRouter directly
+    if api_mode == "credits":
+        if not await storage.check_minimum_balance(user_id, MINIMUM_BALANCE):
+            raise HTTPException(
+                status_code=402,
+                detail=f"Insufficient balance. Minimum ${MINIMUM_BALANCE:.2f} required to make a query."
+            )
 
     # Check if this is the first message
     is_first_message = len(conversation["messages"]) == 0
@@ -1108,33 +1177,38 @@ async def send_message_stream(
                 stage3_result
             )
 
-            # Calculate actual costs from OpenRouter
-            costs = await get_generation_costs_batch(all_generation_ids, api_key=api_key)
-            total_openrouter_cost = sum(c.get('total_cost', 0) for c in costs.values())
+            # Calculate and deduct costs (only for credits mode)
+            if api_mode == "credits":
+                # Calculate actual costs from OpenRouter
+                costs = await get_generation_costs_batch(all_generation_ids, api_key=api_key)
+                total_openrouter_cost = sum(c.get('total_cost', 0) for c in costs.values())
 
-            # Build model breakdown for transparency
-            model_breakdown = {}
-            for gid, cost_info in costs.items():
-                model = cost_info.get('model', 'unknown')
-                if model not in model_breakdown:
-                    model_breakdown[model] = 0.0
-                model_breakdown[model] += cost_info.get('total_cost', 0)
+                # Build model breakdown for transparency
+                model_breakdown = {}
+                for gid, cost_info in costs.items():
+                    model = cost_info.get('model', 'unknown')
+                    if model not in model_breakdown:
+                        model_breakdown[model] = 0.0
+                    model_breakdown[model] += cost_info.get('total_cost', 0)
 
-            # Deduct costs from balance (includes 10% margin)
-            success, new_balance = await storage.deduct_query_cost(
-                user_id=user_id,
-                conversation_id=conversation_id,
-                generation_ids=all_generation_ids,
-                openrouter_cost=total_openrouter_cost,
-                model_breakdown=model_breakdown
-            )
+                # Deduct costs from balance (includes 10% margin)
+                success, new_balance = await storage.deduct_query_cost(
+                    user_id=user_id,
+                    conversation_id=conversation_id,
+                    generation_ids=all_generation_ids,
+                    openrouter_cost=total_openrouter_cost,
+                    model_breakdown=model_breakdown
+                )
 
-            # Calculate margin for response
-            margin_cost = total_openrouter_cost * 0.10
-            total_cost = total_openrouter_cost + margin_cost
+                # Calculate margin for response
+                margin_cost = total_openrouter_cost * 0.10
+                total_cost = total_openrouter_cost + margin_cost
 
-            # Send completion event with cost breakdown
-            yield f"data: {json.dumps({'type': 'complete', 'cost': {'openrouter_cost': round(total_openrouter_cost, 6), 'margin_cost': round(margin_cost, 6), 'total_cost': round(total_cost, 6), 'new_balance': round(new_balance, 6)}})}\n\n"
+                # Send completion event with cost breakdown
+                yield f"data: {json.dumps({'type': 'complete', 'cost': {'openrouter_cost': round(total_openrouter_cost, 6), 'margin_cost': round(margin_cost, 6), 'total_cost': round(total_cost, 6), 'new_balance': round(new_balance, 6)}})}\n\n"
+            else:
+                # BYOK mode - no cost tracking, user pays OpenRouter directly
+                yield f"data: {json.dumps({'type': 'complete', 'mode': 'byok'})}\n\n"
 
         except ClientDisconnectedError:
             # Client disconnected - cancel any running tasks and stop
