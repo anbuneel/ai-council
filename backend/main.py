@@ -512,13 +512,14 @@ async def get_credit_history(user_id: UUID = Depends(get_current_user)):
 
 
 @app.post("/api/credits/provision-key")
-async def provision_openrouter_key(user_id: UUID = Depends(get_current_user)):
+async def provision_openrouter_key(request: Request, user_id: UUID = Depends(get_current_user)):
     """Retry OpenRouter key provisioning for users who have credits but no key.
 
     MEDIUM: This provides a retry path for users whose initial provisioning failed.
     """
-    # Rate limit to prevent abuse
+    # Rate limit by both user and IP to prevent multi-account abuse
     await checkout_rate_limiter.check(str(user_id))
+    await checkout_rate_limiter.check(f"ip:{get_client_ip(request)}")
 
     if not openrouter_provisioning.is_provisioning_configured():
         raise HTTPException(status_code=503, detail="Provisioning not configured")
@@ -578,12 +579,14 @@ def _validate_redirect_url(url: str) -> bool:
 
 @app.post("/api/credits/checkout", response_model=CheckoutSessionResponse)
 async def create_checkout(
+    request: Request,
     data: CreateCheckoutRequest,
     user_id: UUID = Depends(get_current_user)
 ):
     """Create Stripe checkout session for credit purchase."""
-    # Rate limit to prevent card testing abuse
+    # Rate limit by both user and IP to prevent multi-account abuse
     await checkout_rate_limiter.check(str(user_id))
+    await checkout_rate_limiter.check(f"ip:{get_client_ip(request)}")
 
     if not stripe_client.is_stripe_configured():
         raise HTTPException(status_code=503, detail="Payment system not configured")
@@ -631,12 +634,14 @@ async def create_checkout(
 
 @app.post("/api/deposits/checkout", response_model=CheckoutSessionResponse)
 async def create_deposit_checkout(
+    request: Request,
     data: CreateDepositRequest,
     user_id: UUID = Depends(get_current_user)
 ):
     """Create Stripe checkout session for deposit (usage-based billing)."""
-    # Rate limit to prevent card testing abuse
+    # Rate limit by both user and IP to prevent multi-account abuse
     await checkout_rate_limiter.check(str(user_id))
+    await checkout_rate_limiter.check(f"ip:{get_client_ip(request)}")
 
     if not stripe_client.is_stripe_configured():
         raise HTTPException(status_code=503, detail="Payment system not configured")

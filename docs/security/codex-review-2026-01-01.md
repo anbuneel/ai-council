@@ -151,5 +151,6 @@ This was reviewed and explicitly deferred in prior reviews:
 
 **Implementation Details:**
 - Added `checkout_rate_limiter` to `backend/rate_limit.py` (10 requests/minute)
-- Applied to all three endpoints using user-based rate limiting
+- Applied to all three endpoints using both user-based AND IP-based rate limiting
+- IP-based limiting prevents multi-account abuse from same IP
 - Uses same in-memory sliding window algorithm as other rate limiters
