@@ -27,7 +27,8 @@
       "Bash(mv:*)",
       "WebFetch(domain:openrouter.ai)",
       "Bash(fly ssh console:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(fly logs:*)"
     ]
   }
 }
