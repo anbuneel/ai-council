@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { api } from '../api';
+import { useState, useEffect, useRef } from 'react';
 import './InquiryComposer.css';
 
 const MIN_MODELS = 2;
@@ -23,7 +22,6 @@ export default function InquiryComposer({
   const [selectedModels, setSelectedModels] = useState([]);
   const [leadModel, setLeadModel] = useState('');
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [costEstimate, setCostEstimate] = useState(null);
   const textareaRef = useRef(null);
 
   // Initialize models when available
@@ -36,25 +34,6 @@ export default function InquiryComposer({
       setLeadModel(defaultLeadModel || availableModels[0] || '');
     }
   }, [availableModels, defaultModels, defaultLeadModel, selectedModels.length]);
-
-  // Fetch cost estimate when models change
-  const fetchCostEstimate = useCallback(async () => {
-    if (selectedModels.length < MIN_MODELS || !leadModel) {
-      setCostEstimate(null);
-      return;
-    }
-    try {
-      const estimate = await api.getCostEstimate(selectedModels, leadModel);
-      setCostEstimate(estimate);
-    } catch (err) {
-      // Non-critical, ignore errors
-      setCostEstimate(null);
-    }
-  }, [selectedModels, leadModel]);
-
-  useEffect(() => {
-    fetchCostEstimate();
-  }, [fetchCostEstimate]);
 
   // Focus textarea on mount
   useEffect(() => {
@@ -200,13 +179,9 @@ export default function InquiryComposer({
                 'Ask the Council'
               )}
             </button>
-            {costEstimate && (
-              <div className="cost-estimate" title={costEstimate.disclaimer}>
-                <span className="cost-label">Estimated cost:</span>
-                <span className="cost-value">~${costEstimate.estimated_cost.toFixed(2)}</span>
-                <span className="cost-info">({costEstimate.query_count} queries)</span>
-              </div>
-            )}
+            <div className="cost-estimate">
+              Typical cost: $0.05–0.20 depending on response length
+            </div>
           </div>
 
           <p className="composer-disclosure">

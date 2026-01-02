@@ -605,9 +605,7 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - Demo data stored in `frontend/src/demoData/demos.json`
 
 ### Cost Preview
-- Estimated cost shown before query submission
-- Updates dynamically as user changes model selection
-- Displays query count and approximate cost with 10% margin
+- Static "Typical cost: $0.05–0.20" shown before query submission
 - Helps users understand pricing before committing
 
 ### Deposit Options
