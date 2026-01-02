@@ -145,6 +145,11 @@ This was reviewed and explicitly deferred in prior reviews:
 
 ## Implementation Status
 
-- [ ] Add rate limiting to `/api/deposits/checkout` endpoint
-- [ ] Add rate limiting to `/api/credits/checkout` endpoint
-- [ ] Add rate limiting to `/api/credits/provision-key` endpoint
+- [x] Add rate limiting to `/api/deposits/checkout` endpoint
+- [x] Add rate limiting to `/api/credits/checkout` endpoint
+- [x] Add rate limiting to `/api/credits/provision-key` endpoint
+
+**Implementation Details:**
+- Added `checkout_rate_limiter` to `backend/rate_limit.py` (10 requests/minute)
+- Applied to all three endpoints using user-based rate limiting
+- Uses same in-memory sliding window algorithm as other rate limiters

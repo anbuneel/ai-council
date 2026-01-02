@@ -111,8 +111,10 @@ class RateLimiter:
             return max(0, self.requests_per_minute - recent_count)
 
 
-# Global rate limiter instance
+# Global rate limiter instances
 # - 30 requests/minute for general API calls
 # - 10 requests/minute for expensive streaming operations
+# - 10 requests/minute for checkout/payment operations (prevents card testing)
 api_rate_limiter = RateLimiter(requests_per_minute=30)
 streaming_rate_limiter = RateLimiter(requests_per_minute=10)
+checkout_rate_limiter = RateLimiter(requests_per_minute=10)

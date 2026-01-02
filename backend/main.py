@@ -16,7 +16,7 @@ import asyncio
 import asyncpg
 from decimal import Decimal
 
-from .rate_limit import api_rate_limiter, streaming_rate_limiter
+from .rate_limit import api_rate_limiter, streaming_rate_limiter, checkout_rate_limiter
 
 from .config import (
     CORS_ORIGINS,
@@ -517,6 +517,9 @@ async def provision_openrouter_key(user_id: UUID = Depends(get_current_user)):
 
     MEDIUM: This provides a retry path for users whose initial provisioning failed.
     """
+    # Rate limit to prevent abuse
+    await checkout_rate_limiter.check(str(user_id))
+
     if not openrouter_provisioning.is_provisioning_configured():
         raise HTTPException(status_code=503, detail="Provisioning not configured")
 
@@ -579,6 +582,9 @@ async def create_checkout(
     user_id: UUID = Depends(get_current_user)
 ):
     """Create Stripe checkout session for credit purchase."""
+    # Rate limit to prevent card testing abuse
+    await checkout_rate_limiter.check(str(user_id))
+
     if not stripe_client.is_stripe_configured():
         raise HTTPException(status_code=503, detail="Payment system not configured")
 
@@ -629,6 +635,9 @@ async def create_deposit_checkout(
     user_id: UUID = Depends(get_current_user)
 ):
     """Create Stripe checkout session for deposit (usage-based billing)."""
+    # Rate limit to prevent card testing abuse
+    await checkout_rate_limiter.check(str(user_id))
+
     if not stripe_client.is_stripe_configured():
         raise HTTPException(status_code=503, detail="Payment system not configured")
 

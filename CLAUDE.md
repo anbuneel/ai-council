@@ -736,5 +736,5 @@ Repeat findings (already accepted/deferred):
 - [x] Webhook metadata trust - already addressed (verifies session from Stripe API)
 - [x] CORS_ORIGINS for redirect allowlist - acceptable (scheme validated)
 
-Pending:
-- [ ] Rate limiting on checkout/provisioning endpoints (`/api/deposits/checkout`, `/api/credits/provision-key`)
+Completed:
+- [x] Rate limiting on checkout/provisioning endpoints (10 req/min via `checkout_rate_limiter`)
