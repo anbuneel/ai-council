@@ -150,6 +150,8 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `components/PaymentCancel.jsx` - Checkout cancelled page
 - `components/AvatarMenu.jsx` - User avatar dropdown with account/logout
 - `components/ConfirmDialog.jsx` - Custom styled confirmation/alert dialogs
+- `components/DemoView.jsx` - Public demo page showing precomputed deliberations (no auth required)
+- `demoData/demos.json` - Static demo data with 3 example deliberations
 - `api.js` - Backend communication with OAuth auth, JWT tokens, billing API, SSE streaming
 
 ---
@@ -594,6 +596,13 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - ConfirmDialog component replaces browser confirm/alert modals
 - Editorial styling with support for danger/alert variants
 - Focus trap and keyboard navigation (Escape, Enter, Tab)
+
+### Demo Mode (Launch Readiness)
+- Public `/demo` route accessible without authentication
+- Shows 3 precomputed example deliberations with full Stage 1/2/3 data
+- Users can browse demos to understand product value before signing up
+- Login page prominently links to demos ("See example deliberations")
+- Demo data stored in `frontend/src/demoData/demos.json`
 
 ---
 

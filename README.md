@@ -12,6 +12,8 @@ The UI uses a two-pane docket layout:
 
 **Live Demo:** https://ai-council-anbs.vercel.app
 
+**Try Before Signing Up:** Visit `/demo` to see example deliberations without creating an account.
+
 Production Application: Deployed on Vercel (frontend), Fly.io (backend), and Supabase (database).
 
 In a bit more detail, here is what happens when you submit a query:
