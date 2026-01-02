@@ -3,14 +3,22 @@
    ========================================================================== */
 
 .account-page {
-  min-height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   background: var(--paper-cream, #FAF8F5);
-  padding: 2rem;
+  min-width: 0;
+  position: relative;
 }
 
 .account-container {
+  flex: 1;
   max-width: 900px;
   margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .account-loading {
@@ -23,30 +31,6 @@
 /* Header */
 .account-header {
   margin-bottom: 2rem;
-}
-
-.account-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  background: none;
-  border: none;
-  color: var(--ink-gray, #666);
-  font-family: var(--font-ui, 'IBM Plex Sans', sans-serif);
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: color 0.2s;
-  margin-bottom: 1rem;
-}
-
-.account-back:hover {
-  color: var(--ink-black, #1A1614);
-}
-
-.account-back svg {
-  width: 18px;
-  height: 18px;
 }
 
 .account-title-wrapper {
@@ -62,7 +46,7 @@
   background: var(--ink-black, #1A1614);
 }
 
-.account-header h1 {
+.account-header h2 {
   margin: 0;
   font-family: var(--font-display, 'Playfair Display', Georgia, serif);
   font-size: 1.5rem;

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { billing, auth } from '../api';
+import AvatarMenu from './AvatarMenu';
+import CreditBalance from './CreditBalance';
 import './Account.css';
 
-function Account({ onRefreshBalance }) {
+function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleSidebar, isSidebarOpen }) {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [balance, setBalance] = useState(null);
@@ -78,9 +80,34 @@ function Account({ onRefreshBalance }) {
     });
   };
 
+  const handleOpenAccount = () => navigate('/account');
+
   if (isLoading) {
     return (
       <div className="account-page">
+        <header className="masthead">
+          <div className="masthead-row">
+            <button
+              type="button"
+              className="sidebar-toggle"
+              onClick={onToggleSidebar}
+              aria-label="Open archive (Ctrl+K)"
+              aria-expanded={isSidebarOpen}
+              aria-controls="sidebar"
+              title="Open archive (Ctrl+K)"
+            >
+              Archive
+            </button>
+            <div className="masthead-center">
+              <h1 className="masthead-title">The AI Council</h1>
+              <p className="masthead-tagline">Synthesized knowledge from AI experts</p>
+            </div>
+            <div className="masthead-actions">
+              <CreditBalance balance={userBalance} onClick={handleOpenAccount} />
+              <AvatarMenu userEmail={userEmail} onLogout={onLogout} />
+            </div>
+          </div>
+        </header>
         <div className="account-container">
           <p className="account-loading">Loading account...</p>
         </div>
@@ -90,21 +117,50 @@ function Account({ onRefreshBalance }) {
 
   return (
     <div className="account-page">
-      <div className="account-container">
-        {/* Header */}
-        <header className="account-header">
-          <button className="account-back" onClick={handleBack}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Back
+      <header className="masthead">
+        <div className="masthead-row">
+          <button
+            type="button"
+            className="sidebar-toggle"
+            onClick={onToggleSidebar}
+            aria-label="Open archive (Ctrl+K)"
+            aria-expanded={isSidebarOpen}
+            aria-controls="sidebar"
+            title="Open archive (Ctrl+K)"
+          >
+            Archive
           </button>
+          <div className="masthead-center">
+            <h1 className="masthead-title">The AI Council</h1>
+            <p className="masthead-tagline">Synthesized knowledge from AI experts</p>
+          </div>
+          <div className="masthead-actions">
+            <button
+              type="button"
+              className="masthead-btn masthead-btn-new"
+              onClick={handleBack}
+              title="Back to Home"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              <span className="masthead-btn-label">Home</span>
+            </button>
+            <CreditBalance balance={userBalance} onClick={handleOpenAccount} />
+            <AvatarMenu userEmail={userEmail} onLogout={onLogout} />
+          </div>
+        </div>
+      </header>
+
+      <div className="account-container">
+        {/* Page Title */}
+        <div className="account-header">
           <div className="account-title-wrapper">
             <span className="account-title-rule"></span>
-            <h1>Account</h1>
+            <h2>Account</h2>
             <span className="account-title-rule"></span>
           </div>
-        </header>
+        </div>
 
         {error && <div className="account-error">{error}</div>}
 

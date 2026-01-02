@@ -699,7 +699,50 @@ function App() {
         />
         <Route
           path="/account"
-          element={isAuthenticated ? <Account onRefreshBalance={loadBalance} /> : <Login onLogin={handleLogin} />}
+          element={
+            isAuthenticated ? (
+              <div className="app-layout">
+                <Sidebar
+                  conversations={conversations}
+                  currentConversationId={currentConversationId}
+                  onSelectConversation={handleSelectConversation}
+                  onNewConversation={handleGoToComposer}
+                  onDeleteConversation={handleDeleteConversation}
+                  isOpen={isSidebarOpen}
+                  onClose={handleCloseSidebar}
+                />
+                <main className="main-pane">
+                  <Account
+                    userEmail={userEmail}
+                    userBalance={userBalance}
+                    onLogout={handleLogout}
+                    onRefreshBalance={loadBalance}
+                    onToggleSidebar={handleToggleSidebar}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                </main>
+                <div
+                  className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`}
+                  onClick={handleCloseSidebar}
+                  role="presentation"
+                  aria-hidden={!isSidebarOpen}
+                />
+                <ConfirmDialog
+                  isOpen={confirmDialog.isOpen}
+                  title={confirmDialog.title}
+                  message={confirmDialog.message}
+                  variant={confirmDialog.variant}
+                  icon={confirmDialog.icon}
+                  onConfirm={confirmDialog.onConfirm}
+                  onCancel={closeConfirmDialog}
+                  confirmLabel={confirmDialog.variant === 'danger' ? 'Delete' : 'OK'}
+                  cancelLabel="Cancel"
+                />
+              </div>
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
         />
         <Route
           path="/*"
