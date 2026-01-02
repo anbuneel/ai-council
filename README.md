@@ -4,6 +4,12 @@
 
 A collaborative deliberation system where multiple LLMs answer your questions, then review and rank each other anonymously. A Chairman LLM synthesizes the insights into a final response.
 
+## Project Purpose
+
+**Primary goal:** Learn to use AI agents (Claude Code, Codex) to build a full-stack SaaS application from scratch.
+
+This project serves as a hands-on exploration of AI-assisted development workflows, covering frontend (React/Vite), backend (FastAPI/Python), database (PostgreSQL/Supabase), authentication (OAuth), payments (Stripe), and deployment (Vercel/Fly.io).
+
 Instead of asking a single LLM provider, submit your question to the AI Council, a group of leading models (OpenAI GPT-5.1, Google Gemini 3 Pro, Anthropic Claude Sonnet 4.5, xAI Grok 4, etc.). The Council deliberates in three stages: individual responses, peer review, and final synthesis.
 
 The UI uses a two-pane docket layout:

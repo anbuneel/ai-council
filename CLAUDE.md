@@ -3,9 +3,11 @@
 ## Project: AI Council
 A 3-stage deliberation system where multiple LLMs collaboratively answer questions with anonymized peer review.
 
+**Primary goal:** Learn to use AI agents (Claude Code, Codex) to build a full-stack SaaS application from scratch.
+
 Status: Production application deployed on Vercel (frontend), Fly.io (backend), and Supabase (database).
 
-This file and CLAUDE.md should stay in sync.
+This file and README.md should stay in sync.
 
 ---
 
