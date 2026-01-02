@@ -11,6 +11,7 @@ import PaymentSuccess from './components/PaymentSuccess';
 import PaymentCancel from './components/PaymentCancel';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import DemoView from './components/DemoView';
 import { api, auth, billing, hasTokens, clearTokens } from './api';
 import './App.css';
 
@@ -706,6 +707,10 @@ function App() {
         <Route
           path="/terms"
           element={<TermsOfService />}
+        />
+        <Route
+          path="/demo"
+          element={<DemoView />}
         />
         <Route
           path="/account"

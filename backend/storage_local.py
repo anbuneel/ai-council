@@ -595,6 +595,35 @@ async def get_credit_pack(pack_id: UUID) -> Optional[Dict]:
     return None
 
 
+async def get_deposit_options() -> List[Dict]:
+    """List available deposit options (hardcoded for local dev)."""
+    # Use stable UUIDs for local dev to match Pydantic UUID schema
+    return [
+        {"id": "00000000-0000-0000-0000-000000000001", "name": "$1 Try It", "amount_cents": 100},
+        {"id": "00000000-0000-0000-0000-000000000002", "name": "$2 Starter", "amount_cents": 200},
+        {"id": "00000000-0000-0000-0000-000000000005", "name": "$5 Deposit", "amount_cents": 500},
+        {"id": "00000000-0000-0000-0000-000000000010", "name": "$10 Deposit", "amount_cents": 1000},
+        {"id": "00000000-0000-0000-0000-000000000020", "name": "$20 Deposit", "amount_cents": 2000},
+    ]
+
+
+async def get_deposit_option(
+    option_id: UUID,
+    include_inactive: bool = False
+) -> Optional[Dict]:
+    """Get a specific deposit option by ID.
+
+    Args:
+        option_id: The deposit option UUID
+        include_inactive: Ignored in local dev (all options always returned)
+    """
+    options = await get_deposit_options()
+    for option in options:
+        if option["id"] == str(option_id):
+            return option
+    return None
+
+
 async def was_session_processed(stripe_session_id: str) -> bool:
     """Check if a Stripe session was already processed."""
     # For local dev, check all user credit files

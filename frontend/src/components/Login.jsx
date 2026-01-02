@@ -54,6 +54,15 @@ function Login({ onLogin }) {
           <span className="model-badge">Claude</span>
         </div>
 
+        {/* Demo CTA */}
+        <a href="/demo" className="demo-link">
+          <span className="demo-link-text">See example deliberations</span>
+          <svg className="demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
         {/* Sign-in card */}
         <div className="login-card">
           <h2 className="card-title">Enter the Council</h2>

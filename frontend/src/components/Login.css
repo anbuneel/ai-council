@@ -151,6 +151,46 @@
 }
 
 /* ==========================================================================
+   Demo Link
+   ========================================================================== */
+.demo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--accent-vermillion);
+  border-radius: var(--radius-md);
+  color: var(--accent-vermillion);
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.demo-link:hover {
+  background: var(--accent-vermillion);
+  color: white;
+}
+
+.demo-link-text {
+  letter-spacing: 0.01em;
+}
+
+.demo-link-arrow {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.demo-link:hover .demo-link-arrow {
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
    Login Card
    ========================================================================== */
 .login-card {

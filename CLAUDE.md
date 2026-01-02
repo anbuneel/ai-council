@@ -3,9 +3,11 @@
 ## Project: AI Council
 A 3-stage deliberation system where multiple LLMs collaboratively answer questions with anonymized peer review.
 
+**Primary goal:** Learn to use AI agents (Claude Code, Codex) to build a full-stack SaaS application from scratch.
+
 Status: Production application deployed on Vercel (frontend), Fly.io (backend), and Supabase (database).
 
-This file and CLAUDE.md should stay in sync.
+This file and README.md should stay in sync.
 
 ---
 
@@ -150,7 +152,10 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `components/PaymentCancel.jsx` - Checkout cancelled page
 - `components/AvatarMenu.jsx` - User avatar dropdown with account/logout
 - `components/ConfirmDialog.jsx` - Custom styled confirmation/alert dialogs
+- `components/DemoView.jsx` - Public demo page showing precomputed deliberations (no auth required)
+- `demoData/demos.json` - Static demo data with 3 example deliberations
 - `api.js` - Backend communication with OAuth auth, JWT tokens, billing API, SSE streaming
+- `config.js` - Frontend constants (cost estimate, demo version) with review dates
 
 ---
 
@@ -594,6 +599,27 @@ An editorial/newspaper-inspired light theme that treats AI Council as a prestigi
 - ConfirmDialog component replaces browser confirm/alert modals
 - Editorial styling with support for danger/alert variants
 - Focus trap and keyboard navigation (Escape, Enter, Tab)
+
+### Demo Mode (Launch Readiness)
+- Public `/demo` route accessible without authentication
+- Shows 3 precomputed example deliberations with full Stage 1/2/3 data
+- Users can browse demos to understand product value before signing up
+- Login page prominently links to demos ("See example deliberations")
+- Demo data stored in `frontend/src/demoData/demos.json`
+
+**Updating Demo Data:**
+1. Edit `frontend/src/demoData/demos.json` with new deliberations
+2. Update `DEMO_VERSION` in `frontend/src/config.js` (increment version, update date)
+3. Ensure model names match current `AVAILABLE_MODELS` in `backend/config.py`
+4. Test locally: visit `/demo` and verify all tabs render correctly
+
+### Cost Preview
+- Static "Typical cost: $0.05–0.20" shown before query submission
+- Helps users understand pricing before committing
+
+### Deposit Options
+- $1, $2, $5, $10, $20 tiers (lower barrier to entry)
+- Stored in `deposit_options` database table
 
 ---
 

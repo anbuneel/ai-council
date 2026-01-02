@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { COST_ESTIMATE } from '../config';
 import './InquiryComposer.css';
 
 const MIN_MODELS = 2;
@@ -164,20 +165,25 @@ export default function InquiryComposer({
             )}
           </div>
 
-          <button
-            type="submit"
-            className="composer-submit"
-            disabled={!isValid || isSubmitting || isLoadingModels}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="submit-spinner"></span>
-                Asking...
-              </>
-            ) : (
-              'Ask the Council'
-            )}
-          </button>
+          <div className="composer-submit-row">
+            <button
+              type="submit"
+              className="composer-submit"
+              disabled={!isValid || isSubmitting || isLoadingModels}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="submit-spinner"></span>
+                  Asking...
+                </>
+              ) : (
+                'Ask the Council'
+              )}
+            </button>
+            <div className="cost-estimate">
+              {COST_ESTIMATE.text}
+            </div>
+          </div>
 
           <p className="composer-disclosure">
             Your query will be processed by third-party AI models via{' '}

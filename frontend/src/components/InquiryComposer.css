@@ -331,6 +331,22 @@
 }
 
 /* ==========================================================================
+   Submit Row with Cost Estimate
+   ========================================================================== */
+.composer-submit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cost-estimate {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--ink-light);
+}
+
+/* ==========================================================================
    Data Disclosure
    ========================================================================== */
 .composer-disclosure {
