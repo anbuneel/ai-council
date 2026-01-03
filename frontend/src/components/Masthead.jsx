@@ -32,10 +32,12 @@ export default function Masthead({
         return (
             <header className="masthead masthead-centered">
                 <div className="masthead-row">
+                    <div className="masthead-spacer" />
                     <div className="masthead-center">
                         <h1 className="masthead-title">The AI Council</h1>
                         <p className="masthead-tagline">{tagline}</p>
                     </div>
+                    <div className="masthead-spacer" />
                 </div>
             </header>
         );
@@ -45,15 +47,14 @@ export default function Masthead({
         return (
             <header className="masthead masthead-minimal">
                 <div className="masthead-row">
+                    <div className="masthead-spacer" />
                     <div className="masthead-center">
                         <h1 className="masthead-title masthead-title-link" onClick={handleGoHome} role="link" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleGoHome()}>
                             The AI Council
                         </h1>
                         {tagline && <p className="masthead-tagline">{tagline}</p>}
                     </div>
-                    {children && (
-                        <div className="masthead-actions">{children}</div>
-                    )}
+                    <div className="masthead-actions">{children}</div>
                 </div>
             </header>
         );

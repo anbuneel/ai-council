@@ -23,7 +23,7 @@
     pointer-events: none;
 }
 
-/* Main masthead row */
+/* Main masthead row - 3 column grid for perfect centering */
 .masthead-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -34,17 +34,18 @@
     z-index: 1;
 }
 
-/* Left section (Archive button) */
-.masthead-row > *:first-child {
+/* Left column - align start */
+.masthead-spacer,
+.sidebar-toggle {
     justify-self: start;
 }
 
-/* Right section (actions) */
-.masthead-row > *:last-child {
+/* Right column - align end */
+.masthead-actions {
     justify-self: end;
 }
 
-/* Title section - grid centered */
+/* Title section - naturally centered by grid */
 .masthead-center {
     display: flex;
     flex-direction: column;
