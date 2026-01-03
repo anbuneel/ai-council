@@ -792,9 +792,42 @@
   transition: all var(--transition-fast);
 }
 
-.danger-btn:hover {
+.danger-btn:hover:not(:disabled) {
   background: var(--accent-vermillion);
   color: white;
+}
+
+.danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--ink-light);
+  color: var(--ink-light);
+}
+
+/* Coming Soon Badge */
+.coming-soon-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--paper-aged);
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-light);
+  vertical-align: middle;
+}
+
+/* Disabled States for Data Actions */
+.data-action-disabled {
+  opacity: 0.6;
+}
+
+.danger-zone-disabled {
+  opacity: 0.6;
 }
 
 /* Legal Links Footer */
