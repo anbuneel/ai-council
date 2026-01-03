@@ -291,9 +291,11 @@ Returns:
 #### GET `/api/auth/export`
 Export all user data as a ZIP file (requires auth).
 Returns a ZIP archive containing:
-- `data.json` - Complete data export (account, conversations, transactions)
+- `data.json` - Complete data export (account, conversations, transactions, usage history, summary, schema_version)
 - `conversations/*.md` - Each conversation as a Markdown file
+- `conversations/index.md` - Table of contents for all conversations
 - `account_summary.md` - Account overview in Markdown
+- `manifest.json` - SHA-256 checksums and file sizes for integrity verification
 
 ### GET `/api/models`
 Returns available models and defaults:
@@ -779,7 +781,7 @@ Completed fixes:
 **Usage-Based Billing Update (2026-01-01):**
 
 Converted from credit-based (1 credit = 1 query) to usage-based billing:
-- [x] Users deposit funds ($5/$10/$20) instead of buying credit packs
+- [x] Users deposit funds ($1/$2/$5/$10) instead of buying credit packs
 - [x] Queries charged at actual OpenRouter cost + 10% margin
 - [x] Cost calculated after completion via OpenRouter generation API
 - [x] Transparent cost breakdown shown to users

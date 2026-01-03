@@ -94,7 +94,7 @@ Superseded documentation (kept for reference).
 
 **Current Status:**
 - Production app deployed (Vercel + Fly.io + Supabase)
-- Usage-based billing implemented ($5/$10/$20 deposits + BYOK)
+- Usage-based billing implemented ($1/$2/$5/$10 deposits + BYOK)
 - All security fixes complete (Phase 1-3 + checkout rate limiting)
 - Privacy compliance ready (Privacy Policy, ToS, account deletion)
 - Free tier infrastructure verified ready for launch

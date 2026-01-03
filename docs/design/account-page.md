@@ -38,7 +38,7 @@ A dedicated **Account page** aligns with the "Paper of Record" theme. Think of i
 │  ║  ┌─────────────┐    BALANCE                   ║  │
 │  ║  │             │    ─────────────────         ║  │
 │  ║  │   $4.97     │    Add Funds                 ║  │
-│  ║  │             │    [$5] [$10] [$20]          ║  │
+│  ║  │             │    [$1] [$2] [$5] [$10]       ║  │
 │  ║  └─────────────┘                              ║  │
 │  ║                                               ║  │
 │  ║  ═══════════════════════════════════════════  ║  │
@@ -81,7 +81,7 @@ Using existing project fonts:
 - Last updated timestamp
 
 ### 2. Add Funds
-- Three deposit options: $5 / $10 / $20
+- Four deposit options: $1 / $2 / $5 / $10
 - Styled as elegant stacked buttons
 - Clear CTAs with Stripe integration
 
