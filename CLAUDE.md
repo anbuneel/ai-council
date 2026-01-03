@@ -52,6 +52,7 @@ JWT_SECRET=your-secure-random-secret-here
 
 # API Key Encryption (required for production)
 # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# Supports comma-separated keys for rotation (newest first): "new-key,old-key"
 API_KEY_ENCRYPTION_KEY=your-fernet-key-here
 
 # OAuth Configuration (required for production)
@@ -134,10 +135,10 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `storage_local.py` - JSON file storage (fallback when `DATABASE_URL` not set)
 - `database.py` - Async PostgreSQL connection pool (asyncpg)
 - `auth_jwt.py` - JWT token creation and verification
-- `encryption.py` - API key encryption (Fernet)
+- `encryption.py` - API key encryption (MultiFernet with key rotation support)
 - `models.py` - Pydantic schemas for OAuth, billing, and checkout endpoints
 - `migrate.py` - Database migration runner
-- `migrations/` - SQL migration files (006_usage_based_billing.sql for current billing model)
+- `migrations/` - SQL migration files (011_add_key_version.sql for encryption key rotation)
 
 ### Frontend (`frontend/src/`)
 - `App.jsx` - Main orchestration with BrowserRouter, OAuth callback, balance state
@@ -800,6 +801,52 @@ Repeat findings (already accepted/deferred):
 
 Completed:
 - [x] Rate limiting on checkout/provisioning endpoints (10 req/min via `checkout_rate_limiter`)
+
+---
+
+## Encryption Key Rotation
+
+The application uses MultiFernet for API key encryption, supporting zero-downtime key rotation.
+
+### How It Works
+
+1. **Multiple keys**: `API_KEY_ENCRYPTION_KEY` accepts comma-separated Fernet keys (newest first)
+2. **Encrypt with newest**: New encryptions always use the first (newest) key
+3. **Decrypt with any**: Decryption tries all keys until one succeeds
+4. **Lazy re-encryption**: When a key is accessed, it's automatically re-encrypted with the newest key
+
+### Rotation Procedure
+
+1. **Generate a new key:**
+   ```bash
+   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+   ```
+
+2. **Update the environment variable** (prepend new key):
+   ```bash
+   # Before: API_KEY_ENCRYPTION_KEY=old-key
+   # After:  API_KEY_ENCRYPTION_KEY=new-key,old-key
+   fly secrets set API_KEY_ENCRYPTION_KEY="new-key,old-key"
+   ```
+
+3. **Deploy**: The app will immediately use the new key for all new encryptions
+
+4. **Lazy migration**: Existing keys are automatically re-encrypted when accessed
+
+5. **Remove old key** (after all keys have been accessed/rotated):
+   ```bash
+   fly secrets set API_KEY_ENCRYPTION_KEY="new-key"
+   ```
+
+### Key Version Tracking
+
+- `user_api_keys.key_version` - Tracks encryption version for legacy API keys
+- `users.byok_key_version` - Tracks encryption version for BYOK keys
+- Version increments on each re-encryption (audit trail)
+
+### Migration 011
+
+Run `uv run python -m backend.migrate` to add key version columns.
 
 ---
 

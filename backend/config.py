@@ -19,7 +19,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 JWT_SECRET = os.getenv("JWT_SECRET", "change-me-in-production")
 
 # API Key Encryption (required for production)
-API_KEY_ENCRYPTION_KEY = os.getenv("API_KEY_ENCRYPTION_KEY")
+# Supports comma-separated list for key rotation (newest key first)
+# Example: "new-key,old-key,older-key"
+_raw_encryption_keys = os.getenv("API_KEY_ENCRYPTION_KEY", "")
+API_KEY_ENCRYPTION_KEYS: list[str] = [
+    k.strip() for k in _raw_encryption_keys.split(",") if k.strip()
+]
+# Backwards compatibility: single key access
+API_KEY_ENCRYPTION_KEY = API_KEY_ENCRYPTION_KEYS[0] if API_KEY_ENCRYPTION_KEYS else None
 
 # OAuth Configuration
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")

@@ -391,7 +391,8 @@ async def save_user_api_key(
     user_id: UUID,
     provider: str,
     encrypted_key: str,
-    key_hint: str
+    key_hint: str,
+    key_version: int = 1
 ) -> Dict[str, Any]:
     """Save or update a user's API key."""
     _ensure_api_keys_dir()
@@ -416,6 +417,7 @@ async def save_user_api_key(
         "provider": provider,
         "encrypted_key": encrypted_key,
         "key_hint": key_hint,
+        "key_version": key_version,
         "created_at": keys.get(provider, {}).get("created_at", now),
         "updated_at": now
     }
@@ -427,8 +429,11 @@ async def save_user_api_key(
 
 
 async def get_user_api_key(user_id: UUID, provider: str) -> Optional[str]:
-    """Get a user's decrypted API key for a provider."""
-    from .encryption import decrypt_api_key
+    """Get a user's decrypted API key for a provider.
+
+    Performs lazy re-encryption if the key was encrypted with an older key version.
+    """
+    from .encryption import decrypt_api_key, rotate_api_key, get_key_count
 
     path = _get_api_keys_path(str(user_id))
 
@@ -442,7 +447,24 @@ async def get_user_api_key(user_id: UUID, provider: str) -> Optional[str]:
     if not key_data:
         return None
 
-    return decrypt_api_key(key_data["encrypted_key"])
+    encrypted = key_data["encrypted_key"]
+    current_version = key_data.get("key_version", 1)
+
+    # Lazy re-encryption: if we have multiple keys, try to rotate
+    if get_key_count() > 1:
+        try:
+            new_encrypted, was_rotated = rotate_api_key(encrypted)
+            if was_rotated:
+                key_data["encrypted_key"] = new_encrypted
+                key_data["key_version"] = current_version + 1
+                key_data["updated_at"] = datetime.utcnow().isoformat()
+                with open(path, 'w') as f:
+                    json.dump(keys, f, indent=2)
+                encrypted = new_encrypted
+        except ValueError:
+            pass  # Rotation failed, continue with original
+
+    return decrypt_api_key(encrypted)
 
 
 async def get_user_api_keys(user_id: UUID) -> List[Dict[str, Any]]:

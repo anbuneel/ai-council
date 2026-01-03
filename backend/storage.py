@@ -605,25 +605,34 @@ async def save_user_api_key(
     user_id: UUID,
     provider: str,
     encrypted_key: str,
-    key_hint: str
+    key_hint: str,
+    key_version: int = 1
 ) -> Dict[str, Any]:
     """
     Save or update a user's API key.
 
     Uses upsert to handle both insert and update cases.
+
+    Args:
+        user_id: User's UUID
+        provider: API provider (e.g., 'openrouter')
+        encrypted_key: Fernet-encrypted API key
+        key_hint: Display hint (e.g., '...abc123')
+        key_version: Encryption key version used
     """
     row = await db.fetchrow(
         """
-        INSERT INTO user_api_keys (user_id, provider, encrypted_key, key_hint)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO user_api_keys (user_id, provider, encrypted_key, key_hint, key_version)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (user_id, provider)
-        DO UPDATE SET encrypted_key = $3, key_hint = $4, updated_at = NOW()
+        DO UPDATE SET encrypted_key = $3, key_hint = $4, key_version = $5, updated_at = NOW()
         RETURNING id, provider, key_hint, created_at
         """,
         user_id,
         provider,
         encrypted_key,
-        key_hint
+        key_hint,
+        key_version
     )
     return dict(row)
 
@@ -632,16 +641,43 @@ async def get_user_api_key(user_id: UUID, provider: str = "openrouter") -> Optio
     """
     Get a user's decrypted API key.
 
+    Performs lazy re-encryption if the key was encrypted with an older key version.
     Returns the decrypted API key string or None if not found.
     """
     row = await db.fetchrow(
-        "SELECT encrypted_key FROM user_api_keys WHERE user_id = $1 AND provider = $2",
+        "SELECT encrypted_key, key_version FROM user_api_keys WHERE user_id = $1 AND provider = $2",
         user_id,
         provider
     )
     if row:
-        from .encryption import decrypt_api_key
-        return decrypt_api_key(row["encrypted_key"])
+        from .encryption import decrypt_api_key, rotate_api_key, get_key_count
+
+        encrypted = row["encrypted_key"]
+        current_version = row["key_version"] or 1
+
+        # Lazy re-encryption: if we have multiple keys, try to rotate
+        if get_key_count() > 1:
+            try:
+                new_encrypted, was_rotated = rotate_api_key(encrypted)
+                if was_rotated:
+                    # Update with new encryption (increment version)
+                    new_version = current_version + 1
+                    await db.execute(
+                        """
+                        UPDATE user_api_keys
+                        SET encrypted_key = $3, key_version = $4, updated_at = NOW()
+                        WHERE user_id = $1 AND provider = $2
+                        """,
+                        user_id,
+                        provider,
+                        new_encrypted,
+                        new_version
+                    )
+                    encrypted = new_encrypted
+            except ValueError:
+                pass  # Rotation failed, continue with original
+
+        return decrypt_api_key(encrypted)
     return None
 
 
@@ -1217,34 +1253,62 @@ async def get_user_billing_info(user_id: UUID) -> Dict[str, Any]:
 async def get_user_byok_key(user_id: UUID) -> Optional[str]:
     """Get user's BYOK OpenRouter API key (decrypted).
 
+    Performs lazy re-encryption if the key was encrypted with an older key version.
+
     Returns:
         Decrypted API key or None if not set
     """
     row = await db.fetchrow(
-        "SELECT byok_api_key FROM users WHERE id = $1",
+        "SELECT byok_api_key, byok_key_version FROM users WHERE id = $1",
         user_id
     )
     if row and row["byok_api_key"]:
-        from .encryption import decrypt_api_key
-        return decrypt_api_key(row["byok_api_key"])
+        from .encryption import decrypt_api_key, rotate_api_key, get_key_count
+
+        encrypted = row["byok_api_key"]
+        current_version = row["byok_key_version"] or 1
+
+        # Lazy re-encryption: if we have multiple keys, try to rotate
+        if get_key_count() > 1:
+            try:
+                new_encrypted, was_rotated = rotate_api_key(encrypted)
+                if was_rotated:
+                    new_version = current_version + 1
+                    await db.execute(
+                        """
+                        UPDATE users
+                        SET byok_api_key = $2, byok_key_version = $3, updated_at = NOW()
+                        WHERE id = $1
+                        """,
+                        user_id,
+                        new_encrypted,
+                        new_version
+                    )
+                    encrypted = new_encrypted
+            except ValueError:
+                pass  # Rotation failed, continue with original
+
+        return decrypt_api_key(encrypted)
     return None
 
 
-async def save_user_byok_key(user_id: UUID, encrypted_key: str) -> None:
+async def save_user_byok_key(user_id: UUID, encrypted_key: str, key_version: int = 1) -> None:
     """Save user's BYOK OpenRouter API key.
 
     Args:
         user_id: User's ID
         encrypted_key: Fernet-encrypted API key
+        key_version: Encryption key version used
     """
     await db.execute(
         """
         UPDATE users
-        SET byok_api_key = $2, byok_validated_at = NOW(), updated_at = NOW()
+        SET byok_api_key = $2, byok_key_version = $3, byok_validated_at = NOW(), updated_at = NOW()
         WHERE id = $1
         """,
         user_id,
-        encrypted_key
+        encrypted_key,
+        key_version
     )
 
 
@@ -1257,7 +1321,7 @@ async def delete_user_byok_key(user_id: UUID) -> bool:
     result = await db.execute(
         """
         UPDATE users
-        SET byok_api_key = NULL, byok_validated_at = NULL, updated_at = NOW()
+        SET byok_api_key = NULL, byok_key_version = NULL, byok_validated_at = NULL, updated_at = NOW()
         WHERE id = $1 AND byok_api_key IS NOT NULL
         """,
         user_id
