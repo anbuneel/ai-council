@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { auth } from '../api';
-import Masthead from './Masthead';
 import './Login.css';
 
 function Login({ onLogin }) {
@@ -26,7 +25,13 @@ function Login({ onLogin }) {
       <div className="login-texture" aria-hidden="true" />
 
       {/* Top masthead bar */}
-      <Masthead variant="centered" />
+      <header className="login-masthead">
+        <div className="masthead-inner">
+          <span className="masthead-prefix">The</span>
+          <h1 className="masthead-title">Quinthesis</h1>
+          <div className="masthead-divider"><span className="masthead-diamond">◆</span></div>
+        </div>
+      </header>
 
       {/* Main content area - two columns on desktop */}
       <main className="login-main">
