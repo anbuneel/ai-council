@@ -332,8 +332,8 @@ The five-dot pattern (four corners + center) is a powerful symbol:
 
 ### Phase 3: Content & Messaging (Week 3)
 - [x] Update Stage 3 label → "Quintessence"
-- [ ] Update all copy (legal, marketing, UI)
-- [ ] Update system prompts (council.py)
+- [x] Update all copy (removed "council" from user-facing text)
+- [x] Update system prompts (N/A - no user-facing council terminology)
 - [ ] Update documentation
 
 ### Phase 4: Infrastructure (Week 4)
