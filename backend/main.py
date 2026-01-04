@@ -612,7 +612,7 @@ async def export_data(
 
     # Generate filename with date
     export_date = datetime.now().strftime("%Y-%m-%d")
-    filename = f"ai-council-export-{export_date}.zip"
+    filename = f"quinthesis-export-{export_date}.zip"
 
     return StreamingResponse(
         zip_buffer,

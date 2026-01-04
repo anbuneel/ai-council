@@ -247,7 +247,7 @@ export const auth = {
     a.href = url;
     // Get filename from Content-Disposition header or use default
     const disposition = response.headers.get('Content-Disposition');
-    let filename = 'ai-council-export.zip';
+    let filename = 'quinthesis-export.zip';
     const headerFilename = getFilenameFromDisposition(disposition);
     if (headerFilename) {
       filename = headerFilename;

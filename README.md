@@ -16,7 +16,7 @@ The UI uses a two-pane docket layout:
 - Left pane: Archive drawer with search and date-grouped conversations (Today, Yesterday, This Week, etc.)
 - Right pane: The inquiry with question, final answer, and collapsible Stage 1/2 deliberation records
 
-**Live Demo:** https://ai-council-anbs.vercel.app
+**Live Demo:** https://quinthesis.vercel.app
 
 **Try Before Signing Up:** Visit `/demo` to see example deliberations without creating an account.
 
