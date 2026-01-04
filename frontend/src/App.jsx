@@ -33,6 +33,7 @@ function App() {
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [createError, setCreateError] = useState('');
   const [userBalance, setUserBalance] = useState(0);
+  const [isByokMode, setIsByokMode] = useState(false);
 
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
@@ -49,6 +50,7 @@ function App() {
     try {
       const data = await billing.getBalance();
       setUserBalance(data.balance);
+      setIsByokMode(data.has_byok_key || false);
       // Auto-redirect to Account if user has no balance and no API key (except for certain pages)
       const excludedPaths = ['/account', '/privacy', '/terms', '/demo'];
       const hasAnyKey = data.has_openrouter_key || data.has_byok_key;
@@ -643,6 +645,7 @@ function App() {
           // User controls
           userEmail={userEmail}
           userBalance={userBalance}
+          isByokMode={isByokMode}
           onLogout={handleLogout}
           onNewInquiry={handleGoToComposer}
         />
@@ -733,6 +736,7 @@ function App() {
                   <Account
                     userEmail={userEmail}
                     userBalance={userBalance}
+                    isByokMode={isByokMode}
                     onLogout={handleLogout}
                     onRefreshBalance={loadBalance}
                     onToggleSidebar={handleToggleSidebar}

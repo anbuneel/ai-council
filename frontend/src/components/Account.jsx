@@ -6,7 +6,7 @@ import ConfirmDialog from './ConfirmDialog';
 import Masthead from './Masthead';
 import './Account.css';
 
-function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleSidebar, isSidebarOpen }) {
+function Account({ userEmail, userBalance, isByokMode, onLogout, onRefreshBalance, onToggleSidebar, isSidebarOpen }) {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [balance, setBalance] = useState(null);
@@ -204,6 +204,7 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
           isSidebarOpen={isSidebarOpen}
           userEmail={userEmail}
           userBalance={userBalance}
+          isByokMode={isByokMode}
           onLogout={onLogout}
         >
           <HomeButton />
@@ -226,6 +227,7 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
         isSidebarOpen={isSidebarOpen}
         userEmail={userEmail}
         userBalance={userBalance}
+        isByokMode={isByokMode}
         onLogout={onLogout}
       >
         <HomeButton />

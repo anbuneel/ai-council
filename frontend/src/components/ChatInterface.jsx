@@ -73,6 +73,7 @@ export default function ChatInterface({
     // User controls
     userEmail,
     userBalance,
+    isByokMode,
     onLogout,
     onNewInquiry,
 }) {
@@ -171,6 +172,7 @@ export default function ChatInterface({
                     isSidebarOpen={isSidebarOpen}
                     userEmail={userEmail}
                     userBalance={userBalance}
+                    isByokMode={isByokMode}
                     onLogout={onLogout}
                 />
                 <InquiryComposer
@@ -195,6 +197,7 @@ export default function ChatInterface({
                 isSidebarOpen={isSidebarOpen}
                 userEmail={userEmail}
                 userBalance={userBalance}
+                isByokMode={isByokMode}
                 onLogout={onLogout}
                 onNewInquiry={onNewInquiry}
                 showNewInquiry={Boolean(onNewInquiry)}

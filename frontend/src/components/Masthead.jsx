@@ -16,6 +16,7 @@ export default function Masthead({
     isSidebarOpen,
     userEmail,
     userBalance,
+    isByokMode = false,
     onLogout,
     onNewInquiry,
     showNewInquiry = false,
@@ -108,7 +109,7 @@ export default function Masthead({
                     )}
                     {children}
                     {userBalance !== undefined && (
-                        <CreditBalance balance={userBalance} onClick={handleOpenAccount} />
+                        <CreditBalance balance={userBalance} isByokMode={isByokMode} onClick={handleOpenAccount} />
                     )}
                     {userEmail && (
                         <AvatarMenu
