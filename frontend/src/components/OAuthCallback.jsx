@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { auth } from '../api';
 import './OAuthCallback.css';
@@ -9,8 +9,13 @@ function OAuthCallback({ onLogin }) {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState(true);
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    // Guard against double execution (StrictMode, dependency changes, etc.)
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const completeAuth = async () => {
       const code = searchParams.get('code');
       const state = searchParams.get('state');
