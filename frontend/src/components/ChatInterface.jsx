@@ -79,9 +79,17 @@ export default function ChatInterface({
 }) {
     const [input, setInput] = useState('');
     const [activeTab, setActiveTab] = useState('final');
+    const responsePanelRef = useRef(null);
 
+    // When conversation changes, show Quintessence if finalized, otherwise stage1
     useEffect(() => {
-        setActiveTab('stage1');
+        const messages = conversation?.messages || [];
+        const lastAssistant = messages.filter(m => m.role === 'assistant').pop();
+        if (lastAssistant?.stage3) {
+            setActiveTab('final');
+        } else {
+            setActiveTab('stage1');
+        }
     }, [conversation?.id]);
 
     const handleSubmit = (e) => {
@@ -162,6 +170,13 @@ export default function ChatInterface({
             setActiveTab('final');
         }
     }, [latestAssistant]);
+
+    // Scroll to top of response panel when switching to final tab with completed answer
+    useEffect(() => {
+        if (activeTab === 'final' && latestAssistant?.stage3 && responsePanelRef.current) {
+            responsePanelRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [activeTab, latestAssistant?.stage3]);
 
     if (!conversation) {
         return (
@@ -281,7 +296,7 @@ export default function ChatInterface({
                         <p>Submit a question to start the run.</p>
                     </div>
                 ) : hasResponse && (
-                    <div className="response-panel reveal-stagger">
+                    <div className="response-panel reveal-stagger" ref={responsePanelRef}>
                         <div className="panel-inner">
                             <div className="response-tab-panels">
                                 {activeTab === 'final' && (
