@@ -87,6 +87,7 @@ from .council import (
 from .openrouter import close_client as close_openrouter_client, get_generation_costs_batch
 from . import stripe_client
 from . import openrouter_provisioning
+from . import notifications
 
 # Use local JSON storage if DATABASE_URL is not set
 if DATABASE_URL:
@@ -252,6 +253,17 @@ async def find_or_create_oauth_user(oauth_user) -> dict:
         name=oauth_user.name,
         avatar_url=oauth_user.avatar_url
     )
+
+    # Send notification for new signup (fire and forget)
+    try:
+        await notifications.notify_new_signup(
+            email=oauth_user.email,
+            provider=oauth_user.provider,
+            user_id=str(user["id"])
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send signup notification: {e}")
+
     return user
 
 
@@ -1055,6 +1067,19 @@ async def handle_successful_payment(session: dict):
                 stripe_payment_intent_id=verified_session.get("payment_intent")
             )
             logger.info(f"Added ${deposit_dollars:.2f} deposit for user {user_id} from session {session_id}")
+
+            # Send deposit notification (fire and forget)
+            try:
+                user_info = await storage.get_user_by_id(user_id)
+                balance_info = await storage.get_user_balance(user_id)
+                if user_info:
+                    await notifications.notify_deposit(
+                        email=user_info.get("email", "unknown"),
+                        amount_dollars=float(deposit_dollars),
+                        new_balance=balance_info
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to send deposit notification: {e}")
         except asyncpg.UniqueViolationError:
             logger.info(f"Session {session_id} already processed (unique constraint), skipping")
             return

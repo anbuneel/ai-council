@@ -48,6 +48,10 @@ OPENROUTER_PROVISIONING_KEY = os.getenv("OPENROUTER_PROVISIONING_KEY")
 # Sentry Configuration (for error tracking and monitoring)
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 
+# Email Notifications (via Resend)
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+NOTIFICATION_EMAIL = os.getenv("NOTIFICATION_EMAIL")  # Where to send admin notifications
+
 # CORS origins (comma-separated list)
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 

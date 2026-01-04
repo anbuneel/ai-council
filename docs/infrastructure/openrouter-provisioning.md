@@ -136,3 +136,30 @@ Get your provisioning key at: https://openrouter.ai/settings/provisioning-keys
 2. **Monitor provisioned keys** for unusual usage patterns
 3. **Keep OpenRouter balance funded** - all child keys draw from it
 4. **Review `query_costs` table** for per-user spending trends
+
+When you use provisioned keys, all user API calls are paid from your OpenRouter account balance — not the users' deposits directly.
+
+  User deposits $5 into Quinthesis
+          ↓
+  You receive $5 via Stripe
+          ↓
+  User makes a query
+          ↓
+  OpenRouter charges YOUR account balance
+          ↓
+  You keep the $5 (minus OpenRouter's cost)
+
+  The risk: If your OpenRouter balance is $0, all user queries will fail — even if users have deposited money.
+
+  What to do:
+  1. Go to https://openrouter.ai/credits
+  2. Add funds to your OpenRouter account (this is your float/working capital)
+  3. Keep it topped up as users make queries
+
+  Example:
+  - 10 users each deposit $5 = $50 in Stripe
+  - They collectively run queries costing $30 on OpenRouter
+  - You need at least $30 in your OpenRouter balance to cover those calls
+  - You profit: $50 (deposits) - $30 (OpenRouter cost) = $20 (minus Stripe fees)
+
+  The user deposits go to you; you pay OpenRouter. You're the middleman.
