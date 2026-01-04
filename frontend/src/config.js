@@ -8,10 +8,10 @@
 // Based on typical OpenRouter pricing as of January 2026
 // Review quarterly or when model pricing changes significantly
 export const COST_ESTIMATE = {
-  min: 0.05,
-  max: 0.20,
-  text: "Typical cost: $0.05–0.20 depending on response length",
-  lastReviewed: "2026-01-02",
+  min: 0.02,
+  max: 0.10,
+  text: "Estimated cost: ~$0.02–$0.10 per inquiry",
+  lastReviewed: "2026-01-03",
 };
 
 // Demo data version - update when demos.json content changes

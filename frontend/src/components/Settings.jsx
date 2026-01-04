@@ -181,7 +181,7 @@ function Settings({ isOpen, onClose, userEmail, userBalance, onRefreshBalance })
               <span className="credits-balance-label">available</span>
             </div>
             <p className="settings-desc">
-              Each inquiry costs approximately $0.02-0.10 depending on the AI models used.
+              Each inquiry costs an estimated ~$0.02–$0.10 depending on the AI models used.
               You pay only for what you use, plus a 10% service fee.
             </p>
           </section>
@@ -201,7 +201,7 @@ function Settings({ isOpen, onClose, userEmail, userBalance, onRefreshBalance })
                   <div key={option.id} className="credit-pack">
                     <div className="pack-info">
                       <span className="pack-name">{option.name}</span>
-                      <span className="pack-credits">~{Math.round(option.amount_cents / 5)} inquiries</span>
+                      <span className="pack-credits">~{Math.round(option.amount_cents / 5)} inquiries (est.)</span>
                     </div>
                     <button
                       className="pack-buy-btn"

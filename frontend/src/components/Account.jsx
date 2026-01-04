@@ -287,7 +287,7 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
                     </button>
                   ))}
                 </div>
-                <p className="deposit-note">~$0.02–$0.10 per inquiry</p>
+                <p className="deposit-note">Estimated ~$0.02–$0.10 per inquiry</p>
               </div>
             </section>
           </div>
