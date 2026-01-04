@@ -1678,7 +1678,8 @@ async def delete_user_account(user_id: UUID) -> tuple[bool, Optional[str]]:
         - success: True if user was deleted, False if user not found
         - openrouter_key_hash: The user's provisioned key hash (if any) for cleanup
     """
-    async with db.pool.acquire() as conn:
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
         async with conn.transaction():
             # Get user info for audit logging and key cleanup
             user = await conn.fetchrow(
