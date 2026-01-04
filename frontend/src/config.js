@@ -17,7 +17,7 @@ export const COST_ESTIMATE = {
 
 // Demo data version - update when demos.json content changes
 export const DEMO_VERSION = {
-  version: "1.0.0",
-  lastUpdated: "2026-01-02",
-  description: "Initial launch demos: Rust vs Go, Quantum Computing, Career advice",
+  version: "2.0.0",
+  lastUpdated: "2026-01-04",
+  description: "Replaced demos: Rust vs Go (dev), India Test XI (sports), EV Buy vs Lease (consumer)",
 };
