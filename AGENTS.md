@@ -1,7 +1,7 @@
-# AGENTS.md - Technical Notes for AI Council
+# AGENTS.md - Technical Notes for Quinthesis
 
-## Project: AI Council
-A 3-stage deliberation system where multiple LLMs collaboratively answer questions with anonymized peer review.
+## Project: Quinthesis
+A multi-AI deliberation platform where multiple LLMs collaboratively answer questions with anonymized peer review. The name combines "quintessence" (the purest essence) with "synthesis" (combining ideas).
 
 **Primary goal:** Learn to use AI agents (Claude Code, Codex) to build a full-stack SaaS application from scratch.
 
@@ -543,7 +543,7 @@ Use OpenRouter model identifiers. Verify with `test_openrouter.py` before adding
 
 ## Design Theme: The Paper of Record
 
-An editorial/newspaper-inspired light theme that treats AI Council as a prestigious publication.
+An editorial/newspaper-inspired light theme that treats Quinthesis as a prestigious publication.
 
 ### Color Palette
 - Paper tones: `--paper-cream` (#FAF8F5), `--paper-aged` (#F5F0E8)
