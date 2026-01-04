@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { billing, auth } from '../api';
+import { COST_ESTIMATE } from '../config';
 import ConfirmDialog from './ConfirmDialog';
 import Masthead from './Masthead';
 import './Account.css';
@@ -281,13 +282,13 @@ function Account({ userEmail, userBalance, onLogout, onRefreshBalance, onToggleS
                     >
                       <span className="deposit-amount">{formatPrice(option.amount_cents)}</span>
                       <span className="deposit-meta">
-                        <span className="deposit-estimate">~{Math.round(option.amount_cents / 5)} inquiries</span>
+                        <span className="deposit-estimate">~{Math.round(option.amount_cents / COST_ESTIMATE.avgCents)} inquiries (est.)</span>
                         {isPurchasing && <span className="deposit-loading">Processing...</span>}
                       </span>
                     </button>
                   ))}
                 </div>
-                <p className="deposit-note">Estimated ~$0.02–$0.10 per inquiry</p>
+                <p className="deposit-note">{COST_ESTIMATE.text}</p>
               </div>
             </section>
           </div>
