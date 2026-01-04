@@ -1000,8 +1000,8 @@ async def get_openrouter_total_limit(user_id: UUID) -> float:
 
 # ============== Usage-Based Billing ==============
 
-# 10% margin on OpenRouter costs
-MARGIN_RATE = 0.10
+# 5% margin on OpenRouter costs
+MARGIN_RATE = 0.05
 
 
 async def get_user_balance(user_id: UUID) -> float:

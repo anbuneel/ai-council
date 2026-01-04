@@ -79,7 +79,7 @@ Not a hosting tier, but relevant for cost management:
 
 **Safeguards in Place:**
 - $0.50 minimum balance check before queries
-- Usage-based billing with 10% margin
+- Usage-based billing with 5% margin
 - Per-query cost tracking
 
 **Recommendation:** Set daily spend cap alerts on OpenRouter dashboard.

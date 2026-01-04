@@ -53,7 +53,7 @@ function TermsOfService() {
             <h3>Usage-Based Pricing</h3>
             <p>
               The Service operates on a usage-based model. You deposit funds and are charged per query
-              based on actual AI provider costs plus a 10% service fee.
+              based on actual AI provider costs plus a 5% service fee.
             </p>
 
             <h3>Deposits</h3>

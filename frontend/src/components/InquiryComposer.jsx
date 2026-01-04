@@ -181,7 +181,8 @@ export default function InquiryComposer({
               )}
             </button>
             <div className="cost-estimate">
-              {COST_ESTIMATE.text}
+              <span className="cost-estimate-main">{COST_ESTIMATE.text}</span>
+              <span className="cost-estimate-sub">{COST_ESTIMATE.subtext}</span>
             </div>
           </div>
 

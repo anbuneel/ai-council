@@ -11,8 +11,9 @@ export const COST_ESTIMATE = {
   min: 0.10,
   max: 0.25,
   avgCents: 20, // Used for inquiry count calculations (~$0.20 avg)
-  text: "Estimated cost: ~$0.10–$0.25 per inquiry",
-  lastReviewed: "2026-01-03",
+  text: "Estimated cost: ~$0.10–$0.25",
+  subtext: "AI provider costs + 5% service fee",
+  lastReviewed: "2026-01-04",
 };
 
 // Demo data version - update when demos.json content changes

@@ -183,7 +183,7 @@ function Settings({ isOpen, onClose, userEmail, userBalance, onRefreshBalance })
             </div>
             <p className="settings-desc">
               Each inquiry costs an estimated ~$0.10–$0.25 depending on the AI models used.
-              You pay only for what you use, plus a 10% service fee.
+              You pay only for what you use, plus a 5% service fee.
             </p>
           </section>
 

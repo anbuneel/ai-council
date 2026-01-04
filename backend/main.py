@@ -1208,7 +1208,7 @@ async def send_message(
     Returns the complete response with all stages and cost breakdown.
 
     Rate limited to 10 requests/minute per user to control OpenRouter costs.
-    Uses usage-based billing: actual OpenRouter cost + 10% margin deducted after query.
+    Uses usage-based billing: actual OpenRouter cost + 5% margin deducted after query.
     """
     # Set Sentry user context for error tracking
     set_sentry_user(user_id)
@@ -1285,7 +1285,7 @@ async def send_message(
                 model_breakdown[model] = 0.0
             model_breakdown[model] += cost_info.get('total_cost', 0)
 
-        # Deduct costs from balance (includes 10% margin)
+        # Deduct costs from balance (includes 5% margin)
         success, new_balance = await storage.deduct_query_cost(
             user_id=user_id,
             conversation_id=conversation_id,
@@ -1294,8 +1294,8 @@ async def send_message(
             model_breakdown=model_breakdown
         )
 
-        # Calculate margin for response
-        margin_cost = total_openrouter_cost * 0.10
+        # Calculate margin for response (5% markup)
+        margin_cost = total_openrouter_cost * 0.05
         total_cost = total_openrouter_cost + margin_cost
 
         # Return the complete response with metadata and cost
@@ -1334,7 +1334,7 @@ async def send_message_stream(
     Returns Server-Sent Events as each stage completes.
 
     Rate limited to 10 requests/minute per user to control OpenRouter costs.
-    Uses usage-based billing: actual OpenRouter cost + 10% margin deducted after query.
+    Uses usage-based billing: actual OpenRouter cost + 5% margin deducted after query.
     Detects client disconnection and cancels in-flight API calls to save costs.
     """
     # Set Sentry user context for error tracking
@@ -1485,7 +1485,7 @@ async def send_message_stream(
                         model_breakdown[model] = 0.0
                     model_breakdown[model] += cost_info.get('total_cost', 0)
 
-                # Deduct costs from balance (includes 10% margin)
+                # Deduct costs from balance (includes 5% margin)
                 success, new_balance = await storage.deduct_query_cost(
                     user_id=user_id,
                     conversation_id=conversation_id,
@@ -1494,8 +1494,8 @@ async def send_message_stream(
                     model_breakdown=model_breakdown
                 )
 
-                # Calculate margin for response
-                margin_cost = total_openrouter_cost * 0.10
+                # Calculate margin for response (5% markup)
+                margin_cost = total_openrouter_cost * 0.05
                 total_cost = total_openrouter_cost + margin_cost
 
                 # Send completion event with cost breakdown

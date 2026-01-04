@@ -75,7 +75,7 @@ If a user provides their own OpenRouter API key:
 |-------|---------|
 | `conversation_id` | Which conversation |
 | `openrouter_cost` | Actual cost from OpenRouter |
-| `margin_cost` | 10% margin added |
+| `margin_cost` | 5% margin added |
 | `total_cost` | Total charged to user balance |
 | `model_breakdown` | Cost per model (JSON) |
 | `generation_ids` | OpenRouter generation IDs for audit |

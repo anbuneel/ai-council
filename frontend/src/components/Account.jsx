@@ -290,10 +290,36 @@ function Account({ userEmail, userBalance, isByokMode, onLogout, onRefreshBalanc
                     </button>
                   ))}
                 </div>
-                <p className="deposit-note">{COST_ESTIMATE.text}</p>
               </div>
             </section>
           </div>
+
+          {/* Pricing Explainer */}
+          <section className="account-card pricing-explainer">
+            <div className="card-header">
+              <h2 className="card-title">How Pricing Works</h2>
+            </div>
+            <div className="card-content">
+              <ul className="pricing-list">
+                <li>
+                  <span className="pricing-bullet"></span>
+                  <span>You pay <strong>actual AI provider costs + 5% service fee</strong></span>
+                </li>
+                <li>
+                  <span className="pricing-bullet"></span>
+                  <span>Typical inquiry costs <strong>$0.10–$0.25</strong> depending on models used</span>
+                </li>
+                <li>
+                  <span className="pricing-bullet"></span>
+                  <span>BYOK users pay OpenRouter directly — <strong>0% fee</strong></span>
+                </li>
+                <li>
+                  <span className="pricing-bullet"></span>
+                  <span>No monthly fees, no subscriptions — just pay as you go</span>
+                </li>
+              </ul>
+            </div>
+          </section>
 
           {/* API Settings Section */}
           <section className="account-card">
@@ -406,7 +432,7 @@ function Account({ userEmail, userBalance, isByokMode, onLogout, onRefreshBalanc
                             <span>{formatCost(tx.openrouter_cost)}</span>
                           </div>
                           <div className="detail-row">
-                            <span>Service Fee (10%)</span>
+                            <span>Service Fee (5%)</span>
                             <span>{formatCost(tx.margin_cost)}</span>
                           </div>
                         </div>
