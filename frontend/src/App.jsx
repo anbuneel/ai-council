@@ -410,6 +410,10 @@ function App() {
   const handleSelectConversation = (id) => {
     setCurrentConversationId(id);
     setIsSidebarOpen(false);
+    // Navigate to home if on a different page (e.g., /account)
+    if (window.location.pathname !== '/') {
+      window.location.href = '/';
+    }
   };
 
   const handleDeleteConversation = (id) => {
