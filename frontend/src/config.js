@@ -8,10 +8,10 @@
 // Based on typical OpenRouter pricing as of January 2026
 // Review quarterly or when model pricing changes significantly
 export const COST_ESTIMATE = {
-  min: 0.05,
-  max: 0.15,
-  avgCents: 10, // Used for inquiry count calculations (~$0.10 avg)
-  text: "Estimated cost: ~$0.05–$0.15 per inquiry",
+  min: 0.10,
+  max: 0.25,
+  avgCents: 20, // Used for inquiry count calculations (~$0.20 avg)
+  text: "Estimated cost: ~$0.10–$0.25 per inquiry",
   lastReviewed: "2026-01-03",
 };
 

@@ -182,7 +182,7 @@ function Settings({ isOpen, onClose, userEmail, userBalance, onRefreshBalance })
               <span className="credits-balance-label">available</span>
             </div>
             <p className="settings-desc">
-              Each inquiry costs an estimated ~$0.05–$0.15 depending on the AI models used.
+              Each inquiry costs an estimated ~$0.10–$0.25 depending on the AI models used.
               You pay only for what you use, plus a 10% service fee.
             </p>
           </section>
