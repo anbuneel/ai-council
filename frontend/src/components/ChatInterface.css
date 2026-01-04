@@ -135,7 +135,7 @@
 }
 
 .question-status.pending {
-  color: var(--accent-ochre);
+  color: var(--accent-gold);
 }
 
 .question-status.resolved {

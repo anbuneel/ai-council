@@ -27,9 +27,9 @@ function Login({ onLogin }) {
       {/* Top masthead bar */}
       <header className="login-masthead">
         <div className="masthead-inner">
-          <div className="masthead-rule" />
+          <span className="masthead-prefix">The</span>
           <h1 className="masthead-title">Quinthesis</h1>
-          <div className="masthead-rule" />
+          <div className="masthead-divider"><span className="masthead-diamond">◆</span></div>
         </div>
       </header>
 

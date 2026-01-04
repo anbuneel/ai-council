@@ -29,7 +29,7 @@
 }
 
 .avatar-btn:focus {
-  outline: 2px solid var(--accent-ochre);
+  outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
 }
 

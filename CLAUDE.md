@@ -548,30 +548,32 @@ An editorial/newspaper-inspired light theme that treats Quinthesis as a prestigi
 ### Color Palette
 - Paper tones: `--paper-cream` (#FAF8F5), `--paper-aged` (#F5F0E8)
 - Ink tones: `--ink-black` (#1A1614), `--ink-dark` (#2D2926)
-- Accents: `--accent-vermillion` (#C43D2E), `--accent-forest` (#2D5A3D), `--accent-ochre` (#C4943D)
+- Accents: `--accent-vermillion` (#C43D2E), `--accent-forest` (#2D5A3D), `--accent-gold` (#B8860B)
 
 ### Typography
-- Display: Playfair Display (headlines, Final Answer)
+- Display: Playfair Display (headlines, Quintessence)
 - Body: Source Serif 4 (readable article text)
 - UI: IBM Plex Sans (labels, buttons)
 - Mono: IBM Plex Mono (code, model identifiers)
 
 ### Design Philosophy
-- "Answer-First" hierarchy: Stage 3 (Final Answer) is the hero with editorial flourishes (drop cap, two-column layout)
+- "Answer-First" hierarchy: Stage 3 ("Quintessence") is the hero with editorial flourishes
 - Supporting details as secondary: Stage 1 & 2 are collapsed by default
 - Editorial conventions: Double-rule borders, pull-quote questions, masthead styling
+- Alchemical undertone: Gold accent color, "The Quinthesis" masthead with diamond divider
 - Warm, authoritative feel inspired by The Economist and The New York Times
 
 ### Design Docs
 - `docs/design/ui-redesign-proposal.md` - Full design proposal
 - `docs/design/ui-ux-review.md` - Latest UI/UX review and recommendations
+- `docs/design/quinthesis-brand-exploration-claude.md` - Brand identity and alchemical design direction
 
 ## UX Features (Latest Implementation)
 
 ### Two-Pane Layout
 - Left pane shows prior conversations (Archive drawer)
-- Right pane shows the inquiry with question, final answer, and collapsible Stage 1/2 details
-- Stage 1/2 are collapsed by default; Stage 3 is always prominent
+- Right pane shows the inquiry with question, Quintessence (final answer), and collapsible Stage 1/2 details
+- Stage 1/2 are collapsed by default; Quintessence tab is always prominent
 
 ### Sticky Header + Input
 - Question header stays pinned within each inquiry view

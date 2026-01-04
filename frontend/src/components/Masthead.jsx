@@ -34,8 +34,9 @@ export default function Masthead({
                 <div className="masthead-row">
                     <div className="masthead-spacer" />
                     <div className="masthead-center">
+                        <span className="masthead-prefix">The</span>
                         <h1 className="masthead-title">Quinthesis</h1>
-                        <p className="masthead-tagline">{tagline}</p>
+                        <div className="masthead-divider"><span className="masthead-diamond">◆</span></div>
                     </div>
                     <div className="masthead-spacer" />
                 </div>
@@ -49,10 +50,11 @@ export default function Masthead({
                 <div className="masthead-row">
                     <div className="masthead-spacer" />
                     <div className="masthead-center">
+                        <span className="masthead-prefix">The</span>
                         <h1 className="masthead-title masthead-title-link" onClick={handleGoHome} role="link" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleGoHome()}>
                             Quinthesis
                         </h1>
-                        {tagline && <p className="masthead-tagline">{tagline}</p>}
+                        <div className="masthead-divider"><span className="masthead-diamond">◆</span></div>
                     </div>
                     <div className="masthead-actions">{children}</div>
                 </div>
@@ -83,10 +85,11 @@ export default function Masthead({
                     <div className="masthead-spacer"></div>
                 )}
                 <div className="masthead-center">
+                    <span className="masthead-prefix">The</span>
                     <h1 className="masthead-title masthead-title-link" onClick={handleGoHome} role="link" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleGoHome()}>
                         Quinthesis
                     </h1>
-                    <p className="masthead-tagline">{tagline}</p>
+                    <div className="masthead-divider"><span className="masthead-diamond">◆</span></div>
                 </div>
                 <div className="masthead-actions">
                     {showNewInquiry && onNewInquiry && (

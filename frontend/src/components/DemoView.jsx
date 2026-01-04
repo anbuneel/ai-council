@@ -220,7 +220,7 @@ export default function DemoView() {
                         role="tab"
                         aria-selected={activeTab === 'final'}
                     >
-                        Final Answer
+                        Quintessence
                     </button>
                     <button
                         type="button"

@@ -116,8 +116,8 @@
 }
 
 .standing-item.top-ranked {
-  border-color: var(--accent-ochre);
-  background: var(--accent-ochre-bg);
+  border-color: var(--accent-gold);
+  background: var(--accent-gold-bg);
 }
 
 /* Position badges with medals */

@@ -241,7 +241,7 @@ export default function ChatInterface({
                             role="tab"
                             aria-selected={activeTab === 'final'}
                         >
-                            Final Answer
+                            Quintessence
                         </button>
                         <button
                             type="button"

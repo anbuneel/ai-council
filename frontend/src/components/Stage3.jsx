@@ -13,7 +13,7 @@ export default function Stage3({ finalResponse }) {
     <div className="stage stage3">
       <div className="verdict-header">
         <div className="verdict-titles">
-          <h3 className="stage-title">Stage 3: Final Answer</h3>
+          <h3 className="stage-title">Quintessence</h3>
           <p className="verdict-subtitle">
             Synthesized by Lead {getModelShortName(finalResponse.model)}
           </p>

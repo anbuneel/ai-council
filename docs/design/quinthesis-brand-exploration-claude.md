@@ -320,17 +320,18 @@ The five-dot pattern (four corners + center) is a powerful symbol:
 
 ### Phase 1: Core Identity (Week 1)
 - [ ] Finalize wordmark design
-- [ ] Update masthead component
+- [x] Update masthead component (added "The" prefix + diamond divider)
 - [ ] Update page titles and meta tags
 - [ ] Update favicon and app icons
 
 ### Phase 2: UI Polish (Week 2)
-- [ ] Apply refined color palette
-- [ ] Update accent colors throughout
+- [x] Apply refined color palette (added --accent-gold)
+- [x] Update accent colors throughout (swapped ochre → gold)
 - [ ] Add quincunx loading animation
-- [ ] Update decorative elements
+- [x] Update decorative elements (masthead divider with diamond)
 
 ### Phase 3: Content & Messaging (Week 3)
+- [x] Update Stage 3 label → "Quintessence"
 - [ ] Update all copy (legal, marketing, UI)
 - [ ] Update system prompts (council.py)
 - [ ] Update documentation

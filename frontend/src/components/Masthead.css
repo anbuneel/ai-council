@@ -90,6 +90,55 @@
     line-height: 1;
 }
 
+/* "The" prefix - small caps above title */
+.masthead-prefix {
+    font-family: var(--font-display);
+    font-size: 0.5rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin: 0;
+    line-height: 1;
+}
+
+/* Divider with centered diamond */
+.masthead-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 140px;
+    margin-top: 0.125rem;
+}
+
+.masthead-divider::before,
+.masthead-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+        to var(--dir, right),
+        transparent,
+        var(--ink-faint) 20%,
+        var(--ink-faint)
+    );
+}
+
+.masthead-divider::before {
+    --dir: right;
+}
+
+.masthead-divider::after {
+    --dir: left;
+}
+
+.masthead-diamond {
+    font-size: 0.375rem;
+    color: var(--accent-gold);
+    line-height: 1;
+}
+
 .masthead-spacer {
     width: 60px; /* Same width as Archive button for centering */
 }
@@ -213,9 +262,21 @@
         padding: 0.25rem var(--container-padding);
     }
 
+    .masthead-prefix {
+        font-size: 0.4rem;
+    }
+
     .masthead-title {
         font-size: var(--text-sm);
         letter-spacing: 0.04em;
+    }
+
+    .masthead-divider {
+        max-width: 100px;
+    }
+
+    .masthead-diamond {
+        font-size: 0.3rem;
     }
 }
 

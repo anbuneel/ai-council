@@ -38,6 +38,13 @@
   --accent-forest-bg: rgba(45, 90, 61, 0.08);
 
   --accent-navy: #1E3A5F;
+
+  /* Quintessence Gold - alchemical accent */
+  --accent-gold: #B8860B;
+  --accent-gold-light: #D4AF37;
+  --accent-gold-bg: rgba(184, 134, 11, 0.1);
+
+  /* Legacy ochre - being phased out in favor of gold */
   --accent-ochre: #C4943D;
   --accent-ochre-bg: rgba(196, 148, 61, 0.1);
 
@@ -45,7 +52,7 @@
      Status Colors
      ========================================================================== */
   --status-complete: var(--accent-forest);
-  --status-pending: var(--accent-ochre);
+  --status-pending: var(--accent-gold);
   --status-error: var(--accent-vermillion);
 
   /* ==========================================================================
