@@ -132,8 +132,8 @@ export default function DemoView() {
                     <div className="demo-intro">
                         <h2>Example Deliberations</h2>
                         <p>
-                            Quinthesis gathers responses from multiple AI models, has them review each other's answers,
-                            then synthesizes a comprehensive final answer. Click any example below to see the full deliberation process.
+                            Multiple AI models respond, review each other, and deliberate to produce a definitive answer.
+                            Click any example below to see the full process.
                         </p>
                     </div>
 

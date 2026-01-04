@@ -38,7 +38,7 @@ function Login({ onLogin }) {
         {/* Left column: Editorial content */}
         <section className="login-editorial">
           <p className="editorial-tagline">
-            Synthesized knowledge from AI experts
+            Multi-AI deliberation
           </p>
 
           <div className="editorial-divider" />

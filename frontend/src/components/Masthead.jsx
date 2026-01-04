@@ -20,7 +20,7 @@ export default function Masthead({
     onNewInquiry,
     showNewInquiry = false,
     // Custom tagline
-    tagline = 'Synthesized knowledge from AI experts',
+    tagline = 'Multi-AI deliberation',
     // Custom actions (for DemoView CTA button)
     children,
 }) {
