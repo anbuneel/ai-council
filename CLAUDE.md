@@ -7,7 +7,7 @@ A 3-stage deliberation system where multiple LLMs collaboratively answer questio
 
 Status: Production application deployed on Vercel (frontend), Fly.io (backend), and Supabase (database).
 
-This file and README.md should stay in sync.
+This file and AGENTS.md should stay in sync.
 
 ---
 

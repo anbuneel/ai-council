@@ -66,6 +66,8 @@ Technical reference documentation.
 | Document | Description | Date |
 |----------|-------------|------|
 | [DATA_STORAGE.md](DATA_STORAGE.md) | What user data is stored and how it's handled | 2026-01-03 |
+| [CLAUDE.md](../CLAUDE.md) | Canonical agent reference (mirrored in AGENTS.md) | 2026-01-03 |
+| [AGENTS.md](../AGENTS.md) | Codex agent reference (mirrors CLAUDE.md) | 2026-01-03 |
 
 ---
 
