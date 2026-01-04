@@ -109,7 +109,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - Server: Uvicorn with FastAPI
 - Memory: 1GB shared CPU
 - Health Check: `GET /` every 30s
-- Auto-scaling: Min 0 machines (stops when idle)
+- Auto-scaling: Min 1 machine (always running)
 - HTTPS: Force HTTPS enabled
 - **Important:** OAuth state storage is in-memory; must run single instance (max 1 machine) until Redis is implemented
 
