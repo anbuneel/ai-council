@@ -130,10 +130,11 @@ export default function DemoView() {
 
                 <div className="demo-content">
                     <div className="demo-intro">
-                        <h2>Example Deliberations</h2>
+                        <p className="demo-tagline">The second opinion your AI answer deserves</p>
+                        <h2>See It In Action</h2>
                         <p>
-                            Multiple AI models respond, review each other, and deliberate to produce a definitive answer.
-                            Click any example below to see the full process.
+                            Why trust one AI when three can deliberate? Each example shows GPT, Claude, and Gemini
+                            responding independently, reviewing each other anonymously, then synthesizing the best answer.
                         </p>
                     </div>
 

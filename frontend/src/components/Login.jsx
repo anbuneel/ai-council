@@ -37,8 +37,11 @@ function Login({ onLogin }) {
       <main className="login-main">
         {/* Left column: Editorial content */}
         <section className="login-editorial">
+          <h2 className="editorial-headline">
+            The second opinion your AI answer deserves
+          </h2>
           <p className="editorial-tagline">
-            Multi-AI deliberation
+            Multiple AI models deliberate your question. One synthesized answer emerges.
           </p>
 
           <div className="editorial-divider" />
