@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import Login from './components/Login';
@@ -15,7 +15,9 @@ import DemoView from './components/DemoView';
 import { api, auth, billing, hasTokens, clearTokens } from './api';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [userEmail, setUserEmail] = useState('');
@@ -55,8 +57,8 @@ function App() {
       const excludedPaths = ['/account', '/privacy', '/terms', '/demo'];
       const hasAnyKey = data.has_openrouter_key || data.has_byok_key;
       const needsBalance = data.balance === 0 && !hasAnyKey;
-      if (needsBalance && !excludedPaths.includes(window.location.pathname)) {
-        window.location.href = '/account';
+      if (needsBalance && !excludedPaths.includes(location.pathname)) {
+        navigate('/account');
       }
     } catch (e) {
       console.error('Failed to load balance:', e);
@@ -377,7 +379,7 @@ function App() {
         setIsAuthenticated(false);
       } else if (error.status === 402 || error.message?.includes('balance') || error.message?.includes('Insufficient')) {
         // Insufficient balance - redirect to Account to add funds
-        window.location.href = '/account';
+        navigate('/account');
       } else {
         setCreateError(error.message || 'Failed to submit inquiry.');
       }
@@ -419,8 +421,8 @@ function App() {
     setCurrentConversationId(id);
     setIsSidebarOpen(false);
     // Navigate to home if on a different page (e.g., /account)
-    if (window.location.pathname !== '/') {
-      window.location.href = '/';
+    if (location.pathname !== '/') {
+      navigate('/');
     }
   };
 
@@ -617,7 +619,7 @@ function App() {
         setIsAuthenticated(false);
       } else if (error.status === 402 || error.message?.includes('balance') || error.message?.includes('Insufficient')) {
         // Insufficient balance - redirect to Account to add funds
-        window.location.href = '/account';
+        navigate('/account');
         // Remove optimistic messages
         setCurrentConversation((prev) => ({
           ...prev,
@@ -712,12 +714,11 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/auth/callback/:provider"
-          element={<OAuthCallback onLogin={handleLogin} />}
-        />
+    <Routes>
+      <Route
+        path="/auth/callback/:provider"
+        element={<OAuthCallback onLogin={handleLogin} />}
+      />
         <Route
           path="/credits/success"
           element={<PaymentSuccess onRefreshBalance={loadBalance} />}
@@ -791,6 +792,13 @@ function App() {
           element={isAuthenticated ? renderMainApp() : <Login onLogin={handleLogin} />}
         />
       </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

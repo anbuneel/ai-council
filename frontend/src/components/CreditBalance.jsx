@@ -1,10 +1,10 @@
 import './CreditBalance.css';
 
 function CreditBalance({ balance, isByokMode, onClick }) {
-  // Format balance as currency
+  // Format balance as currency (without $ prefix since icon provides it)
   const formatBalance = (amount) => {
-    if (amount === null || amount === undefined) return '$0.00';
-    return `$${parseFloat(amount).toFixed(2)}`;
+    if (amount === null || amount === undefined) return '0.00';
+    return parseFloat(amount).toFixed(2);
   };
 
   // BYOK users see a key indicator instead of balance
