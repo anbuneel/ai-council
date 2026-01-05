@@ -13,6 +13,11 @@ from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OPENROUTER_PROVISION
 
 logger = logging.getLogger(__name__)
 
+# App attribution headers for OpenRouter rankings/analytics
+# See: https://openrouter.ai/docs/app-attribution
+APP_REFERER = "https://quinthesis.vercel.app"
+APP_TITLE = "Quinthesis"
+
 # OpenRouter generation stats API for cost retrieval
 OPENROUTER_GENERATION_API_URL = "https://openrouter.ai/api/v1/generation"
 
@@ -123,6 +128,8 @@ async def query_model(
     headers = {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
+        "HTTP-Referer": APP_REFERER,
+        "X-Title": APP_TITLE,
     }
 
     payload = {

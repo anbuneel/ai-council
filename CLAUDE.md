@@ -130,7 +130,7 @@ Note: If `DATABASE_URL` is not set, backend falls back to local JSON storage in 
 - `config.py` - Models, CORS, DB, JWT, OAuth, Stripe environment variables
 - `oauth.py` - Google and GitHub OAuth handlers (code exchange, user info)
 - `council.py` - Core logic: stage1/2/3, parsing, aggregation, returns generation IDs
-- `openrouter.py` - OpenRouter API wrapper, parallel queries, cost retrieval via generation API
+- `openrouter.py` - OpenRouter API wrapper, parallel queries, cost retrieval via generation API, app attribution
 - `openrouter_provisioning.py` - OpenRouter Provisioning API for per-user key management
 - `stripe_client.py` - Stripe Checkout and webhook handling (supports deposits and legacy credits)
 - `storage.py` - PostgreSQL storage with user, OAuth, balance, and usage tracking
@@ -702,6 +702,8 @@ Run `test_openrouter.py` to verify API connectivity and test model identifiers.
 - [ ] Set `OPENROUTER_PROVISIONING_KEY` in Fly.io secrets
 - [ ] Add credits to your OpenRouter account (this is the pool for all users)
 - [ ] Monitor usage at https://openrouter.ai/activity
+- [x] App attribution enabled via `HTTP-Referer` and `X-Title` headers (see https://openrouter.ai/docs/app-attribution)
+- [ ] View app analytics at https://openrouter.ai/apps?url=https://quinthesis.vercel.app
 
 ### Sentry (for error tracking - recommended)
 - [ ] Create Sentry account at https://sentry.io
