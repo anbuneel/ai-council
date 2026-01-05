@@ -99,6 +99,16 @@ Superseded documentation (kept for reference).
 
 ---
 
+## Launch
+
+Launch planning and checklists.
+
+| Document | Description | Date |
+|----------|-------------|------|
+| [launch-checklist.md](launch-checklist.md) | Launch checklist, messaging, SEO, channels | 2026-01-04 |
+
+---
+
 ## Quick Reference
 
 **Current Status:**
@@ -107,8 +117,10 @@ Superseded documentation (kept for reference).
 - All security fixes complete (Phase 1-3 + checkout rate limiting)
 - Privacy compliance ready (Privacy Policy, ToS, account deletion)
 - Free tier infrastructure verified ready for launch
+- SEO basics implemented (meta tags, sitemap, robots.txt)
 
 **Key Docs:**
+- **Launch:** [launch-checklist.md](launch-checklist.md)
 - Security: [production-readiness-2025-12-31.md](security/production-readiness-2025-12-31.md)
 - Design: [ui-redesign-proposal.md](design/ui-redesign-proposal.md)
 - Billing: [usage-based-billing.md](implementation/usage-based-billing.md)
