@@ -1502,8 +1502,11 @@ async def send_message_stream(
             # Calculate and deduct costs (only for credits mode)
             if api_mode == "credits":
                 # Calculate actual costs from OpenRouter
+                logger.info(f"Calculating costs for {len(all_generation_ids)} generation IDs: {all_generation_ids[:3]}...")
                 costs = await get_generation_costs_batch(all_generation_ids, api_key=api_key)
+                logger.info(f"Retrieved costs for {len(costs)} generations, total entries: {costs}")
                 total_openrouter_cost = sum(c.get('total_cost', 0) for c in costs.values())
+                logger.info(f"Total OpenRouter cost: ${total_openrouter_cost:.6f}")
 
                 # Build model breakdown for transparency
                 model_breakdown = {}

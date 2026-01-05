@@ -1245,7 +1245,14 @@ async def get_usage_history(
         user_id,
         limit
     )
-    return [dict(row) for row in rows]
+    result = []
+    for row in rows:
+        d = dict(row)
+        # model_breakdown may be stored as JSON string, parse it
+        if d.get('model_breakdown') and isinstance(d['model_breakdown'], str):
+            d['model_breakdown'] = json.loads(d['model_breakdown'])
+        result.append(d)
+    return result
 
 
 async def get_user_billing_info(user_id: UUID) -> Dict[str, Any]:

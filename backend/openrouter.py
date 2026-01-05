@@ -9,7 +9,7 @@ import logging
 import httpx
 from typing import List, Dict, Any, Optional
 
-from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL
+from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OPENROUTER_PROVISIONING_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +224,7 @@ async def query_models_parallel(
 async def get_generation_cost(
     generation_id: str,
     api_key: Optional[str] = None,
-    max_retries: int = 3,
+    max_retries: int = 5,
     retry_delay: float = 0.5
 ) -> Optional[Dict[str, Any]]:
     """
@@ -233,9 +233,13 @@ async def get_generation_cost(
     The /api/v1/generation endpoint returns actual costs using native tokenizer
     counts, which may differ from the normalized counts in the chat response.
 
+    Note: Uses the provisioning key for cost retrieval, as provisioned sub-keys
+    may not have access to cost data (similar to how "only provisioning keys
+    can fetch credits" per OpenRouter docs).
+
     Args:
         generation_id: The generation ID from the chat completion response
-        api_key: API key to use (uses user's key or default)
+        api_key: Ignored - always uses provisioning key for cost retrieval
         max_retries: Number of retries (cost may not be immediately available)
         retry_delay: Base delay between retries in seconds
 
@@ -243,7 +247,9 @@ async def get_generation_cost(
         Dict with 'total_cost', 'native_tokens_prompt', 'native_tokens_completion',
         'model', 'cache_discount' or None if failed
     """
-    key = api_key or OPENROUTER_API_KEY
+    # Use provisioning key for cost retrieval - provisioned sub-keys may not
+    # have access to cost data. Fall back to regular API key if no provisioning key.
+    key = OPENROUTER_PROVISIONING_KEY or OPENROUTER_API_KEY
     if not key:
         logger.error("No API key available for cost retrieval")
         return None
@@ -268,14 +274,24 @@ async def get_generation_cost(
                 return None
 
             response.raise_for_status()
-            data = response.json().get('data', {})
+            raw_data = response.json()
+            data = raw_data.get('data', {})
 
+            # Retry if cost is null - may not be calculated yet
+            if data.get('total_cost') is None:
+                if attempt < max_retries - 1:
+                    logger.debug(f"Generation {generation_id} has no cost yet, retrying... (attempt {attempt + 1})")
+                    await asyncio.sleep(retry_delay * (attempt + 1))
+                    continue
+                logger.warning(f"Generation {generation_id} has no cost data after {max_retries} retries. Response: {raw_data}")
+
+            # Handle None values from API (use 'or 0' since get() default only applies to missing keys)
             return {
-                'total_cost': float(data.get('total_cost', 0)),
-                'native_tokens_prompt': data.get('native_tokens_prompt', 0),
-                'native_tokens_completion': data.get('native_tokens_completion', 0),
+                'total_cost': float(data.get('total_cost') or 0),
+                'native_tokens_prompt': data.get('native_tokens_prompt') or 0,
+                'native_tokens_completion': data.get('native_tokens_completion') or 0,
                 'model': data.get('model'),
-                'cache_discount': float(data.get('cache_discount', 0))
+                'cache_discount': float(data.get('cache_discount') or 0)
             }
 
         except httpx.HTTPStatusError as e:

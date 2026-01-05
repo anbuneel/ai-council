@@ -18,7 +18,7 @@ export const COST_ESTIMATE = {
 
 // Demo data version - update when demos.json content changes
 export const DEMO_VERSION = {
-  version: "2.1.0",
-  lastUpdated: "2026-01-04",
-  description: "Demos: Specialist vs Generalist (career), India Test XI (sports), EV Buy vs Lease (consumer)",
+  version: "2.2.0",
+  lastUpdated: "2026-01-05",
+  description: "Demos: Specialist vs Generalist (career), India Test XI (sports), EV Buy vs Lease (consumer), Serene Places (travel)",
 };
