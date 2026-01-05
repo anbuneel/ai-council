@@ -328,8 +328,12 @@ function App() {
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage3 = true;
-              lastMsg.updated_at = new Date().toISOString();
+              // Create new object to trigger React re-render and effect dependencies
+              messages[messages.length - 1] = {
+                ...lastMsg,
+                loading: { ...lastMsg.loading, stage3: true },
+                updated_at: new Date().toISOString(),
+              };
               return { ...prev, messages };
             });
             break;
@@ -338,9 +342,13 @@ function App() {
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
-              lastMsg.stage3 = event.data;
-              lastMsg.loading.stage3 = false;
-              lastMsg.updated_at = new Date().toISOString();
+              // Create new object to trigger React re-render and effect dependencies
+              messages[messages.length - 1] = {
+                ...lastMsg,
+                stage3: event.data,
+                loading: { ...lastMsg.loading, stage3: false },
+                updated_at: new Date().toISOString(),
+              };
               return { ...prev, messages };
             });
             break;
@@ -558,8 +566,12 @@ function App() {
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage3 = true;
-              lastMsg.updated_at = new Date().toISOString();
+              // Create new object to trigger React re-render and effect dependencies
+              messages[messages.length - 1] = {
+                ...lastMsg,
+                loading: { ...lastMsg.loading, stage3: true },
+                updated_at: new Date().toISOString(),
+              };
               return { ...prev, messages };
             });
             break;
@@ -568,9 +580,13 @@ function App() {
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
-              lastMsg.stage3 = event.data;
-              lastMsg.loading.stage3 = false;
-              lastMsg.updated_at = new Date().toISOString();
+              // Create new object to trigger React re-render and effect dependencies
+              messages[messages.length - 1] = {
+                ...lastMsg,
+                stage3: event.data,
+                loading: { ...lastMsg.loading, stage3: false },
+                updated_at: new Date().toISOString(),
+              };
               return { ...prev, messages };
             });
             break;
