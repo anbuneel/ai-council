@@ -77,6 +77,16 @@ Testing strategy and automation plans.
 
 ---
 
+## Analysis
+
+Codebase analysis and snapshots.
+
+| Document | Description | Date |
+|----------|-------------|------|
+| [codebase-snapshot-claude.md](analysis/codebase-snapshot-claude.md) | Codebase snapshot timeline (architecture, tech stack, metrics) | 2026-01-05 |
+
+---
+
 ## Reference
 
 Technical reference documentation.
