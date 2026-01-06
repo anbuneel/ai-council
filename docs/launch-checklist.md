@@ -25,19 +25,16 @@
 
 ### SEO & Discovery
 
-- [ ] **Google Search Console** - Verify ownership (retry - was timing out)
-  - Go to: https://search.google.com/search-console
-  - Use "URL prefix" method with `https://quinthesis.vercel.app`
-  - Choose "HTML tag" verification (tag already in place)
-  - After verified, submit sitemap: `https://quinthesis.vercel.app/sitemap.xml`
+- [x] **Google Search Console** - Verified ✓
+  - Sitemap submitted: `https://quinthesis.vercel.app/sitemap.xml`
 
-- [ ] **Bing Webmaster Tools** - Helps with ChatGPT visibility
-  - Go to: https://www.bing.com/webmasters
-  - Can import from Google Search Console once that's verified
+- [x] **Bing Webmaster Tools** - Set up ✓
+  - Imported from Google Search Console
 
 - [ ] **Test social sharing cards**
-  - Twitter: https://cards-dev.twitter.com/validator
+  - Use: https://www.opengraph.xyz or https://metatags.io
   - Facebook: https://developers.facebook.com/tools/debug/
+  - (Twitter Card Validator deprecated)
 
 ---
 
