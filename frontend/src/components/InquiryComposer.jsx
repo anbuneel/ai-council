@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { COST_ESTIMATE } from '../config';
+import { Link } from 'react-router-dom';
+import { COST_ESTIMATE, MINIMUM_BALANCE } from '../config';
 import './InquiryComposer.css';
 
 const MIN_MODELS = 2;
@@ -18,6 +19,8 @@ export default function InquiryComposer({
   onSubmit,
   isSubmitting,
   submitError,
+  userBalance = 0,
+  isByokMode = false,
 }) {
   const [question, setQuestion] = useState('');
   const [selectedModels, setSelectedModels] = useState([]);
@@ -44,7 +47,8 @@ export default function InquiryComposer({
   }, [isLoadingModels]);
 
   const selectionCount = selectedModels.length;
-  const isValid = question.trim() && selectionCount >= MIN_MODELS && leadModel;
+  const hasInsufficientBalance = !isByokMode && userBalance < MINIMUM_BALANCE;
+  const isValid = question.trim() && selectionCount >= MIN_MODELS && leadModel && !hasInsufficientBalance;
 
   const toggleModel = (model) => {
     if (isSubmitting) return;
@@ -82,6 +86,17 @@ export default function InquiryComposer({
         <form onSubmit={handleSubmit} className="composer-form">
           {(modelsError || submitError) && (
             <div className="composer-error">{modelsError || submitError}</div>
+          )}
+
+          {hasInsufficientBalance && (
+            <div className="composer-balance-warning">
+              <span className="balance-warning-icon">$</span>
+              <div className="balance-warning-content">
+                <strong>Insufficient balance</strong>
+                <span>You need at least ${MINIMUM_BALANCE.toFixed(2)} to run a query. Current balance: ${userBalance.toFixed(2)}</span>
+                <Link to="/account" className="balance-warning-link">Add funds →</Link>
+              </div>
+            </div>
           )}
 
           <div className="composer-input-wrapper">

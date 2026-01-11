@@ -85,14 +85,16 @@ class TestConversations:
 
     @pytest.mark.asyncio
     async def test_list_conversations(self, isolated_storage):
-        """List all conversations."""
-        # Create a few conversations
+        """List all conversations (only those with messages)."""
+        # Create a few conversations with messages
         ids = [str(uuid4()) for _ in range(3)]
         for conv_id in ids:
             await isolated_storage.create_conversation(conv_id)
+            await isolated_storage.add_user_message(conv_id, "Hello")
 
         result = await isolated_storage.list_conversations()
 
+        # Only conversations with messages should be listed
         assert len(result) == 3
         result_ids = [c["id"] for c in result]
         for conv_id in ids:
@@ -100,14 +102,22 @@ class TestConversations:
 
     @pytest.mark.asyncio
     async def test_list_conversations_user_filter(self, isolated_storage):
-        """List conversations filtered by user_id."""
+        """List conversations filtered by user_id (only those with messages)."""
         user_id = uuid4()
         other_user = uuid4()
 
-        # Create 2 for user, 1 for other
-        await isolated_storage.create_conversation(str(uuid4()), user_id=user_id)
-        await isolated_storage.create_conversation(str(uuid4()), user_id=user_id)
-        await isolated_storage.create_conversation(str(uuid4()), user_id=other_user)
+        # Create 2 for user, 1 for other (with messages so they're not filtered)
+        conv1 = str(uuid4())
+        await isolated_storage.create_conversation(conv1, user_id=user_id)
+        await isolated_storage.add_user_message(conv1, "Hello")
+
+        conv2 = str(uuid4())
+        await isolated_storage.create_conversation(conv2, user_id=user_id)
+        await isolated_storage.add_user_message(conv2, "Hello")
+
+        conv3 = str(uuid4())
+        await isolated_storage.create_conversation(conv3, user_id=other_user)
+        await isolated_storage.add_user_message(conv3, "Hello")
 
         # User sees only their 2
         result = await isolated_storage.list_conversations(user_id=user_id)
@@ -116,6 +126,24 @@ class TestConversations:
         # Other user sees only their 1
         result = await isolated_storage.list_conversations(user_id=other_user)
         assert len(result) == 1
+
+    @pytest.mark.asyncio
+    async def test_list_conversations_filters_empty(self, isolated_storage):
+        """Verify that empty conversations are not listed."""
+        # Create conversation without messages (should be filtered out)
+        empty_conv = str(uuid4())
+        await isolated_storage.create_conversation(empty_conv)
+
+        # Create conversation with messages (should be listed)
+        conv_with_msg = str(uuid4())
+        await isolated_storage.create_conversation(conv_with_msg)
+        await isolated_storage.add_user_message(conv_with_msg, "Hello")
+
+        result = await isolated_storage.list_conversations()
+
+        # Only the conversation with messages should appear
+        assert len(result) == 1
+        assert result[0]["id"] == conv_with_msg
 
     @pytest.mark.asyncio
     async def test_add_user_message(self, isolated_storage):

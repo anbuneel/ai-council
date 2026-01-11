@@ -234,6 +234,9 @@ async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, A
     """
     List all conversations (metadata only).
 
+    Filters out empty conversations (those with no messages) to prevent
+    orphaned entries from appearing in the archive.
+
     Args:
         user_id: Optional user ID to filter by
 
@@ -249,6 +252,7 @@ async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, A
             LEFT JOIN messages m ON c.id = m.conversation_id
             WHERE c.user_id = $1
             GROUP BY c.id, c.title, c.created_at
+            HAVING COUNT(m.id) > 0
             ORDER BY c.created_at DESC
             """,
             user_id
@@ -261,6 +265,7 @@ async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, A
             FROM conversations c
             LEFT JOIN messages m ON c.id = m.conversation_id
             GROUP BY c.id, c.title, c.created_at
+            HAVING COUNT(m.id) > 0
             ORDER BY c.created_at DESC
             """
         )

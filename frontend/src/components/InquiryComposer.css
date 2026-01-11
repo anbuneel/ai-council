@@ -62,6 +62,74 @@
 }
 
 /* ==========================================================================
+   Balance Warning - Insufficient Funds Notice
+   ========================================================================== */
+.composer-balance-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--accent-gold-bg) 0%, #FFF8E1 100%);
+  border: 1px solid var(--accent-gold);
+  border-left: 4px solid var(--accent-gold);
+  border-radius: var(--radius-md);
+}
+
+.balance-warning-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  color: white;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.balance-warning-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.balance-warning-content strong {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #7A5B00;
+}
+
+.balance-warning-content span {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: #8B6914;
+  line-height: 1.4;
+}
+
+.balance-warning-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.375rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent-gold-dark, #8B6914);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.balance-warning-link:hover {
+  color: #5C3D00;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
    Question Input - The Hero
    ========================================================================== */
 .composer-input-wrapper {

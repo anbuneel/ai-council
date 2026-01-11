@@ -199,6 +199,8 @@ export default function ChatInterface({
                     onSubmit={onCreateAndSubmit}
                     isSubmitting={isCreating}
                     submitError={createError}
+                    userBalance={userBalance}
+                    isByokMode={isByokMode}
                 />
             </div>
         );

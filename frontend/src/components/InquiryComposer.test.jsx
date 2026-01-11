@@ -1,7 +1,13 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import InquiryComposer from './InquiryComposer'
+
+// Helper to wrap component with router
+const renderWithRouter = (ui, options = {}) => {
+  return render(<MemoryRouter>{ui}</MemoryRouter>, options)
+}
 
 const mockModels = [
   'openai/gpt-4',
@@ -19,6 +25,8 @@ const defaultProps = {
   onSubmit: vi.fn(),
   isSubmitting: false,
   submitError: null,
+  userBalance: 1.00, // Above minimum balance to enable form
+  isByokMode: false,
 }
 
 describe('InquiryComposer', () => {
@@ -28,38 +36,38 @@ describe('InquiryComposer', () => {
 
   describe('rendering', () => {
     it('renders heading', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByText('What would you like to ask?')).toBeInTheDocument()
     })
 
     it('renders textarea with placeholder', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByPlaceholderText('Enter your question here...')).toBeInTheDocument()
     })
 
     it('renders config toggle with model count', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByText(/Configure Models/)).toBeInTheDocument()
       expect(screen.getByText(/\(2\)/)).toBeInTheDocument()
     })
 
     it('renders submit button', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByRole('button', { name: /Begin Deliberation/i })).toBeInTheDocument()
     })
 
     it('renders keyboard hint', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByText(/⌘\/Ctrl \+ Enter to submit/)).toBeInTheDocument()
     })
 
     it('renders privacy disclosure with links', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByText(/OpenRouter/)).toBeInTheDocument()
       expect(screen.getByText(/Privacy Policy/)).toBeInTheDocument()
@@ -69,7 +77,7 @@ describe('InquiryComposer', () => {
   describe('model configuration', () => {
     it('opens config panel when toggle clicked', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -79,7 +87,7 @@ describe('InquiryComposer', () => {
 
     it('shows model chips when config open', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -90,7 +98,7 @@ describe('InquiryComposer', () => {
 
     it('shows selected state on default models', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -103,7 +111,7 @@ describe('InquiryComposer', () => {
 
     it('toggles model selection on chip click', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -117,7 +125,7 @@ describe('InquiryComposer', () => {
 
     it('shows warning when less than 2 models selected', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -129,7 +137,7 @@ describe('InquiryComposer', () => {
 
     it('changes lead model via dropdown', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 
@@ -141,7 +149,7 @@ describe('InquiryComposer', () => {
 
     it('updates aria-expanded on toggle', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       const toggle = screen.getByRole('button', { name: /Configure Models/ })
 
@@ -155,14 +163,14 @@ describe('InquiryComposer', () => {
 
   describe('form submission', () => {
     it('disables submit when question is empty', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       expect(screen.getByRole('button', { name: /Begin Deliberation/i })).toBeDisabled()
     })
 
     it('enables submit when question entered and models valid', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.type(screen.getByPlaceholderText('Enter your question here...'), 'Test question')
 
@@ -171,7 +179,7 @@ describe('InquiryComposer', () => {
 
     it('calls onSubmit with correct data', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.type(screen.getByPlaceholderText('Enter your question here...'), 'What is AI?')
       await user.click(screen.getByRole('button', { name: /Begin Deliberation/i }))
@@ -185,7 +193,7 @@ describe('InquiryComposer', () => {
 
     it('submits on Ctrl+Enter', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       const textarea = screen.getByPlaceholderText('Enter your question here...')
       await user.type(textarea, 'Test question')
@@ -196,7 +204,7 @@ describe('InquiryComposer', () => {
 
     it('submits on Meta+Enter (Mac)', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       const textarea = screen.getByPlaceholderText('Enter your question here...')
       await user.type(textarea, 'Test question')
@@ -207,7 +215,7 @@ describe('InquiryComposer', () => {
 
     it('trims question whitespace', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.type(screen.getByPlaceholderText('Enter your question here...'), '  Test question  ')
       await user.click(screen.getByRole('button', { name: /Begin Deliberation/i }))
@@ -220,31 +228,31 @@ describe('InquiryComposer', () => {
 
   describe('loading states', () => {
     it('shows loading text when models loading', () => {
-      render(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
 
       expect(screen.getByText('Loading models...')).toBeInTheDocument()
     })
 
     it('disables textarea when models loading', () => {
-      render(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
 
       expect(screen.getByPlaceholderText('Enter your question here...')).toBeDisabled()
     })
 
     it('disables config toggle when models loading', () => {
-      render(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} isLoadingModels={true} />)
 
       expect(screen.getByRole('button', { name: /Loading models/ })).toBeDisabled()
     })
 
     it('shows spinner when submitting', () => {
-      render(<InquiryComposer {...defaultProps} isSubmitting={true} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} isSubmitting={true} />)
 
       expect(screen.getByText('Asking...')).toBeInTheDocument()
     })
 
     it('disables form when submitting', () => {
-      render(<InquiryComposer {...defaultProps} isSubmitting={true} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} isSubmitting={true} />)
 
       expect(screen.getByPlaceholderText('Enter your question here...')).toBeDisabled()
     })
@@ -252,28 +260,62 @@ describe('InquiryComposer', () => {
 
   describe('error states', () => {
     it('shows models error', () => {
-      render(<InquiryComposer {...defaultProps} modelsError="Failed to load models" />)
+      renderWithRouter(<InquiryComposer {...defaultProps} modelsError="Failed to load models" />)
 
       expect(screen.getByText('Failed to load models')).toBeInTheDocument()
     })
 
     it('shows submit error', () => {
-      render(<InquiryComposer {...defaultProps} submitError="Network error" />)
+      renderWithRouter(<InquiryComposer {...defaultProps} submitError="Network error" />)
 
       expect(screen.getByText('Network error')).toBeInTheDocument()
     })
   })
 
+  describe('balance validation', () => {
+    it('shows insufficient balance warning when balance is below minimum', () => {
+      renderWithRouter(<InquiryComposer {...defaultProps} userBalance={0.25} />)
+
+      expect(screen.getByText('Insufficient balance')).toBeInTheDocument()
+      expect(screen.getByText(/You need at least \$0\.50/)).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /Add funds/ })).toBeInTheDocument()
+    })
+
+    it('disables submit when balance is insufficient', async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<InquiryComposer {...defaultProps} userBalance={0.25} />)
+
+      await user.type(screen.getByPlaceholderText('Enter your question here...'), 'Test question')
+
+      expect(screen.getByRole('button', { name: /Begin Deliberation/ })).toBeDisabled()
+    })
+
+    it('does not show balance warning when in BYOK mode', () => {
+      renderWithRouter(<InquiryComposer {...defaultProps} userBalance={0} isByokMode={true} />)
+
+      expect(screen.queryByText('Insufficient balance')).not.toBeInTheDocument()
+    })
+
+    it('enables submit when balance is sufficient', async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<InquiryComposer {...defaultProps} userBalance={1.00} />)
+
+      await user.type(screen.getByPlaceholderText('Enter your question here...'), 'Test question')
+
+      expect(screen.getByRole('button', { name: /Begin Deliberation/ })).toBeEnabled()
+    })
+  })
+
   describe('model initialization', () => {
     it('initializes with default models', () => {
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       // Count should show 2 (the default models)
       expect(screen.getByText(/\(2\)/)).toBeInTheDocument()
     })
 
     it('falls back to first N models when no defaults', () => {
-      render(
+      renderWithRouter(
         <InquiryComposer
           {...defaultProps}
           defaultModels={[]}
@@ -289,7 +331,7 @@ describe('InquiryComposer', () => {
   describe('model label display', () => {
     it('shows short model names without provider prefix', async () => {
       const user = userEvent.setup()
-      render(<InquiryComposer {...defaultProps} />)
+      renderWithRouter(<InquiryComposer {...defaultProps} />)
 
       await user.click(screen.getByText(/Configure Models/))
 

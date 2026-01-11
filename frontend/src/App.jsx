@@ -239,9 +239,11 @@ function AppContent() {
   const handleCreateAndSubmit = async ({ question, models, lead_model }) => {
     setIsCreatingConversation(true);
     setCreateError('');
+    let createdConvId = null; // Track created conversation for cleanup on failure
     try {
       // Step 1: Create the conversation
       const newConv = await api.createConversation({ models, lead_model });
+      createdConvId = newConv.id;
 
       // Don't add to conversations list yet - wait until stage1_complete
       // This prevents empty conversations from cluttering the archive
@@ -375,11 +377,24 @@ function AppContent() {
       });
     } catch (error) {
       console.error('Failed to create and submit:', error);
+
+      // Clean up empty conversation if one was created
+      if (createdConvId) {
+        try {
+          await api.deleteConversation(createdConvId);
+        } catch (deleteError) {
+          console.error('Failed to clean up empty conversation:', deleteError);
+        }
+        setCurrentConversationId(null);
+        setCurrentConversation(null);
+      }
+
       if (error.message === 'Authentication failed') {
         setIsAuthenticated(false);
       } else if (error.status === 402 || error.message?.includes('balance') || error.message?.includes('Insufficient')) {
-        // Insufficient balance - redirect to Account to add funds
-        navigate('/account');
+        // Insufficient balance - show error with link to add funds
+        // This is a fallback for race conditions (balance changed between check and submission)
+        setCreateError('Insufficient balance. Please add funds to continue.');
       } else {
         setCreateError(error.message || 'Failed to submit inquiry.');
       }

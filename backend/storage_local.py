@@ -72,7 +72,12 @@ async def get_conversation(conversation_id: str, user_id: Optional[UUID] = None)
 
 
 async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, Any]]:
-    """List all conversations (metadata only), optionally filtered by user_id."""
+    """
+    List all conversations (metadata only), optionally filtered by user_id.
+
+    Filters out empty conversations (those with no messages) to prevent
+    orphaned entries from appearing in the archive.
+    """
     _ensure_data_dir()
 
     conversations = []
@@ -85,11 +90,15 @@ async def list_conversations(user_id: Optional[UUID] = None) -> List[Dict[str, A
                     conv_user_id = conv.get("user_id")
                     if conv_user_id != str(user_id):
                         continue
+                # Filter out empty conversations
+                message_count = len(conv.get("messages", []))
+                if message_count == 0:
+                    continue
                 conversations.append({
                     "id": conv["id"],
                     "created_at": conv["created_at"],
                     "title": conv.get("title", "Untitled"),
-                    "message_count": len(conv.get("messages", []))
+                    "message_count": message_count
                 })
         except (json.JSONDecodeError, KeyError):
             continue

@@ -631,6 +631,17 @@ An editorial/newspaper-inspired light theme that treats Quinthesis as a prestigi
 - Static "Typical cost: $0.05–0.20" shown before query submission
 - Helps users understand pricing before committing
 
+### Balance Validation
+- **Minimum balance:** $0.50 required to submit a query (defined in `backend/main.py` and `frontend/src/config.js`)
+- **Frontend validation:** InquiryComposer checks balance before allowing submission
+- **Insufficient balance UX:**
+  - Gold warning box displays: "Insufficient balance - You need at least $0.50 to run a query. Current balance: $X.XX"
+  - "Add funds →" link navigates to Account page
+  - Submit button is disabled
+- **BYOK mode:** Users with their own OpenRouter API key bypass balance checks entirely
+- **Empty conversation cleanup:** If a 402 error occurs after conversation creation, the empty conversation is deleted automatically
+- **Backend defense:** `list_conversations` filters out empty conversations (those with no messages)
+
 ### Deposit Options
 - $1, $2, $5, $10 tiers (lower barrier to entry)
 - Stored in `deposit_options` database table

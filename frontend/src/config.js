@@ -22,3 +22,7 @@ export const DEMO_VERSION = {
   lastUpdated: "2026-01-05",
   description: "Demos: Specialist vs Generalist (career), India Test XI (sports), EV Buy vs Lease (consumer), Serene Places (travel)",
 };
+
+// Minimum balance required to run a query (in dollars)
+// Must match backend MINIMUM_BALANCE in main.py
+export const MINIMUM_BALANCE = 0.50;
