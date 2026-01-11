@@ -107,7 +107,7 @@ export default function InquiryComposer({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isSubmitting || isLoadingModels}
+              disabled={isSubmitting || isLoadingModels || hasInsufficientBalance}
               rows={5}
             />
             <span className="composer-hint">⌘/Ctrl + Enter to submit</span>

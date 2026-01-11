@@ -362,6 +362,10 @@ function Account({ userEmail, userBalance, isByokMode, onLogout, onRefreshBalanc
                   <span className="pricing-bullet"></span>
                   <span>No monthly fees, no subscriptions — just pay as you go</span>
                 </li>
+                <li>
+                  <span className="pricing-bullet"></span>
+                  <span>Minimum balance of <strong>$0.50</strong> required to run inquiries</span>
+                </li>
               </ul>
             </div>
           </section>

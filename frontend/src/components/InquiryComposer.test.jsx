@@ -281,12 +281,10 @@ describe('InquiryComposer', () => {
       expect(screen.getByRole('link', { name: /Add funds/ })).toBeInTheDocument()
     })
 
-    it('disables submit when balance is insufficient', async () => {
-      const user = userEvent.setup()
+    it('disables submit and textarea when balance is insufficient', () => {
       renderWithRouter(<InquiryComposer {...defaultProps} userBalance={0.25} />)
 
-      await user.type(screen.getByPlaceholderText('Enter your question here...'), 'Test question')
-
+      expect(screen.getByPlaceholderText('Enter your question here...')).toBeDisabled()
       expect(screen.getByRole('button', { name: /Begin Deliberation/ })).toBeDisabled()
     })
 
