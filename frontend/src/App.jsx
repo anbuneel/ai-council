@@ -12,6 +12,7 @@ import PaymentCancel from './components/PaymentCancel';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import DemoView from './components/DemoView';
+import HowItWorks from './components/HowItWorks';
 import { api, auth, billing, hasTokens, clearTokens } from './api';
 import './App.css';
 
@@ -753,6 +754,10 @@ function AppContent() {
         <Route
           path="/demo"
           element={<DemoView />}
+        />
+        <Route
+          path="/how-it-works"
+          element={<HowItWorks />}
         />
         <Route
           path="/account"

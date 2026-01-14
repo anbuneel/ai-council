@@ -82,23 +82,43 @@ function Login({ onLogin }) {
             </div>
           </div>
 
-          {/* Demo CTA */}
-          <a href="/demo" className="demo-link">
-            <span className="demo-link-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          {/* How It Works + Demo links */}
+          <div className="login-cta-links">
+            <a href="/how-it-works" className="demo-link">
+              <span className="demo-link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </span>
+              <span className="demo-link-text">
+                <span className="demo-link-title">How It Works</span>
+                <span className="demo-link-subtitle">See the 3-stage pipeline</span>
+              </span>
+              <svg className="demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
               </svg>
-            </span>
-            <span className="demo-link-text">
-              <span className="demo-link-title">See Example Deliberations</span>
-              <span className="demo-link-subtitle">Browse real deliberations</span>
-            </span>
-            <svg className="demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </a>
+            </a>
+
+            <a href="/demo" className="demo-link">
+              <span className="demo-link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+              </span>
+              <span className="demo-link-text">
+                <span className="demo-link-title">Example Deliberations</span>
+                <span className="demo-link-subtitle">Browse real deliberations</span>
+              </span>
+              <svg className="demo-link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
 
           {/* Attribution - visible on desktop */}
           <div className="attribution-desktop">
